@@ -3,9 +3,9 @@ Contributors: mateuszgbiorczyk
 Donate link: https://url.mattplugins.com/converter-readme-donate-link
 Tags: convert webp, webp, optimize images, image optimization, compress images
 Requires at least: 4.9
-Tested up to: 6.7
-Requires PHP: 7.0
-Stable tag: 6.1.3
+Tested up to: 7.0
+Requires PHP: 7.4
+Stable tag: 6.6.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -17,15 +17,19 @@ Speed up your website by using our WebP & AVIF Converter. Optimize images and se
 
 [youtube https://www.youtube.com/watch?v=Ls2h38avpRw]
 
-After installing the plugin you do not have to do anything more. Your current images will be converted into a new format. When image optimization by our image optimizer is finished, users will automatically receive new, much lighter images than the original ones.
+After installing the plugin, you can optimize your entire Media Library with a single click — no further action required. When image optimization finishes, every visitor will automatically receive new images with significantly reduced file sizes.
 
-As of today, over 90% of users use browsers that support the WebP format. The loading time of your website depends to a large extent on its weight and the level of image optimization. **Using our WebP Converter, now you can and speed up it in a few seconds without much effort!**
+As of today, over 95% of users use browsers that support the WebP format. The loading time of your website depends to a large extent on its weight and the level of image optimization. **Using our WebP Converter, now you can and speed up it in a few seconds without much effort!**
 
 This will be a profit both for your users who will not have to download so much data, but also for a server that will be less loaded. Remember that a better optimized website also affects your Google ranking. Image optimization is very important.
 
 #### AVIF support
 
-Now in [the PRO version](https://url.mattplugins.com/converter-readme-avif-support-upgrade) you can use AVIF as the output format for your images. The AVIF format is a new extension - is the successor to WebP. **AVIF allows you to achieve even higher levels of image compression**, and the quality of the converted images after image optimization is better than in WebP.
+Now in [the PRO version](https://url.mattplugins.com/converter-readme-avif-support-upgrade) you can use AVIF as the output format for your images. The AVIF format is a new extension — is the successor to WebP. **Images converted to the AVIF format weigh about 50% less than images converted only to the WebP format**, while maintaining better image quality.
+
+Enjoy peace of mind knowing that AVIF is supported by over 90% of browsers. And if any visitor has an older browser, our plugin will automatically fall back to WebP — so every user gets fast, high-quality images without a hitch.
+
+Unlock the magic of AVIF in our PRO version — [upgrade today](https://url.mattplugins.com/converter-readme-avif-support-upgrade-2) for unparalleled image performance.
 
 #### How does this work?
 
@@ -43,15 +47,15 @@ A guide on how to test whether the plugin is working properly can be found [here
 
 Optimize images and raise your website to a new level now! Install the plugin and enjoy the website that loads faster by image optimization. Surely you and your users will appreciate it.
 
+Converting images to WebP and AVIF simultaneously guarantees the lowest weight of your images and compatibility with all browsers. By using [the AVIF format](https://url.mattplugins.com/converter-readme-both-formats-upgrade) you will reduce the weight of your images even more compared to WebP.
+
 #### Support for additional directories
 
 You can convert WebP and AVIF, and optimize images not only from `/uploads` directory but also from `/plugins` and `/themes` directories. This allows full integration with WebP and AVIF formats!
 
-#### Support to the development of plugin
+#### Development of the plugin
 
-We spend hours working on the development of this plugin. Technical support also requires a lot of time, but we do it because we want to offer you the best plugin. We enjoy every new plugin installation.
-
-If you would like to appreciate it, you can try [the PRO version](https://url.mattplugins.com/converter-readme-development-support-upgrade). In addition, you will gain access to extra functionalities that will allow you to achieve **even better image optimization results**.
+If you love our plugin, [leave a ★★★★★ review on WordPress.org](https://url.mattplugins.com/converter-readme-development-support-review) — it really makes our day and helps others discover it!
 
 #### Please also read the FAQ below. Thank you for being with us!
 
@@ -71,7 +75,7 @@ That's all! Your website is already loading faster!
 
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team help validate, triage and handle any security vulnerabilities.
 
-[Report a security vulnerability.](https://patchstack.com/database/vdp/webp-converter-for-media)
+[Report a security vulnerability](https://patchstack.com/database/vdp/webp-converter-for-media)
 
 = How to get technical support? (before you ask for help) =
 
@@ -305,35 +309,44 @@ Current list of supported CDN servers:
 
 == Changelog ==
 
-= 6.1.3 (2024-11-19) =
-* `[Fixed]` Translations in command registration for WP-CLI
-* `[Added]` Support for WordPress 6.7
+= 6.6.1 (2026-06-03) =
+* `[Added]` Blocking of automatic image conversion when uploading images to Media Library during some server configuration errors
+* `[Added]` Blocking of automatic image conversion via WP-Cron during some server configuration errors
+* `[Added]` Blocking of `regenerate` command in WP-CLI during some server configuration errors
 
-= 6.1.2 (2024-10-26) =
-* `[Fixed]` Removing converted files after uninstalling plugin
+= 6.6.0 (2026-05-19) =
+* `[Changed]` Minimum required PHP version from 7.1 to 7.4
+* `[Added]` Compatibility with PHP 8.5
+* `[Added]` Support for WordPress 7.0
 
-= 6.1.1 (2024-10-02) =
-* `[Changed]` Bulk Optimization of Images section
+= 6.5.6 (2026-05-07) =
+* `[Fixed]` Handling of trailing slashes in REST API endpoint URLs
 
-= 6.1.0 (2024-09-13) =
-* `[Removed]` Filter `webpc_supported_source_directory`
-* `[Fixed]` Handling of excluded directories when uploading new images
-* `[Fixed]` Handling of excluded filenames when uploading new images
-* `[Fixed]` Adding support for custom directories using webpc_source_directories filter
-* `[Fixed]` Verification of rewrites_not_working server configuration error when HTTP referer is required
+= 6.5.5 (2026-04-02) =
+* `[Fixed]` Fatal error when source image is not a valid image file
 
-= 6.0.0 (2024-08-28) =
-* `[Fixed]` Generating statistics on plugin settings page when WebP format is unchecked
-* `[Fixed]` Restoring original images in Media Library
-* `[Changed]` Optimization statistics in Media Library
-* `[Added]` Warnings with explanations in plugin settings field: Image loading mode
+= 6.5.4 (2026-02-26) =
+* `[Fixed]` Displaying notification about Cloudflare cache
 
-= 5.13.1 (2024-08-04) =
-* `[Changed]` Optimization statistics in Media Library
+= 6.5.3 (2026-01-24) =
+* `[Changed]` The Pass Thru loading mode is now restricted to standard WordPress directory structures only
 
-= 5.13.0 (2024-06-27) =
-* `[Fixed]` Filter `webpc_option_quality_levels` to change conversion quality levels
-* `[Added]` Support for WordPress 6.6
+= 6.5.2 (2026-01-24) =
+* `[Security]` Replaced cURL-based fetching with native readfile(), implemented a whitelist of trusted website URLs and stricter extension validation in the Pass Thru loading mode to prevent unauthorized server-side requests (CVE-2026-1356)
+* `[Security]` Implemented physical path identity verification for the Pass Thru loading mode using realpath() to provide extra protection against Directory Traversal
+* `[Security]` Added X-Content-Type-Options: nosniff header for browser-side protection in the Pass Thru loading mode
+* `[Fixed]` Priority logic for loading next-generation image formats (AVIF/WebP)
+* `[Added]` Automatic refresh of an image loading mode after a plugin update
+* `[Added]` Significant performance boost for the Pass Thru loading mode by direct filesystem access instead of cURL requests
+* `[Added]` Support for Content-Length headers to optimize image delivery in the Pass Thru loading mode
+
+= 6.5.1 (2026-01-23) =
+* Version superseded by 6.5.2
+
+= 6.5.0 (2026-01-11) =
+* `[Fixed]` Rewrite rules to handle environments where RewriteRule may receive an absolute filesystem path
+* `[Changed]` Field to select the format to which the images should be converted
+* `[Added]` Settings field to modify the prefix used in RewriteRule to fix the absolute filesystem path issue
 
 See [changelog.txt](https://url.mattplugins.com/converter-readme-changelog) for previous versions.
 

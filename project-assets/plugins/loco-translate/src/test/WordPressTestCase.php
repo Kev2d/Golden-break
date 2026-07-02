@@ -1,38 +1,31 @@
 <?php
 /**
- * Test case extending the WordPress base
+ * Test case extending the WordPress base.
+ * The IDE isn't picking up assertion methods, because of the way this inheritance chain is working.
+ * @mixin PHPUnit\Framework\TestCase
  */
 abstract class Loco_test_WordPressTestCase extends WP_UnitTestCase {
 
-    /**
-     * @var string
-     */
-    private $locale = 'en_US';
+    private string $locale = 'en_US';
 
     /**
-     * @var array [ location, status ]
+     * @var null|array [ location, status ]
      */
-    private $redirect;
+    private ?array $redirect = null;
 
-    /**
-     * @var string
-     */
-    private $fs_method;
+    private ?string $fs_method = null;
 
     /**
      * @var bool
      */
-    private $fs_allow = true;
+    private bool $fs_allow = true;
 
     /**
      * @var Loco_data_Cookie[]
      */
-    private $cookies_set;
+    private ?array $cookies_set = null;
 
-    /**
-     * @var Loco_output_Buffer
-     */
-    private $buffer;
+    private ?Loco_output_Buffer $buffer = null;
     
     
     /**
@@ -110,6 +103,8 @@ abstract class Loco_test_WordPressTestCase extends WP_UnitTestCase {
         if( ! isset($sniff['empty-theme']) ){
             delete_site_transient( 'theme_roots' );
         }
+        remove_all_filters('template');
+        remove_all_filters('stylesheet');
         // test plugins require a filter as multiple roots not supported in wp
         remove_all_filters('loco_missing_plugin');
         add_filter( 'loco_missing_plugin', [__CLASS__,'filter_allows_fake_plugins_to_exist'], 10, 2 );
@@ -143,6 +138,10 @@ abstract class Loco_test_WordPressTestCase extends WP_UnitTestCase {
         if( Loco_error_AdminNotices::destroy() ){
             throw new Exception('Refusing to start test with errors in buffer');
         }
+        // Set permissive writeable directories for all tests
+        Loco_data_Settings::get()->populate([
+            'fs_basedir' => dirname(ABSPATH),
+        ])->persist();
     }
     
     
@@ -183,16 +182,13 @@ abstract class Loco_test_WordPressTestCase extends WP_UnitTestCase {
     /**
      * Capture cookie and prevent actual http sending
      */
-    public function captureCookie( Loco_data_Cookie $cookie ){
+    public function captureCookie( Loco_data_Cookie $cookie ):bool {
         $this->cookies_set[ $cookie->getName() ] = $cookie;
         return false;
     }
 
 
-    /**
-     * @return Loco_data_Cookie
-     */
-    public function assertCookieSet( $name, $message = '' ){
+    public function assertCookieSet( string $name, string $message = '' ):Loco_data_Cookie{
         $this->assertArrayHasKey( $name, $this->cookies_set, $message );
         $cookie = $this->cookies_set[ $name ];
         $this->assertInstanceOf( 'Loco_data_Cookie', $cookie, $message );
@@ -209,7 +205,7 @@ abstract class Loco_test_WordPressTestCase extends WP_UnitTestCase {
         $router = new Loco_mvc_AdminRouter;
         $router->on_admin_menu();
         $screen = get_current_screen();
-        $action = isset($_GET['action']) ? $_GET['action'] : null;
+        $action = $_GET['action'] ?? '';
         $router->initPage( $screen, $action );
         $html = get_echo( [$router,'renderPage'] );
         // ensure further hooks fired as WordPress continues to render admin footer
@@ -228,7 +224,7 @@ abstract class Loco_test_WordPressTestCase extends WP_UnitTestCase {
      * Invoke Ajax controller without full hook set up.
      * @return string JSON
      */
-    protected function renderAjax(){
+    protected function renderAjax():string {
         wp_magic_quotes(); // <- I hate this, but it's what WP does!
         $router = new Loco_mvc_AjaxRouter;
         $router->on_init();
@@ -259,7 +255,7 @@ abstract class Loco_test_WordPressTestCase extends WP_UnitTestCase {
     /**
      * @return Loco_test_WordPressTestCase
      */
-    public function disable_file_mods(){
+    public function disable_file_mods():self {
         $this->fs_allow = false;
         return $this;
     } 
@@ -281,7 +277,7 @@ abstract class Loco_test_WordPressTestCase extends WP_UnitTestCase {
      * Filters DISALLOW_FILE_MODS for WP < 4.8
      * @internal
      */
-    public function filter_fs_disallow(){
+    public function filter_fs_disallow():bool {
         return ! $this->fs_allow;
     }    
 
@@ -291,7 +287,7 @@ abstract class Loco_test_WordPressTestCase extends WP_UnitTestCase {
      * @internal
      * @noinspection PhpUnusedParameterInspection
      */
-    public function filter_fs_allow_context( $context, Loco_fs_File $file = null ){
+    public function filter_fs_allow_context( $context, ?Loco_fs_File $file = null ):string {
         return 'loco_test';
     }
 
@@ -371,6 +367,17 @@ abstract class Loco_test_WordPressTestCase extends WP_UnitTestCase {
 
 
     /**
+     * Fully unload a text domain
+     */
+    protected function unload_textdomain( string $domain ):void {
+        global $l10n, $l10n_unloaded;
+        unload_textdomain( $domain );
+        unset($l10n[$domain],$l10n_unloaded[$domain]);
+    }
+
+
+
+    /**
      * Disallow network access
      * @return void
      */
@@ -433,16 +440,15 @@ abstract class Loco_test_WordPressTestCase extends WP_UnitTestCase {
     /**
      * @internal
      */
-    public function _filter_locale(){
+    public function _filter_locale():string {
         return $this->locale;
     }
 
 
     /**
      * Temporarily set test data root to content directory 
-     * @return void
      */
-    public function enable_test_content_dir(){
+    public function enable_test_content_dir():void {
         remove_all_filters('loco_constant_WP_CONTENT_DIR');
         add_filter('loco_constant_WP_CONTENT_DIR', [$this,'_filter_wp_content_dir'], 10, 0 );
     }
@@ -451,7 +457,7 @@ abstract class Loco_test_WordPressTestCase extends WP_UnitTestCase {
     /**
      * @internal
      */
-    public function _filter_wp_content_dir(){
+    public function _filter_wp_content_dir():string {
         return LOCO_TEST_DATA_ROOT;
     }
 
@@ -472,15 +478,38 @@ abstract class Loco_test_WordPressTestCase extends WP_UnitTestCase {
         $this->redirect = func_get_args();
         return false;
     }
+    
+    
+    
+    
+    protected function activate_test_theme( string $slug ):void {
+        $closure = function () use( $slug ){
+            return $slug;
+        };
+        add_filter('stylesheet', $closure,10,0);
+        add_filter('template', $closure, 10,0);
+       /* add_filter('theme_root',function ($theme_root){
+            Loco_error_Debug::trace('? %s',$theme_root);
+            return $theme_root;
+        },10,1);*/
+        /*add_filter('stylesheet_directory', function( $stylesheet_dir, $stylesheet, $theme_root) {
+            Loco_error_Debug::trace('%s',$stylesheet_dir);
+            Loco_error_Debug::trace('%s',$stylesheet);
+            Loco_error_Debug::trace('%s',$theme_root);
+            return $stylesheet_dir;
+        }, 10, 3 );*/
+    }
+    
+    
 
 
     /**
      * @internal 
      */
-    public static function filter_allows_fake_plugins_to_exist( array $data, $handle ){
+    public static function filter_allows_fake_plugins_to_exist( array $data, $handle ):array {
         $file = LOCO_TEST_DATA_ROOT.'/plugins/'.$handle;
         if( file_exists($file) && is_file($file) ) {
-            $data = get_plugin_data($file);
+            $data = get_plugin_data($file,false,false);
             $snip = -strlen($handle);
             $data['basedir'] = substr($file,0,--$snip);
         }
@@ -488,12 +517,13 @@ abstract class Loco_test_WordPressTestCase extends WP_UnitTestCase {
     }
     
     
-    public static function filter_enforce_test_plugins_only( $path ){
+    public static function filter_enforce_test_plugins_only( string $path ):string {
         return LOCO_TEST_DATA_ROOT.'/'.basename($path);
     }
     
     
     public function enable_test_plugins(){
+        wp_cache_delete('plugins','loco');
         add_filter('loco_constant_WP_PLUGIN_DIR',[__CLASS__,'filter_enforce_test_plugins_only']);
         add_filter('loco_constant_WPMU_PLUGIN_DIR',[__CLASS__,'filter_enforce_test_plugins_only']);
     }

@@ -21,26 +21,14 @@ class AIOWPSecurity_List_Debug_Log extends AIOWPSecurity_List_Table {
 	}
 	
 	/**
-	 * Returns logtime column in datetime format as per user setting time zone.
+	 * Renders logtime column in datetime format as per user setting time zone.
 	 *
 	 * @param array $item - data for the columns on the current row
 	 *
-	 * @return string - the datetime
+	 * @return void
 	 */
 	public function column_logtime($item) {
-		return AIOWPSecurity_Utility::convert_timestamp($item['logtime']);
-	}
-
-	/**
-	 * This function renders a default column item
-	 *
-	 * @param array  $item        - Item object
-	 * @param string $column_name - Column name to be rendered from item object
-	 *
-	 * @return mixed - data to be rendered for column
-	 */
-	public function column_default($item, $column_name) {
-		return $item[$column_name];
+		echo esc_html(AIOWPSecurity_Utility::convert_timestamp($item['logtime']));
 	}
 
 	/**
@@ -110,8 +98,10 @@ class AIOWPSecurity_List_Debug_Log extends AIOWPSecurity_List_Table {
 		/* -- Ordering parameters -- */
 
 		//Parameters that are going to be used to order the result
-		isset($_GET["orderby"]) ? $orderby = strip_tags($_GET["orderby"]) : $orderby = '';
-		isset($_GET["order"]) ? $order = strip_tags($_GET["order"]) : $order = '';
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- PCP warning. No nonce.
+		isset($_GET["orderby"]) ? $orderby = sanitize_text_field(wp_unslash($_GET["orderby"])) : $orderby = '';
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- PCP warning. No nonce.
+		isset($_GET["order"]) ? $order = sanitize_text_field(wp_unslash($_GET["order"])) : $order = '';
 
 		// By default show the most recent debug log entries.
 		$orderby = !empty($orderby) ? esc_sql($orderby) : 'logtime';
@@ -126,11 +116,14 @@ class AIOWPSecurity_List_Debug_Log extends AIOWPSecurity_List_Table {
 		$where_sql = (!is_super_admin()) ? 'WHERE site_id = '.get_current_blog_id() : '';
 
 		if ($ignore_pagination) {
-			$data = $wpdb->get_results("SELECT * FROM {$debug_log_tbl} {$where_sql} ORDER BY {$orderby} {$order}", 'ARRAY_A');
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- PCP warning. Ignore.
+			$data = $wpdb->get_results("SELECT * FROM {$debug_log_tbl}$where_sql ORDER BY $orderby $order", 'ARRAY_A');
 		} else {
-			$data = $wpdb->get_results("SELECT * FROM {$debug_log_tbl} {$where_sql} ORDER BY {$orderby} {$order} LIMIT {$per_page} OFFSET {$offset}", 'ARRAY_A');
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- PCP warning. Ignore.
+			$data = $wpdb->get_results("SELECT * FROM {$debug_log_tbl} $where_sql ORDER BY $orderby $order LIMIT $per_page OFFSET $offset", 'ARRAY_A');
 		}
-		$total_items = $wpdb->get_var("SELECT COUNT(*) FROM {$debug_log_tbl} {$where_sql}");
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- PCP warning. Ignore.
+		$total_items = $wpdb->get_var("SELECT COUNT(*) FROM {$debug_log_tbl} $where_sql");
 		$this->items = $data;
 
 		if ($ignore_pagination) return;

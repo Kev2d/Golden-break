@@ -1,6 +1,6 @@
-<?php if (have_rows('footer_social_media_icons', 'option')) : ?>
+﻿<?php if (have_rows('footer_social_media_icons', 'option')) : ?>
 
-    <nav class="footer-social" aria-label="<?php _e('Social media links', 'keweb'); ?>">
+    <nav class="footer-social" aria-label="<?php _e('Social media links', 'golden-break'); ?>">
         <ul class="footer-social__list">
             <?php while (have_rows('footer_social_media_icons', 'option')) : the_row(); ?>
                 <li>
@@ -17,7 +17,7 @@
                         }
 
                         if (empty($alt_text)) {
-                            $alt_text = __('Social media link', 'keweb');
+                            $alt_text = __('Social media link', 'golden-break');
                         }
                         ?>
                         <a href="<?php echo esc_url($link); ?>" aria-label="<?php echo esc_attr($alt_text); ?>">

@@ -21,36 +21,21 @@ use WebpConverter\Settings\Page\PageIntegrator;
  */
 class MediaStatusViewer implements HookableInterface {
 
-	/**
-	 * @var PluginData
-	 */
-	private $plugin_data;
+	private PluginData $plugin_data;
 
-	/**
-	 * @var TokenRepository
-	 */
-	private $token_repository;
+	private TokenRepository $token_repository;
 
-	/**
-	 * @var OutputPathGenerator
-	 */
-	private $output_path;
+	private OutputPathGenerator $output_path;
 
-	/**
-	 * @var AttachmentPathsGenerator|null
-	 */
-	private $attachment = null;
+	private ?AttachmentPathsGenerator $attachment = null;
 
-	/**
-	 * @var Token|null
-	 */
-	private $token = null;
+	private ?Token $token = null;
 
 	public function __construct(
 		PluginData $plugin_data,
 		TokenRepository $token_repository,
 		FormatFactory $format_factory,
-		OutputPathGenerator $output_path = null
+		?OutputPathGenerator $output_path = null
 	) {
 		$this->plugin_data      = $plugin_data;
 		$this->token_repository = $token_repository;
@@ -60,16 +45,15 @@ class MediaStatusViewer implements HookableInterface {
 	/**
 	 * {@inheritdoc}
 	 */
-	public function init_hooks() {
+	public function init_hooks(): void {
 		add_action( 'admin_init', [ $this, 'init_hooks_after_setup' ] );
 		add_filter( 'webpc_attachment_stats', [ $this, 'get_conversion_stats_for_attachment' ], 10, 3 );
 	}
 
 	/**
-	 * @return void
 	 * @internal
 	 */
-	public function init_hooks_after_setup() {
+	public function init_hooks_after_setup(): void {
 		$plugin_settings = $this->plugin_data->get_plugin_settings();
 		if ( ! $plugin_settings[ MediaStatsOption::OPTION_NAME ] ) {
 			return;
@@ -89,7 +73,7 @@ class MediaStatusViewer implements HookableInterface {
 	 * @return string|null
 	 * @internal
 	 */
-	public function get_conversion_stats_for_attachment( string $current_value, int $post_id, int $strategy_level = null ) {
+	public function get_conversion_stats_for_attachment( string $current_value, int $post_id, ?int $strategy_level = null ): ?string {
 		$conversion_status = $this->get_conversion_status( $post_id, $strategy_level );
 		if ( $conversion_status === null ) {
 			return null;
@@ -113,11 +97,10 @@ class MediaStatusViewer implements HookableInterface {
 	 * @param string $column_name .
 	 * @param int    $post_id     .
 	 *
-	 * @return void
 	 * @internal
 	 */
-	public function print_table_column_value( string $column_name, int $post_id ) {
-		if ( $column_name !== 'webpc_status' ) {
+	public function print_table_column_value( string $column_name, int $post_id ): void {
+		if ( ( $column_name !== 'webpc_status' ) || ! current_user_can( 'edit_post', $post_id ) ) {
 			return;
 		}
 
@@ -126,7 +109,7 @@ class MediaStatusViewer implements HookableInterface {
 			return;
 		}
 
-		echo sprintf(
+		printf(
 			'<div id="webpc-attachment-trigger-%1$s-wrapper">%2$s</div>',
 			esc_attr( (string) $post_id ),
 			wp_kses( $conversion_stats, $this->get_allowed_html_tags() )
@@ -136,10 +119,9 @@ class MediaStatusViewer implements HookableInterface {
 	/**
 	 * @param \WP_Post $post .
 	 *
-	 * @return void
 	 * @internal
 	 */
-	public function print_attachment_sidebar_value( \WP_Post $post ) {
+	public function print_attachment_sidebar_value( \WP_Post $post ): void {
 		$conversion_stats = $this->get_conversion_stats_for_attachment( '', $post->ID );
 		if ( $conversion_stats === null ) {
 			return;
@@ -208,7 +190,7 @@ class MediaStatusViewer implements HookableInterface {
 	 *
 	 * @return string[]|null
 	 */
-	private function get_conversion_status( int $post_id, int $strategy_level = null ) {
+	private function get_conversion_status( int $post_id, ?int $strategy_level = null ): ?array {
 		$this->attachment = $this->attachment ?: new AttachmentPathsGenerator( $this->plugin_data );
 		$this->token      = $this->token ?: $this->token_repository->get_token();
 

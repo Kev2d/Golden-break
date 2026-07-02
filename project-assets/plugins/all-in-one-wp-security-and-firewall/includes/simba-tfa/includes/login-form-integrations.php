@@ -51,7 +51,8 @@ class Simba_TFA_Login_Form_Integrations {
 		add_filter('do_shortcode_tag', array($this, 'do_shortcode_tag'), 10, 2);
 	
 		add_filter('simba_tfa_login_enqueue_localize', array($this, 'simba_tfa_login_enqueue_localize'), 9);
-	
+
+		add_filter('edd_errors', array($this, 'edd_errors'));
 	}
 	
 	/**
@@ -94,7 +95,8 @@ class Simba_TFA_Login_Form_Integrations {
 		// bbPress - June 2021
 		// WooCommerce - ported over from the separate wooextend.js code, June 2021
 		// Affiliates WP - ported over from the separate wooextend.js code, June 2021
-		$localize['login_form_selectors'] .= '.tml-login form[name="loginform"], .tml-login form[name="login"], #loginform, #wpmem_login form, form#ihc_login_form, .bbp-login-form, .woocommerce form.login, #affwp-login-form, #wppb-loginform';
+		// Easy Digital Downloads(EDD) - November 2025
+		$localize['login_form_selectors'] .= '.tml-login form[name="loginform"], .tml-login form[name="login"], #loginform, #wpmem_login form, form#ihc_login_form, .bbp-login-form, .woocommerce form.login, #affwp-login-form, #wppb-loginform, form#edd_login_form';
 		$localize['login_form_off_selectors'] .= '#ihc_login_form';
 		return $localize;
 	}
@@ -110,9 +112,13 @@ class Simba_TFA_Login_Form_Integrations {
 		$login = $affiliate_wp->login;
 		
 		$params = array(
-			'log' => stripslashes($_POST['affwp_user_login']),
-			'caller'=> $_SERVER['PHP_SELF'] ? $_SERVER['PHP_SELF'] : $_SERVER['REQUEST_URI'],
-			'two_factor_code' => isset($_POST['two_factor_code']) ? stripslashes((string) $_POST['two_factor_code']) : '',
+			// phpcs:ignore WordPress.Security.NonceVerification -- No nonce.
+			'log' => isset($_POST['affwp_user_login']) ? sanitize_user(wp_unslash($_POST['affwp_user_login'])): '',
+
+			$request_uri = isset($_SERVER['REQUEST_URI']) ? sanitize_text_field(wp_unslash($_SERVER['REQUEST_URI'])) : '',
+			'caller'=> isset($_SERVER['PHP_SELF']) ? sanitize_text_field(wp_unslash($_SERVER['PHP_SELF'])) : $request_uri,
+			// phpcs:ignore WordPress.Security.NonceVerification -- No nonce.
+			'two_factor_code' => isset($_POST['two_factor_code']) ? sanitize_text_field(wp_unslash((string) $_POST['two_factor_code'])) : '',
 		);
 		$code_ok = $this->tfa->authorise_user_from_login($params, true);
 		
@@ -135,8 +141,31 @@ class Simba_TFA_Login_Form_Integrations {
 	 * @return String
 	 */
 	public function do_shortcode_tag($output, $tag) {
-		if ('ihc-login-form' == $tag) $this->tfa->login_enqueue_scripts();
+		// Enqueue TFA scripts for supported login shortcodes.
+		$supported_shortcodes = array('ihc-login-form', 'edd_login');
+
+		if (in_array($tag, $supported_shortcodes)) {
+			$this->tfa->login_enqueue_scripts();
+		}
 		return $output;
 	}
 
+	/**
+	 * Filters Easy Digital Downloads (EDD) error messages.
+	 *
+	 * Removes the default EDD invalid login error when a Two-Factor Authentication (TFA)
+	 * authentication error is already present. This prevents conflicting error messages
+	 * from being displayed on the EDD login form.
+	 *
+	 * @param array $errors Array of EDD error messages.
+	 *
+	 * @return array
+	 */
+	public function edd_errors($errors) {
+		// Remove default EDD login error if a TFA authentication error exists.
+		if (!empty($errors) && isset($errors['authentication_failed'])) {
+			unset($errors['edd_invalid_login']);
+		}
+		return $errors;
+	}
 }

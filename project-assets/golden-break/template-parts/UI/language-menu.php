@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // Fetch the languages
 $languages = function_exists('icl_get_languages') ? icl_get_languages('skip_missing=0&orderby=code') : array();
 
@@ -13,7 +13,7 @@ if (!empty($languages) && count($languages) > 1) :
     }
 ?>
 
-    <nav aria-label="<?php _e('Language menu', 'keweb'); ?>">
+    <nav aria-label="<?php _e('Language menu', 'golden-break'); ?>">
         <ul class="language-menu common-menu">
             <li class="language">
                 <button class="language__toggle common-menu__toggle" aria-haspopup="true" aria-expanded="false">
@@ -25,7 +25,7 @@ if (!empty($languages) && count($languages) > 1) :
                         <?php
                         get_template_part('template-parts/UI/back-button', null, array(
                             'function' => 'close-language-menu',
-                            'label' => __('Back to previous menu', 'keweb')
+                            'label' => __('Back to previous menu', 'golden-break')
                         ));
                         ?>
                     </li>

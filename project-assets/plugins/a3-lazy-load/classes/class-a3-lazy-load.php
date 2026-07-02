@@ -427,17 +427,25 @@ class LazyLoad
 				// replace the src and add the data-src attribute
 				$replaceHTML = $imgHTML;
 
-				if ( ! preg_match( "/ data-src=['\"]/is", $replaceHTML ) ) {
-					$replaceHTML = preg_replace( '/<img(.*?)src=/is', '<img$1src="' . $this->_placeholder_url . '" data-lazy-type="image" data-src=', $replaceHTML );
-				} elseif ( preg_match( "/ src=['\"]/is", $replaceHTML ) ) {
-					$replaceHTML = preg_replace( '/ src=(["\'])(.*?)["\']/is', ' src="' . $this->_placeholder_url . '"', $replaceHTML );
+				if ( ! preg_match( "/\\sdata-src=['\"]/is", $replaceHTML ) ) {
+					$replaceHTML = preg_replace(
+						'/<img\\b((?:(?:"[^"]*")|(?:\'[^\']*\')|[^"\'<>])*)\\s+src=(["\'])(.*?)\2/is',
+						'<img$1 src="' . $this->_placeholder_url . '" data-lazy-type="image" data-src=$2$3$2',
+						$replaceHTML
+					);
+				} elseif ( preg_match( "/\\s+src=['\"]/is", $replaceHTML ) ) {
+					$replaceHTML = preg_replace( '/\\s+src=(["\'])(.*?)\1/is', ' src="' . $this->_placeholder_url . '"', $replaceHTML );
 				}
 
-				$replaceHTML = preg_replace( '/<img(.*?)srcset=/is', '<img$1srcset="" data-srcset=', $replaceHTML );
+				$replaceHTML = preg_replace(
+					'/<img\\b((?:(?:"[^"]*")|(?:\'[^\']*\')|[^"\'<>])*)\\s+srcset=(["\'])(.*?)\2/is',
+					'<img$1 srcset="" data-srcset=$2$3$2',
+					$replaceHTML
+				);
 
 				// add the lazy class to the img element
-				if ( preg_match( '/class=["\']/i', $replaceHTML ) ) {
-					$replaceHTML = preg_replace( '/class=(["\'])(.*?)["\']/is', 'class=$1lazy lazy-hidden $2$1', $replaceHTML );
+				if ( preg_match( '/(?<=\s)class=["\']/i', $replaceHTML ) ) {
+					$replaceHTML = preg_replace( '/(?<=\s)class=(["\'])(.*?)\1/is', 'class=$1lazy lazy-hidden $2$1', $replaceHTML );
 				} else {
 					$replaceHTML = preg_replace( '/<img/is', '<img class="lazy lazy-hidden"', $replaceHTML );
 				}
@@ -476,11 +484,15 @@ class LazyLoad
 				$i++;
 				// replace the srcset and add the data-srcset attribute
 				$replaceHTML = '';
-				$replaceHTML = preg_replace( '/<source(.*?)srcset=/is', '<source$1srcset="" data-srcset=', $imgHTML );
+				$replaceHTML = preg_replace(
+					'/<source\b((?:(?:"[^"]*")|(?:\'[^\']*\')|[^"\'<>])*)\s+srcset=(["\'])(.*?)\2/is',
+					'<source$1 srcset="" data-srcset=$2$3$2',
+					$imgHTML
+				);
 
 				// add the lazy class to the img element
-				if ( preg_match( '/class=["\']/i', $replaceHTML ) ) {
-					$replaceHTML = preg_replace( '/class=(["\'])(.*?)["\']/is', 'class=$1lazy lazy-hidden $2$1', $replaceHTML );
+				if ( preg_match( '/(?<=\s)class=["\']/i', $replaceHTML ) ) {
+					$replaceHTML = preg_replace( '/(?<=\s)class=(["\'])(.*?)\1/is', 'class=$1lazy lazy-hidden $2$1', $replaceHTML );
 				} else {
 					$replaceHTML = preg_replace( '/<source/is', '<source class="lazy lazy-hidden"', $replaceHTML );
 				}
@@ -579,11 +591,15 @@ class LazyLoad
 				$i++;
 				// replace the src and add the data-src attribute
 				$replaceHTML = '';
-				$replaceHTML = preg_replace( '/iframe(.*?)src=/is', 'iframe$1 data-lazy-type="iframe" data-src=', $imgHTML );
+				$replaceHTML = preg_replace(
+					'/<iframe\b((?:(?:"[^"]*")|(?:\'[^\']*\')|[^"\'<>])*)\s+src=(["\'])(.*?)\2/is',
+					'<iframe$1 data-lazy-type="iframe" data-src=$2$3$2',
+					$imgHTML
+				);
 
 				// add the lazy class to the img element
-				if ( preg_match( '/class=["\']/i', $replaceHTML ) ) {
-					$replaceHTML = preg_replace( '/class=(["\'])(.*?)["\']/is', 'class=$1lazy lazy-hidden $2$1', $replaceHTML );
+				if ( preg_match( '/(?<=\s)class=["\']/i', $replaceHTML ) ) {
+					$replaceHTML = preg_replace( '/(?<=\s)class=(["\'])(.*?)\1/is', 'class=$1lazy lazy-hidden $2$1', $replaceHTML );
 				} else {
 					$replaceHTML = preg_replace( '/<iframe/is', '<iframe class="lazy lazy-hidden"', $replaceHTML );
 				}
@@ -624,19 +640,31 @@ class LazyLoad
 
 
 				$replaceHTML = '';
-				$replaceHTML = preg_replace( '/video(.*?)src=/is', 'video$1 data-lazy-type="video" data-src=', $imgHTML );
+				$replaceHTML = preg_replace(
+					'/<video\b((?:(?:"[^"]*")|(?:\'[^\']*\')|[^"\'<>])*)\s+src=(["\'])(.*?)\2/is',
+					'<video$1 data-lazy-type="video" data-src=$2$3$2',
+					$imgHTML
+				);
 
 				if ( ! preg_match( "/ data-poster=['\"]/is", $replaceHTML ) ) {
-					$replaceHTML = preg_replace( '/video(.*?)poster=/is', 'video$1poster="' . $this->_placeholder_url . '" data-lazy-type="video" data-poster=', $replaceHTML );
-				} elseif ( preg_match( "/ poster=['\"]/is", $replaceHTML ) ) {
-					$replaceHTML = preg_replace( '/ poster=(["\'])(.*?)["\']/is', ' poster="' . $this->_placeholder_url . '"', $replaceHTML );
+					$replaceHTML = preg_replace(
+						'/<video\b((?:(?:"[^"]*")|(?:\'[^\']*\')|[^"\'<>])*)\s+poster=(["\'])(.*?)\2/is',
+						'<video$1 poster="' . $this->_placeholder_url . '" data-lazy-type="video" data-poster=$2$3$2',
+						$replaceHTML
+					);
+				} elseif ( preg_match( "/\sposter=['\"]/is", $replaceHTML ) ) {
+					$replaceHTML = preg_replace(
+						'/\sposter=(["\'])(.*?)\1/is',
+						' poster="' . $this->_placeholder_url . '"',
+						$replaceHTML
+					);
 				} else {
 					$replaceHTML = preg_replace( '/<video/is', '<video poster="' . $this->_placeholder_url . '"', $replaceHTML );
 				}
 
 				// add the lazy class to the img element
-				if ( preg_match( '/class=["\']/i', $replaceHTML ) ) {
-					$replaceHTML = preg_replace( '/class=(["\'])(.*?)["\']/is', 'class=$1lazy lazy-hidden $2$1', $replaceHTML );
+				if ( preg_match( '/(?<=\s)class=["\']/i', $replaceHTML ) ) {
+					$replaceHTML = preg_replace( '/(?<=\s)class=(["\'])(.*?)\1/is', 'class=$1lazy lazy-hidden $2$1', $replaceHTML );
 				} else {
 					$replaceHTML = preg_replace( '/<video/is', '<video class="lazy lazy-hidden"', $replaceHTML );
 				}
@@ -678,10 +706,14 @@ class LazyLoad
 				// replace the src and add the data-src attribute
 				$replaceHTML = '';
 				//$replaceHTML = str_replace("src", 'data-src', $imgHTML);
-				$replaceHTML = preg_replace( '/embed(.*?)src=/is', 'embed$1 data-lazy-type="video" data-src=', $imgHTML );
+				$replaceHTML = preg_replace(
+					'/<embed\b((?:(?:"[^"]*")|(?:\'[^\']*\')|[^"\'<>])*)\s+src=(["\'])(.*?)\2/is',
+					'<embed$1 data-lazy-type="video" data-src=$2$3$2',
+					$imgHTML
+				);
 				// add the lazy class to the img element
-				if ( preg_match( '/class=["\']/i', $replaceHTML ) ) {
-					$replaceHTML = preg_replace( '/class=(["\'])(.*?)["\']/is', 'class=$1lazy lazy-hidden $2$1', $replaceHTML );
+				if ( preg_match( '/(?<=\s)class=["\']/i', $replaceHTML ) ) {
+					$replaceHTML = preg_replace( '/(?<=\s)class=(["\'])(.*?)\1/is', 'class=$1lazy lazy-hidden $2$1', $replaceHTML );
 				} else {
 					$replaceHTML = preg_replace( '/<embed/is', '<embed class="lazy lazy-hidden"', $replaceHTML );
 				}

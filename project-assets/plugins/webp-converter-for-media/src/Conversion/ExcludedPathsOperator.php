@@ -24,7 +24,7 @@ class ExcludedPathsOperator implements HookableInterface {
 	/**
 	 * @var string[]
 	 */
-	private $excluded_dirs = [
+	private array $excluded_dirs = [
 		'.',
 		'..',
 		'.git',
@@ -41,12 +41,9 @@ class ExcludedPathsOperator implements HookableInterface {
 	/**
 	 * @var string[]
 	 */
-	private $excluded_paths = [];
+	private array $excluded_paths = [];
 
-	/**
-	 * @var PluginData
-	 */
-	private $plugin_data;
+	private PluginData $plugin_data;
 
 	public function __construct( PluginData $plugin_data ) {
 		$this->plugin_data = $plugin_data;
@@ -55,27 +52,25 @@ class ExcludedPathsOperator implements HookableInterface {
 	/**
 	 * {@inheritdoc}
 	 */
-	public function init_hooks() {
+	public function init_hooks(): void {
 		add_action( 'init', [ $this, 'load_excluded_directories_from_plugin_settings' ] );
 		add_filter( 'webpc_supported_source_directory', [ $this, 'skip_excluded_directory' ], 0, 3 );
 	}
 
 	/**
-	 * @return void
 	 * @internal
 	 */
-	public function load_excluded_directories_from_plugin_settings() {
+	public function load_excluded_directories_from_plugin_settings(): void {
 		$plugin_settings = $this->plugin_data->get_plugin_settings();
 		$saved_dirs      = ( $plugin_settings[ ExcludedDirectoriesOption::OPTION_NAME ] !== '' )
 			? explode( ',', $plugin_settings[ ExcludedDirectoriesOption::OPTION_NAME ] )
 			: [];
 
 		foreach ( $saved_dirs as $saved_dir ) {
-			if ( preg_match( '/(\/|\\\)/', $saved_dir ) ) {
-				$this->excluded_paths[] = '/' . str_replace( '\\', '/', $saved_dir ) . '/';
-			} else {
+			if ( ! preg_match( '/(\/|\\\)/', $saved_dir ) ) {
 				$this->excluded_dirs[] = $saved_dir;
 			}
+			$this->excluded_paths[] = '/' . str_replace( '\\', '/', $saved_dir ) . '/';
 		}
 	}
 

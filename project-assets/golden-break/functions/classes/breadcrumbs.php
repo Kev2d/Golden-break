@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 class Breadcrumbs
 {
@@ -6,7 +6,7 @@ class Breadcrumbs
     {
         // Define the home page link
         $home_link = home_url('/');
-        $home_text = __('Home', 'textdomain'); // Make Home translatable
+        $home_text = __('Home', 'golden-break'); // Make Home translatable
 
         // Start the breadcrumbs with the home link
         echo '<div class="site-breadcrumbs">';
@@ -26,7 +26,7 @@ class Breadcrumbs
                 
                 if ($post_type === 'post') {
                     // If it's a regular blog post, show "Blog" as a translatable string
-                    echo '<span class="site-breadcrumbs__item">' . __('Blog', 'textdomain') . '</span>';
+                    echo '<span class="site-breadcrumbs__item">' . __('Blog', 'golden-break') . '</span>';
                 } else {
                     // For custom post types
                     if ($post_type) {

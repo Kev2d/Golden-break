@@ -1,9 +1,9 @@
-<nav role="navigation" class="site-nav site-nav--mobile" aria-label="<?php _e('Primary navigation', 'keweb'); ?>">
+﻿<nav role="navigation" class="site-nav site-nav--mobile" aria-label="<?php _e('Primary navigation', 'golden-break'); ?>">
 
     <ul class="site-nav__menu-top">
         <?php get_template_part('template-parts/UI/back-button', null, array(
             'function' => 'close-nav-menu',
-            'label' => __('Close navigation', 'keweb')
+            'label' => __('Close navigation', 'golden-break')
         )); ?>
 
         <?php get_template_part('template-parts/UI/language-menu'); ?>

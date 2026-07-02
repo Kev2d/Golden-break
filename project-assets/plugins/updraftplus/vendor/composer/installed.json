@@ -1,33 +1,76 @@
 {
     "packages": [
         {
-            "name": "components/jquery",
-            "version": "v3.7.1",
-            "version_normalized": "3.7.1.0",
+            "name": "brumann/polyfill-unserialize",
+            "version": "v2.0.0",
+            "version_normalized": "2.0.0.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/components/jquery.git",
-                "reference": "8edc7785239bb8c2ad2b83302b856a1d61de60e7"
+                "url": "https://github.com/dbrumann/polyfill-unserialize.git",
+                "reference": "46e5c18ee87d8a9b5765ef95468c1ac27bd107bf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/components/jquery/zipball/8edc7785239bb8c2ad2b83302b856a1d61de60e7",
-                "reference": "8edc7785239bb8c2ad2b83302b856a1d61de60e7",
+                "url": "https://api.github.com/repos/dbrumann/polyfill-unserialize/zipball/46e5c18ee87d8a9b5765ef95468c1ac27bd107bf",
+                "reference": "46e5c18ee87d8a9b5765ef95468c1ac27bd107bf",
                 "shasum": ""
             },
-            "time": "2023-09-22T01:43:46+00:00",
+            "require": {
+                "php": "^5.3|^7.0"
+            },
+            "time": "2020-07-24T10:16:53+00:00",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Brumann\\Polyfill\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Denis Brumann",
+                    "email": "denis.brumann@sensiolabs.de"
+                }
+            ],
+            "description": "Backports unserialize options introduced in PHP 7.0 to older PHP versions.",
+            "support": {
+                "issues": "https://github.com/dbrumann/polyfill-unserialize/issues",
+                "source": "https://github.com/dbrumann/polyfill-unserialize/tree/v2.0.0"
+            },
+            "install-path": "../brumann/polyfill-unserialize"
+        },
+        {
+            "name": "components/jquery",
+            "version": "4.0.0",
+            "version_normalized": "4.0.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/components/jquery.git",
+                "reference": "594f9dd922c3b12519c8d52bde744b79fd2ca816"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/components/jquery/zipball/594f9dd922c3b12519c8d52bde744b79fd2ca816",
+                "reference": "594f9dd922c3b12519c8d52bde744b79fd2ca816",
+                "shasum": ""
+            },
+            "time": "2026-05-11T18:06:23+00:00",
             "type": "component",
             "extra": {
                 "component": {
-                    "scripts": [
-                        "jquery.js"
-                    ],
                     "files": [
                         "jquery.min.js",
                         "jquery.min.map",
                         "jquery.slim.js",
                         "jquery.slim.min.js",
                         "jquery.slim.min.map"
+                    ],
+                    "scripts": [
+                        "jquery.js"
                     ]
                 }
             },
@@ -599,17 +642,17 @@
         },
         {
             "name": "phpseclib/phpseclib",
-            "version": "2.0.47",
-            "version_normalized": "2.0.47.0",
+            "version": "2.0.54",
+            "version_normalized": "2.0.54.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpseclib/phpseclib.git",
-                "reference": "b7d7d90ee7df7f33a664b4aea32d50a305d35adb"
+                "reference": "a96a835067c39ee7a709329fe70869817da18081"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/b7d7d90ee7df7f33a664b4aea32d50a305d35adb",
-                "reference": "b7d7d90ee7df7f33a664b4aea32d50a305d35adb",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/a96a835067c39ee7a709329fe70869817da18081",
+                "reference": "a96a835067c39ee7a709329fe70869817da18081",
                 "shasum": ""
             },
             "require": {
@@ -617,7 +660,7 @@
             },
             "require-dev": {
                 "phing/phing": "~2.7",
-                "phpunit/phpunit": "^4.8.35|^5.7|^6.0|^9.4",
+                "phpunit/phpunit": "^4.8.35|^5.7|^6.0|^8.5|^9.4",
                 "squizlabs/php_codesniffer": "~2.0"
             },
             "suggest": {
@@ -627,7 +670,7 @@
                 "ext-openssl": "Install the OpenSSL extension in order to speed up a wide variety of cryptographic operations.",
                 "ext-xml": "Install the XML extension to load XML formatted public keys."
             },
-            "time": "2024-02-26T04:55:38+00:00",
+            "time": "2026-04-27T06:59:24+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -692,7 +735,7 @@
             ],
             "support": {
                 "issues": "https://github.com/phpseclib/phpseclib/issues",
-                "source": "https://github.com/phpseclib/phpseclib/tree/2.0.47"
+                "source": "https://github.com/phpseclib/phpseclib/tree/2.0.54"
             },
             "funding": [
                 {
@@ -1028,12 +1071,12 @@
             "time": "2020-10-21T09:57:48+00:00",
             "type": "library",
             "extra": {
+                "thanks": {
+                    "url": "https://github.com/symfony/polyfill",
+                    "name": "symfony/polyfill"
+                },
                 "branch-alias": {
                     "dev-main": "1.19-dev"
-                },
-                "thanks": {
-                    "name": "symfony/polyfill",
-                    "url": "https://github.com/symfony/polyfill"
                 }
             },
             "installation-source": "dist",
@@ -1116,12 +1159,12 @@
             "time": "2020-10-23T09:01:57+00:00",
             "type": "library",
             "extra": {
+                "thanks": {
+                    "url": "https://github.com/symfony/polyfill",
+                    "name": "symfony/polyfill"
+                },
                 "branch-alias": {
                     "dev-main": "1.19-dev"
-                },
-                "thanks": {
-                    "name": "symfony/polyfill",
-                    "url": "https://github.com/symfony/polyfill"
                 }
             },
             "installation-source": "dist",
@@ -1203,12 +1246,12 @@
             "time": "2020-10-23T09:01:57+00:00",
             "type": "library",
             "extra": {
+                "thanks": {
+                    "url": "https://github.com/symfony/polyfill",
+                    "name": "symfony/polyfill"
+                },
                 "branch-alias": {
                     "dev-main": "1.19-dev"
-                },
-                "thanks": {
-                    "name": "symfony/polyfill",
-                    "url": "https://github.com/symfony/polyfill"
                 }
             },
             "installation-source": "dist",
@@ -1284,12 +1327,12 @@
             "time": "2020-10-23T09:01:57+00:00",
             "type": "library",
             "extra": {
+                "thanks": {
+                    "url": "https://github.com/symfony/polyfill",
+                    "name": "symfony/polyfill"
+                },
                 "branch-alias": {
                     "dev-main": "1.19-dev"
-                },
-                "thanks": {
-                    "name": "symfony/polyfill",
-                    "url": "https://github.com/symfony/polyfill"
                 }
             },
             "installation-source": "dist",
@@ -1366,12 +1409,12 @@
             "time": "2020-10-23T09:01:57+00:00",
             "type": "library",
             "extra": {
+                "thanks": {
+                    "url": "https://github.com/symfony/polyfill",
+                    "name": "symfony/polyfill"
+                },
                 "branch-alias": {
                     "dev-main": "1.19-dev"
-                },
-                "thanks": {
-                    "name": "symfony/polyfill",
-                    "url": "https://github.com/symfony/polyfill"
                 }
             },
             "installation-source": "dist",
@@ -1426,17 +1469,17 @@
         },
         {
             "name": "team-updraft/common-libs",
-            "version": "3.0.8",
-            "version_normalized": "3.0.8.0",
+            "version": "3.1.10",
+            "version_normalized": "3.1.10.0",
             "source": {
                 "type": "git",
                 "url": "ssh://git@source.updraftplus.com:20022/team-updraft/common-libs.git",
-                "reference": "65081c07ed5ce99eca7ad40136d90d2f99edf51f"
+                "reference": "027214202c3dbc15a807bb3860da36e764c1a58f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://source.updraftplus.com/api/v4/projects/28/packages/composer/archives/team-updraft/common-libs.zip?sha=65081c07ed5ce99eca7ad40136d90d2f99edf51f",
-                "reference": "65081c07ed5ce99eca7ad40136d90d2f99edf51f",
+                "url": "https://source.updraftplus.com/api/v4/projects/28/packages/composer/archives/team-updraft/common-libs.zip?sha=027214202c3dbc15a807bb3860da36e764c1a58f",
+                "reference": "027214202c3dbc15a807bb3860da36e764c1a58f",
                 "shasum": ""
             },
             "require-dev": {
@@ -1485,23 +1528,23 @@
             "type": "component",
             "extra": {
                 "component": {
-                    "scripts": [
-                        "dist/jstree.js"
-                    ],
-                    "styles": [
-                        "dist/themes/default/style.css"
-                    ],
-                    "images": [
-                        "dist/themes/default/32px.png",
-                        "dist/themes/default/40px.png",
-                        "dist/themes/default/throbber.gif"
-                    ],
                     "files": [
                         "dist/jstree.min.js",
                         "dist/themes/default/style.min.css",
                         "dist/themes/default/32px.png",
                         "dist/themes/default/40px.png",
                         "dist/themes/default/throbber.gif"
+                    ],
+                    "images": [
+                        "dist/themes/default/32px.png",
+                        "dist/themes/default/40px.png",
+                        "dist/themes/default/throbber.gif"
+                    ],
+                    "styles": [
+                        "dist/themes/default/style.css"
+                    ],
+                    "scripts": [
+                        "dist/jstree.js"
                     ]
                 }
             },

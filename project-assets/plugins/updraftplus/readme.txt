@@ -2,8 +2,8 @@
 Contributors: Backup with UpdraftPlus, DavidAnderson, pmbaldha, DNutbourne, aporter, bcrodua
 Tags: backup, database backup, wordpress backup, cloud backup, migration
 Requires at least: 3.2
-Tested up to: 6.7
-Stable tag: 1.24.11
+Tested up to: 7.0
+Stable tag: 1.26.5
 Author URI: https://updraftplus.com
 Donate link: https://david.dw-perspective.org.uk/donate
 License: GPLv3 or later
@@ -141,7 +141,7 @@ Many thanks to our existing translators.
 
 = How do I install the UpdraftPlus backup & migration plugin? =
 
-Here are the installation guidelines from our <a href="https://www.youtube.com/watch?v=7ReY7Z19h2I">YouTube channel</a> or from <a href="https://updraftplus.com/download/">our website</a>.
+Here are the installation guidelines from our [YouTube channel](https://www.youtube.com/watch?v=7ReY7Z19h2I) or from [our website](https://updraftplus.com/download/).
 
 = What if I have a problem / need support ? =
 
@@ -149,9 +149,9 @@ If you’re struggling to backup, migrate or restore there’s help available.
 
 Search existing topics on the WordPress support forum or post a new one. Our support and development teams check and respond to queries everyday.
 
-UpdraftPlus Premium customers can log a ticket directly with our support and development teams via the <a href="https://updraftplus.com/support/">UpdraftPlus support hub</a>.
+UpdraftPlus Premium customers can log a ticket directly with our support and development teams via the [UpdraftPlus support hub](https://updraftplus.com/support/).
 
-Before you get in touch, please ensure that you have read through our <a href=https://updraftplus.com/frequently-asked-questions/">FAQs</a> and that you’ve updated to the latest release of our plugin.
+Before you get in touch, please ensure that you have read through our [FAQs](https://updraftplus.com/frequently-asked-questions) and that you’ve updated to the latest release of our plugin.
 
 It helps greatly if you can include the backup log and as much other information as possible in your report, for example the PHP version, your website, the error description, how you got to the page that caused it, any other relevant plugins you have installed, plus any other information that might be of use.
 
@@ -175,9 +175,192 @@ This problem is probably caused by your account being starved of resources by yo
 
 == Changelog ==
 
-The <a href="https://updraftplus.com/news/">UpdraftPlus backup blog</a> is the best place to learn in more detail about any important changes.
+The [UpdraftPlus backup blog](https://updraftplus.com/news/) is the best place to learn in more detail about any important changes.
 
 N.B. Paid versions of UpdraftPlus Backup / Restore have a version number which is 1 higher in the first digit, and has an extra component on the end, but the changelog below still applies. i.e. changes listed for 1.16.32.x of the free version correspond to changes made in 2.16.32.x of the paid version.
+
+= 1.26.5 - 05/Jun/2026 =
+
+* SECURITY: Previous versions contained a defect allowing sites with an active Migrator key (paid versions only) or UpdraftCentral key (free and paid versions) to have unauthorised operations carried out on them. All users should update immediately.
+* TWEAK: Added explicit HTTP timeout of 60 seconds to pCloud chunk upload requests to prevent cURL error 28 on slow server connections 
+* TWEAK: Guard curl_close(), finfo_close() and xml_parser_free() calls with a PHP version check to prevent deprecation warnings on PHP 8.5+
+* TWEAK: Update the bundled common-libs version
+* TWEAK: Replace all usages of wpdb::esc_like() with UpdraftPlus_Database_Utility::esc_like() across the codebase to maintain consistency.
+* TWEAK: Add "auto-backup before update" tour guide
+
+= 1.26.4 - 07/May/2026 =
+
+* FIX: In version 1.26.2, a regression prevented the backup schedule, including the day name or number, as well as backup entity exclusion rules, from being saved.
+* TWEAK: Alert users who wrongly enter URLs instead of an actual hostname for SFTP and FTP remote storage.
+* TWEAK: Updated DreamObjects endpoints by removing the deprecated objects-us-west-1, marking objects-us-east-1.dream.io as unavailable (Nov. 12th, 2025), and adding admin notices to inform users of this change.
+* TWEAK: get_structured_data() now accepts params to avoid timeouts.
+
+= 1.26.3 - 23/Apr/2026 =
+
+* FEATURE: Implemented enhanced streaming extraction for large files during restoration to handle cases where the file size exceeds the PHP memory limit.
+* FIX: Fix users role filter empty state shows generic “Failed to Fetch Data” error.
+* FIX: Fixed backup failures on tables with invisible columns and large data volumes.
+* FIX: Unable to uncheck all categories on post in UDC dashboard
+* TWEAK: Added a new internal command to get given plugins' installation info.
+* TWEAK: Ensure autobackup notice is always a string to prevent PHP 8.1+ deprecation in wp_kses()
+* TWEAK: Fix the JS errors that occur when deleting the last generated UDC keys.
+* TWEAK: Implemented adjustments for UI misalignment issues caused by the WordPress 7 visual design refresh across the admin dashboard. The plugin's interface now aligns correctly with the updated design standards.
+* TWEAK: Prevent broken settings pages in other plugins in multisite when UpdraftPlus is active due to modified menu URLs.
+* TWEAK: Update all links in the addons folder to use teamupdraft.com instead of updraftplus.com.
+* TWEAK: Replaced esc_html_e() with esc_html__() where string concatenation was silently discarding the colon separator in SFTP connection failure message and noscript JavaScript warning notice
+* TWEAK: Switched to native phpseclib API/function for Dropbox token decryption, replacing deprecated mcrypt_decrypt since PHP 7.1 and removed in PHP 7.2.
+* TWEAK: Clear out PHP "Undefined offset" notice that occurred while restoring a backup of single site to multisite. It happened during the search-replace operation due to the absence of the users and usermeta tables.
+* TWEAK: Enhance the unzip file function to handle more folder inclusion/exclusion
+* TWEAK: Update all links in the methods folder to use teamupdraft.com instead of updraftplus.com.
+* TWEAK: Add post status and date fields to get_posts API response for UDC
+
+= 1.26.2 - 03/Mar/2026 =
+
+* TWEAK: Added PHP 8.5 support to UpdraftClone
+* TWEAK: Fix deprecation warnings in PHP 8.4 for the Dropbox integration
+* TWEAK: Make abort backup warning icon responsive with percentage-based sizing
+* TWEAK: Prevent the suppressed PHP warnings from being output in the backup and restore log on PHP 8.0+
+* TWEAK: On a site where the site owner has restricted (super-)administrators (so that they can't restore backups), require a constant to first be set to use the HTTP debug tool for internal IP addresses.
+* TWEAK: Update all links in the settings folder to use teamupdraft.com instead of updraftplus.com. 
+* TWEAK: When deleting backup sets created through a direct site-to-site migration, the 'Also delete from remote storage' checkbox is unnecessary.
+
+= 1.26.1 - 19/Jan/2026 =
+
+* FIX: Google Drive chunked uploads didn't resume from where it left off but started from the beginning resulting in file duplicates
+* TWEAK: Add a WP-CLI command to register a product key (premium)
+* TWEAK: Add product registration link on the premium version
+* TWEAK: Fix JS error on UpdraftCentral Cloud connect modal.
+* TWEAK: Fix grammatical error in the low disk space admin notice.
+* TWEAK: Update links for better user experience
+* TWEAK: Update the premium links on the settings page
+* TWEAK: Update all links in the includes/notices/central folders to use teamupdraft.com instead of updraftplus.com.
+* TWEAK: Upgrade the common-libs tag version
+
+= 1.25.9 - 12/Nov/2025 =
+
+* FIX: A regression that resulted in the list of tables within the "Database size" tools not being displayed, due to code refactoring implemented in version 1.25.8.
+* TWEAK: Add function for returning Advanced Tools menu data in a structured format.
+* TWEAK: Resolve regression in 1.25.2 which caused the admin notice "Not yet connected to licence" was linking to teamupdraft.com instead of the UpdraftPlus Premium/Extensions tab.
+* TWEAK: Refactoring connection keys data function to deduplicate and read from a single source
+* TWEAK: Restored the missing backup confirmation pop-up icon for older WordPress versions.
+* TWEAK: Stripped unwanted HTML from the plain-text notice and added new lines after each sentences in the sale offer message.
+* TWEAK: Update Black Friday seasonal sale URL/link 
+* TWEAK: Updated "Check our premium" and "Back up non-WP tables and external databases" URL links to avoid HTTP 404 (not found) errors.
+* TWEAK: Update database charset detection to support both CHARSET= and CHARACTER SET syntax in SQL dumps
+* TWEAK: Replaced deprecated (boolean) casting
+
+= 1.25.8 - 07/Oct/2025 =
+
+* FIX: A fatal error in UpdraftCentral when trying to manage posts when no posts exist.
+* FIX: During a failure in the file copy process while restoring, a directory was created with the same name as the file, and the restoration process persisted when it ought to have been stopped
+* FIX: PHP fatal error in WP CLI commands for listing or scanning existing backups on PHP 8.0+ after a rescan
+* TWEAK: Add UpdraftCentral support to import_settings function with return values
+* TWEAK: Add support for new Amazon AWS S3 regions
+* TWEAK: Added Burst Statistics to the family plugin list
+* TWEAK: Adjust the backup logic to recognize invisible columns, and when that occurs, use a query that explicitly specifies the required columns instead of relying on "SELECT *".
+* TWEAK: Ensure the restore process terminates with an error when file copying/moving fails
+* TWEAK: Improve the backup email report to better reflect the backup types and status.
+* TWEAK: New endpoint for getting locked settings data for UpdraftCentral
+* TWEAK: Perform a search and replace on __PHP_Incomplete_Class to make it work with unserialize() when object deserialization is not allowed.
+* TWEAK: Refactoring site info section to deduplicate and read from single source
+* TWEAK: Resolved a PHP warning triggered when uploading the plugin via the WP Plugins page — caused by translation functions (e.g. __()) being called too early.
+* TWEAK: Some text was left out of the translation POT file, which meant that certain translator plugins and libraries could not find the text, making it impossible to translate. 
+* TWEAK: Update the db_size function to allow returning either data or html, depending on the argument that is passed in.
+
+= 1.25.7 - 07/Aug/2025 =
+
+* FIX: A regression for verifying the presence of old folders in the backup directory; old folders created during the restoration of the "Others" entity were not detected correctly.
+* FIX: The per-backup lock entries were not removed, resulting in an accumulation of these entries in the database over time. (Includes clean-up of old entries).
+* TWEAK: Add IDrive e2 and MEGA to the S3-Compatible storage list
+* TWEAK: Internal function call to prevent a PHP 8.1 deprecation notice on fresh WP installs
+* TWEAK: Add wp-staging to the default uploads exclusion list
+* TWEAK: Add UpdraftCentral handler for site icon upload request.
+* TWEAK: Added support for the database view dashicon in WordPress versions prior to 5.5.
+* TWEAK: Include site icon information in the 'get_site_icon' response of the UpdraftCentral core module.
+* TWEAK: Resolve the empty list issue on the backup email reports created by the UpdraftPlus free version
+* TWEAK: The "Get every feature of UpdraftPlus Premium" box shouldn't be displayed after purchases got claimed/activated
+* TWEAK: Remove seasonal (new year, summer, spring and plugin collection) sale notices
+* TWEAK: Handle unsupported character set defined for table fields during database pre-restoration.
+* TWEAK: Updated links in the Premium Extensions tab of the plugin’s admin menu page.
+
+= 1.25.6 - 27/May/2025 =
+
+* FIX: A regression that prevented the remote storage label from being updated
+* FIX: A regression that could cause unintended behaviour when restoring special files
+* FIX: A fatal error when executing a standalone php backup script with "do_action('updraft_backup_all')".
+* FIX: Regression that caused certain features (e.g. PHP Info) to break due to a missing HTML attribute on the triggering element
+* FIX: An issue that caused migration failure for sites using the Performance Lab plugin or other plugins implementing an object cache drop-in
+* TWEAK: handle non fatal file rename failure during restore
+* TWEAK: The automatic backup feature is now disabled by default on new installs
+* TWEAK: return post status and formatted date from UDC post API
+* TWEAK: Replace a call to unserialize() in the Dropbox storage library
+* TWEAK: Validate the DreamObjects endpoint to ensure only expected DreamObjects enpoint formats can pass through.
+* TWEAK: Position the "includes all tables not listed below" option at the beginning of the first known table in the DB restoration widget.
+* TWEAK: Add a new default endpoint in DreamObjects along with UI to allow users to add custom endpoint in the format "s3.<region>.dream.io".
+* TWEAK: The Azure Storage Service add-on now requires PHP 5.6 or higher to support the mandatory use of TLS 1.2, which will be enforced starting August 31, 2025.
+
+= 1.25.5 - 17/Apr/2025 =
+
+* FIX: A bug that prevented the Rackspace "Create new API user and container" dialog from opening.
+* TWEAK: An HTTP header intended to terminate the browser's connection was incorrectly assigned a value that the header does not support.
+* TWEAK: Ability to automatically choose the proper checkout page when the user is about to buy TeamUpdraft products from within the plugin
+* TWEAK: Clear Divi theme CSS cache at the end of the restoration process
+* TWEAK: Resolve PHP warning in pCloud addon when upgrading from free to premium version.
+* TWEAK: Update error messages when the user fails to connect to their TeamUpdraft account on the 'Premium/Extensions' tab.
+
+= 1.25.4 - 24/Mar/2025 =
+
+* FIX: Regression in 1.25.3 - missing database encryption input field due to the use of the "wp_kses_post" function that doesn't allow "<input>" tag to be rendered
+* TWEAK: Add new fields to UpdraftCentral handler
+
+= 1.25.3 - 21/Mar/2025 =
+
+* FIX: An issue that prevented an UpdraftClone backup from sending when attempting to boot an UpdraftClone from WP_CLI
+* FIX: An issue that prevented changing the default UpdraftClone region when attempting to boot an UpdraftClone from WP_CLI
+* TWEAK: The "x-amz-content-sha256" request header is now signed and included in the S3 signature version 4. Some S3-based providers mandate the signing of this header for accurate signature calculation.
+* TWEAK: Introduce a new constant named "UPDRAFTPLUS_S3_EXCLUDE_SIGV4_CONTENT_SHA256_HEADER". This constant allows for the exclusion of the "x-amz-content-sha256" headers from being signed if desired; it accepts a boolean value, defaulting to false.
+* TWEAK: Add 'noopener, noreferrer' window features to the Javascript's window.open() call to prevent the target page from changing content of the original page
+* TWEAK: Favicon fetching feature for UpdraftCentral
+* TWEAK: Minor tweak to "updates" module to include icons to plugin and screenshot url to theme update items  
+* TWEAK: New UpdraftCentral module for background fetching
+* TWEAK: Revise the wording found in the expert settings regarding the deletion of local backup files
+* TWEAK: Update seasonal notices
+* TWEAK: Enhance the notifications to signify the introduction of other plugins that belong to the same plugin family
+* TWEAK: To avoid CORS issues and ensure the UpdraftPlus plugin is functional and accessible via the UpdraftCentral dashboard, the hostname and/or domain origin is changed from updraftplus.com to teamupdraft.com.
+* COMPATIBILITY: Resolved PHP deprecation warnings in lockadmin.php by eliminating the use of dynamic properties
+
+= 1.25.2 - 26/Feb/2025 =
+
+* FEATURE: Added a "Cron events" tab in the Advanced Tools section to check for the presence of the UpdraftPlus cron job.
+* FIX: Resolve the issue of uploads to pCloud failing after a folder name change by resetting the "folderid" whenever the folder name is updated.
+* TWEAK: Add site information for WooCommerce and HPOS support to the database backup header.
+* TWEAK: Create a log entry when a bot verification page appears during the file upload in the migration procedure.
+* TWEAK: Improve error message clarity for failed connection tests in migration.
+* TWEAK: Include details in the backup log file about the status and availability of the proxy configured in the system.
+* TWEAK: Update the Google library to support the WP_PROXY_HOST and WP_PROXY_PORT constants.
+* TWEAK: Update the link for Onedrive and Azure app creation
+* COMPATIBILITY: Got rid of PHP 8.4 deprecation messages caused by the E_STRICT constant usage
+
+= 1.25.1 - 11/Jan/2025 =
+
+* SECURITY: Fix a non-persistent reflected XSS vulnerability due to a missing nonce combined with missing sanitisation. This could allow an attacker, who persuaded you to click a personally-crafted link to your site's dashboard whilst you were logged in, to once run JavaScript code in your dashboard. Thanks to Asaf Mozes for finding and responsibly disclosing this issue.
+* FIX: Prevent the restoration from failing when there is a 'sync-xhr=()' permission policy on the response header.
+* FIX: Improve the approach of acquiring a suggested region for Amazon AWS S3 if a failure arises during the getBucketLocation() call, particularly when the XML response fails to provide a field for the suggested region - this resolves issues with regions (e.g. us-east-2) which recently changed their response behaviour
+* TWEAK: Broaden the support to incorporate the "ap-southeast-4" region of Amazon AWS S3 and additional recently updated regions
+* TWEAK: A regression in the paid version update checker to version 4.13.2, resulting in non-appearance of notices concerning subscription status or WP version compatibility.
+
+= 1.24.12 - 23/Dec/2024 =
+
+* FIX: The pre-restoration stage failed to properly address the tables that were to be excluded, which caused a logical error that misread the checked "include all tables not listed" option as an instruction to restore every table
+* FIX: Update PHPSecLib library to version 2.0.48 which has the fixes for the "gmp_pow(): base and exponent overflow" on certain PHP versions and could cause backups to fail on the SFTP remote storage
+* TWEAK: Complete the review and removal of calls to the unserialize() PHP function allowing class instantiation begun in 1.24.7. (The final removal involved a theoretical security defect, if your development site allowed an attacker to post content to it which you migrated to another site, and which contained customised code that could perform destructive actions which the attacker knew about, prior to you then cloning the site. The result of this removal is that some search-replaces, highly unlikely to be encountered in practice, will be skipped).
+* TWEAK: Drop search and replace feature for PHP 5.2 users (to fulfil the preceding item)
+* TWEAK: Tweak UpdraftCentral media module to add "has_image_editor" property to each media item
+* TWEAK: On the restoration screen in a multisite configuration, the dropdown labeled "which site to restore" was covering other HTML elements, which caused some buttons to be positioned at the bottom instead of at the top
+* TWEAK: Avoid deregistering jQuery-UI CSS if already printed by other plugins to prevent compatibility issues
+* TWEAK: In the context of database restoration, the execution of LOCK and/or ALTER SQL statements must be avoided for any tables that are part of the "skipped tables" list
+* TWEAK: openssl_free_key() is only needed on PHP < 8
+* TWEAK: Various coding style changes to comply with "Plugin Check" rules
 
 = 1.24.11 - 15/Nov/2024 =
 
@@ -188,6 +371,7 @@ N.B. Paid versions of UpdraftPlus Backup / Restore have a version number which i
 
 * FIX: A regression in 1.24.8 when handling restoration of wp-config.php
 * TWEAK: The changes in handling of loading text domains in 1.24.8 did not cover most cases
+* TWEAK: Introduce the "updraftplus_use_builtin_wpcore_restoration" filter which can be used to restore WP-Core entity using a different WP-Core restoration mechanism especially in a case that the admin-ajax.php file couldn't be deleted during the restoration
 
 = 1.24.8 - 13/Nov/2024 =
 
@@ -369,7 +553,7 @@ N.B. Paid versions of UpdraftPlus Backup / Restore have a version number which i
 * TWEAK: Fix unable to switch tab when a plugin (wrongly) loads certain CSS onto UD's settings page
 * TWEAK: Remove the word 'apparently' in the backup success message
 * TWEAK: Update to latest phpseclib 1.0.X version (prevents deprecation notice on PHP 8.1+)
-* TWEAK: Change "s3" property to "public" in UpdraftPlus_AWSRequest class for PHP 8.2 deprecation compatibility [https://source.updraftplus.com/team-updraft/updraftplus/-/merge_requests/1481]
+* TWEAK: Change "s3" property to "public" in UpdraftPlus_AWSRequest class for PHP 8.2 deprecation compatibility
 * TWEAK: Fixed Missing/ broken links for the pCloud image in addons tab
 * TWEAK: Buying UpdraftClone tokens through inline checkout
 * TWEAK: Fixed Spelling errors in updraftplus repo
@@ -1982,4 +2166,4 @@ Non-English translators are provided by volunteers, and wordpress.org does not g
 We recognise and thank those mentioned at https://updraftplus.com/acknowledgements/ for code and/or libraries used and/or modified under the terms of their open source licences.
 
 == Upgrade Notice ==
-* 1.24.11: Restore ability to connect new sites to Google Drive. A recommended update for all.
+* 1.26.5: Important security fix, plus various fixes and small tweaks - see the changelog for details. A recommended update for all; please update immediately.

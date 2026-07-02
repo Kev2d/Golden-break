@@ -1,5 +1,5 @@
-{
-  "name": "keweb",
+﻿{
+  "name": "golden-break",
   "version": "1.0.0",
   "scripts": {
     "build": "npx babel assets/js --out-file dist/main.min.js && npm run scss",

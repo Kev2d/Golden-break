@@ -6,6 +6,7 @@ if (class_exists('AIOWPSecurity_Commands')) return;
 
 if (!trait_exists('AIOWPSecurity_Log_Commands_Trait')) require_once(AIO_WP_SECURITY_PATH.'/classes/commands/wp-security-log-commands.php');
 if (!trait_exists('AIOWPSecurity_Ip_Commands_Trait')) require_once(AIO_WP_SECURITY_PATH.'/classes/commands/wp-security-ip-commands.php');
+if (!trait_exists('AIOWPSecurity_Brute_Force_Commands_Trait')) require_once(AIO_WP_SECURITY_PATH.'/classes/commands/wp-brute-force-commands.php');
 if (!trait_exists('AIOWPSecurity_Comment_Commands_Trait')) require_once(AIO_WP_SECURITY_PATH.'/classes/commands/wp-security-comment-commands.php');
 if (!trait_exists('AIOWPSecurity_User_Security_Commands_Trait')) require_once(AIO_WP_SECURITY_PATH.'/classes/commands/wp-security-user-security-commands.php');
 if (!trait_exists('AIOWPSecurity_Settings_Commands_Trait')) require_once(AIO_WP_SECURITY_PATH.'/classes/commands/wp-security-settings-commands.php');
@@ -13,10 +14,15 @@ if (!trait_exists('AIOWPSecurity_Files_Commands_Trait')) require_once(AIO_WP_SEC
 if (!trait_exists('AIOWPSecurity_Firewall_Commands_Trait')) require_once(AIO_WP_SECURITY_PATH.'/classes/commands/wp-security-firewall-commands.php');
 if (!trait_exists('AIOWPSecurity_Tools_Commands_Trait')) require_once(AIO_WP_SECURITY_PATH.'/classes/commands/wp-security-tools-commands.php');
 if (!trait_exists('AIOWPSecurity_File_Scan_Commands_Trait')) require_once(AIO_WP_SECURITY_PATH.'/classes/commands/wp-security-file-scan-commands.php');
-class AIOWPSecurity_Commands {
+if (!trait_exists('AIOWPSecurity_Tfa_Commands_Trait')) require_once(AIO_WP_SECURITY_PATH.'/classes/commands/wp-security-tfa-commands.php');
+
+if (!class_exists('Updraft_Task_Manager_Commands_1_0')) require_once(AIO_WP_SECURITY_PATH . '/vendor/team-updraft/common-libs/src/updraft-tasks/class-updraft-task-manager-commands.php');
+
+class AIOWPSecurity_Commands extends Updraft_Task_Manager_Commands_1_0 {
 
 	use AIOWPSecurity_Log_Commands_Trait;
 	use AIOWPSecurity_Ip_Commands_Trait;
+	use AIOWPSecurity_Brute_Force_Commands_Trait;
 	use AIOWPSecurity_Comment_Commands_Trait;
 	use AIOWPSecurity_User_Security_Commands_Trait;
 	use AIOWPSecurity_Settings_Commands_Trait;
@@ -24,6 +30,23 @@ class AIOWPSecurity_Commands {
 	use AIOWPSecurity_Firewall_Commands_Trait;
 	use AIOWPSecurity_Tools_Commands_Trait;
 	use AIOWPSecurity_File_Scan_Commands_Trait;
+	use AIOWPSecurity_Tfa_Commands_Trait;
+
+	/**
+	 * Retrieves a list of allowed heartbeat commands.
+	 *
+	 * Defines heartbeat commands specifically allowed for scanner-related actions. The list
+	 * can be extended using the 'aios_allowed_heartbeat_commands' filter.
+	 *
+	 * @return array Filtered list of allowed heartbeat commands.
+	 */
+	public static function get_allowed_heartbeat_commands() {
+		$commands = array(
+			'get_file_scan_update'
+		);
+
+		return apply_filters('aios_allowed_heartbeat_commands', $commands);
+	}
 
 	/**
 	 * This variable holds an instance of AIOWPSecurity_Feature_Item_Manager.
@@ -31,6 +54,53 @@ class AIOWPSecurity_Commands {
 	 * @var AIOWPSecurity_Feature_Item_Manager $aiowps_feature_mgr
 	 */
 	private $aiowps_feature_mgr;
+
+
+	/**
+	 * The commands constructor
+	 */
+	public function __construct() {
+		parent::__construct(AIOWPSecurity_Task_Manager::get_instance());
+	}
+
+	/**
+	 * Retrieves a list of allowed task types.
+	 *
+	 * Defines and filters the types of tasks that the scanner can handle, such as file scans.
+	 * The list is extendable via the 'aios_allowed_task_types' filter.
+	 *
+	 * @return array Filtered list of allowed task types.
+	 */
+	protected static function get_allowed_task_types() {
+		$types = array(
+			'file_scan'
+		);
+
+		return apply_filters('aios_allowed_task_types', $types);
+	}
+
+	/**
+	 * Checks for a currently running task of a specified type.
+	 *
+	 * Validates if the provided task type is within the allowed task types and checks if there
+	 * are any active tasks of this type. If a running task is found, it returns its data; otherwise,
+	 * it returns a failed response.
+	 *
+	 * @param array $data Contains the 'type' key indicating the task type to check.
+	 *
+	 * @return array Response object with task details if a task is running; otherwise, an unsuccessful response.
+	 */
+	public function check_running_task($data) {
+		$type = isset($data['type']) ? $data['type'] : '';
+
+		if (!in_array($type, self::get_allowed_task_types())) return $this->handle_response(false);
+
+		$tasks = $this->get_active_tasks($data);
+
+		if (empty($tasks)) return $this->handle_response(false);
+
+		return $this->handle_response(true, false, array('extra_args' => array('task_id' => $tasks[0])));
+	}
 
 	/**
 	 * The initializes the AIOWPS Feature Manager
@@ -78,7 +148,7 @@ class AIOWPSecurity_Commands {
 		$ip_retrieve_methods = AIOS_Abstracted_Ids::get_ip_retrieve_methods();
 		if (isset($ip_retrieve_methods[$ip_method_id])) {
 			return array(
-				'ip_address' => isset($_SERVER[$ip_retrieve_methods[$ip_method_id]]) ? $_SERVER[$ip_retrieve_methods[$ip_method_id]] : '',
+				'ip_address' => isset($_SERVER[$ip_retrieve_methods[$ip_method_id]]) ? sanitize_text_field(wp_unslash($_SERVER[$ip_retrieve_methods[$ip_method_id]])) : '',
 			);
 		} else {
 			return new WP_Error('aios-invalid-ip-retrieve-method', __('Invalid IP retrieve method.', 'all-in-one-wp-security-and-firewall'));
@@ -95,6 +165,7 @@ class AIOWPSecurity_Commands {
 	 */
 	public function dismiss_notice($data) {
 		global $aio_wp_security;
+		global $aiowps_firewall_config;
 
 		$time_now = $aio_wp_security->notices->get_time_now();
 		
@@ -122,6 +193,7 @@ class AIOWPSecurity_Commands {
 		} elseif ('dismiss_ip_blacklist_notice' == $data['notice']) {
 			if (isset($data['turn_it_back_on']) && '1' == $data['turn_it_back_on']) {
 				$aio_wp_security->configs->set_value('aiowps_enable_blacklisting', '1');
+				$aiowps_firewall_config->set_value('aiowps_enable_blacklisting', '1');
 				AIOWPSecurity_Configure_Settings::set_blacklist_ip_firewall_configs();
 				AIOWPSecurity_Configure_Settings::set_user_agent_firewall_configs();
 			}
@@ -129,7 +201,7 @@ class AIOWPSecurity_Commands {
 		} elseif ('dismiss_firewall_settings_disabled_on_upgrade_notice' == $data['notice']) {
 			$is_reactivated = (isset($data['turn_it_back_on']) && '1' == $data['turn_it_back_on']);
 				if ($is_reactivated) {
-					global $aiowps_firewall_config;
+					$aiowps_firewall_config = AIOS_Firewall_Resource::request(AIOS_Firewall_Resource::CONFIG);
 					$active_settings = $aio_wp_security->configs->get_value('aiowps_firewall_active_upgrade');
 	
 					if (!empty($active_settings)) {
@@ -143,6 +215,8 @@ class AIOWPSecurity_Commands {
 				}
 
 				$aio_wp_security->configs->delete_value('aiowps_firewall_active_upgrade');
+		} elseif ('php_73_eol_dismiss_forever' == $data['notice']) {
+			$aio_wp_security->configs->set_value('php_73_eol_dismiss_forever', $time_now + (100 * 365.25 * 86400));
 		}
 		
 
@@ -274,8 +348,9 @@ class AIOWPSecurity_Commands {
 			'status' => 'success',
 			'data' => array(),
 		);
-		
-		$nonce = empty($_POST['nonce']) ? '' : $_POST['nonce'];
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- PCP warning. It is the nonce.
+		$nonce = empty($_POST['nonce']) ? '' : sanitize_key(wp_unslash($_POST['nonce']));
 		if (!wp_verify_nonce($nonce, 'wp-security-ajax-nonce')) {
 			$response['status'] = false;
 			$response['error_code'] = 'invalid_nonce';
@@ -288,7 +363,202 @@ class AIOWPSecurity_Commands {
 			}
 		}
 		
-		echo json_encode($response);
+		echo wp_json_encode($response);
 		exit;
+	}
+
+	/**
+	 * This function will send the diagnostic report email
+	 *
+	 * @param array $data - the request data
+	 *
+	 * @return array
+	 */
+	public function send_report_email($data) {
+		global $aio_wp_security;
+
+		// Sanitize the email address first.
+		$sanitized_email = !empty($data['report_email']) ? sanitize_email($data['report_email']) : '';
+
+		if ('' === $sanitized_email || !is_email($sanitized_email)) {
+			return array(
+				'status' => 'error',
+				'message' => __('Invalid email address.', 'all-in-one-wp-security-and-firewall'),
+			);
+		}
+
+		$result = $aio_wp_security->debug_obj->send_report($sanitized_email, wp_kses_post(html_entity_decode($data['report_sections'])));
+
+		if ($result) {
+			return array(
+				'status' => 'success',
+				'message' => __('The diagnostic report has been sent successfully.', 'all-in-one-wp-security-and-firewall'),
+			);
+		}
+
+		return array(
+			'status' => 'error',
+			'message' => __('There was an error sending the diagnostic report.', 'all-in-one-wp-security-and-firewall'),
+		);
+	}
+
+	/**
+	 * Returns an array of translations used by the AIOS plugin. Primarily used for UpdraftCentral consumption.
+	 *
+	 * @param array $params - The parameters passed to the function.
+	 *
+	 * @return array - The AIOS translations array
+	 */
+	public function get_js_translation($params) {
+		$translations = array();
+
+		if (isset($params['return_formatted_response'])) {
+			return array(
+				'error' => false,
+				'data' => array(
+					'translations' => $translations,
+				)
+			);
+		}
+
+		return $translations;
+	}
+
+	/**
+	 * Get multiple widgets data. Primarily used for UpdraftCentral consumption.
+	 *
+	 * @param array $args - The arguments containing the widgets to retrieve data for.
+	 *
+	 * @return array - An array containing error status and data for each widget.
+	 */
+	public function get_widgets_data($args) {
+		// Widgets.
+		$widgets = isset($args['widgets']) ? $args['widgets'] : array();
+
+		// Return early if no widgets supplied.
+		if (!is_array($widgets) || empty($widgets)) {
+			return array('error' => false, 'data' => array());
+		}
+
+		// Get the data for each widget.
+		$data = array();
+
+		// Loop through the widgets and get their data.
+		foreach ($widgets as $widget) {
+			$method = 'get_' . $widget . '_data';
+
+			if (method_exists($this, $method)) {
+				$data[$widget] = $this->$method($args);
+			}
+		}
+
+		return array('error' => false, 'data' => $data);
+	}
+
+	/**
+	 * Get the AIOS premium upsell data for UDC widget.
+	 *
+	 * @return array
+	 */
+	public function get_is_premium_data() {
+		$is_premium = AIOWPSecurity_Utility_Permissions::is_premium_installed();
+		$upgrade_to_premium_data = array();
+
+		if (false === $is_premium) {
+			$upgrade_to_premium_data = array(
+				'heading' => __('AIOS premium', 'all-in-one-wp-security-and-firewall'),
+				'checklist' => array(
+					__('Advanced malware scanning', 'all-in-one-wp-security-and-firewall'),
+					__('Real-time response time monitoring', 'all-in-one-wp-security-and-firewall'),
+					__('Custom two-factor authentication', 'all-in-one-wp-security-and-firewall'),
+					__('404 error protection & bot blocking', 'all-in-one-wp-security-and-firewall'),
+					__('Country-based traffic blocking', 'all-in-one-wp-security-and-firewall'),
+					__('Country whitelist management', 'all-in-one-wp-security-and-firewall'),
+					__('Guaranteed premium support', 'all-in-one-wp-security-and-firewall'),
+				),
+				'cta' => array(
+					'text' => __('Upgrade Now', 'all-in-one-wp-security-and-firewall'),
+					'url' => 'https://teamupdraft.com/all-in-one-security/pricing/',
+				),
+			);
+		}
+
+		return array(
+			'is_premium' => $is_premium,
+			'upgrade_to_premium_data' => $upgrade_to_premium_data,
+		);
+	}
+
+	/**
+	 * Get report data for the current month.
+	 *
+	 * @return array - An array containing this month's report data.
+	 */
+	public function get_report_data() {
+		$start_time = strtotime('first day of this month 00:00:00');
+		$end_time = strtotime('last day of this month 23:59:59');
+		global $wpdb;
+
+		$block_table_name = AIOWPSEC_TBL_PERM_BLOCK;
+		$blocked_ips_count = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(*) 
+				FROM {$block_table_name}
+				WHERE created BETWEEN %d AND %d",
+				$start_time,
+				$end_time
+			)
+		);
+
+		$audit_log_table_name = AIOWPSEC_TBL_AUDIT_LOG;
+		$failed_login_attempts_count = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(*) 
+				FROM {$audit_log_table_name}
+				WHERE event_type='failed_login' AND created BETWEEN %d AND %d",
+				$start_time,
+				$end_time
+			)
+		);
+
+		$stopped_malicious_requests_count = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(*) 
+				FROM {$audit_log_table_name}
+				WHERE event_type='rule_triggered' AND created BETWEEN %d AND %d",
+				$start_time,
+				$end_time
+			)
+		);
+
+		$file_change_detection_data = AIOWPSecurity_File_Scanner::get_fcd_data();
+
+		$critical_features = AIOWPSecurity_Feature_Item_Manager::get_critical_features();
+		$aiowps_feature_mgr = $this->get_feature_mgr_object();
+		$aiowps_feature_mgr->check_feature_status_and_recalculate_points();
+
+		$critical_issues = 0;
+
+		foreach ($critical_features as $key => $feature) {
+			$feature_item = $aiowps_feature_mgr->get_feature_item_by_id($key);
+			if (!$feature_item) continue;
+
+			if (!$feature_item->is_active()) {
+				++$critical_issues;
+			}
+		}
+
+		return array(
+			'report_data' => array(
+				'login_attempts_blocked' => empty($failed_login_attempts_count) ? 0 : $failed_login_attempts_count,
+				'stopped_malicious_requests' => empty($stopped_malicious_requests_count) ? 0 : $stopped_malicious_requests_count,
+				'blocked_ips_count' => empty($blocked_ips_count) ? 0 : $blocked_ips_count,
+				'total_files_scanned' => empty($file_change_detection_data['file_scan_data']) ? 0 : count($file_change_detection_data['file_scan_data']),
+			),
+			'variables' => array(
+				/* translators: %d is the number of critical issues found. */
+				'security_highlights' => sprintf(__('%d critical issue(s)', 'all-in-one-wp-security-and-firewall'), $critical_issues),
+			),
+		);
 	}
 }

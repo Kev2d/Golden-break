@@ -1,4 +1,4 @@
-<?php $title_tag = get_field('title_tag');
+﻿<?php $title_tag = get_field('title_tag');
 if (!$title_tag) {
     $title_tag = 'h2';
 }
@@ -28,7 +28,7 @@ if (!$title_tag) {
                             if ('media_library' === $icon['type']) :
                                 $attachment_id = $icon['value']['ID'];
                                 $image_src = wp_get_attachment_image_url($attachment_id, 'regular-icon');
-                                $image_alt = get_post_meta($attachment_id, '_wp_attachment_image_alt', true) ?: __('Social media icon', 'keweb');
+                                $image_alt = get_post_meta($attachment_id, '_wp_attachment_image_alt', true) ?: __('Social media icon', 'golden-break');
 
                                 // Render SVG if applicable
                                 $svg_content = SvgRenderer::render($image_src);
@@ -47,7 +47,7 @@ if (!$title_tag) {
                                     echo $svg_content; // Render SVG
                                 } else {
                                     echo '<img src="' . esc_url($url) . '" 
-                                    alt="' . esc_attr(__('Social media icon', 'keweb')) . '" 
+                                    alt="' . esc_attr(__('Social media icon', 'golden-break')) . '" 
                                     width="32" 
                                     height="32">';
                                 }

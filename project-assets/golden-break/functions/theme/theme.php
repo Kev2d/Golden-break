@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // Helper Function for Enqueuing Scripts and Styles
 function enqueue_script_style($handle, $src = '', $deps = array(), $ver = false, $media = 'all', $in_footer = false)
 {
@@ -61,7 +61,7 @@ function keweb_customize_register($wp_customize)
 
     // Add a control for the dark mode logo
     $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, 'dark_mode_logo_control', array(
-        'label'    => __('Dark Mode Logo', 'keweb'),
+        'label'    => __('Dark Mode Logo', 'golden-break'),
         'section'  => 'title_tagline', // Adds to the "Site Identity" section
         'settings' => 'dark_mode_logo',
         'priority' => 8, // Display order

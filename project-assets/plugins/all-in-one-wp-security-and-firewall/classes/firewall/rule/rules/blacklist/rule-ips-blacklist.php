@@ -19,9 +19,16 @@ class Rule_Ips_Blacklist extends Rule {
 	private $blocked_ips;
 
 	/**
+	 * Enabled state.
+	 *
+	 * @var bool
+	 */
+	private $enabled;
+
+	/**
 	 * Construct our rule
 	 *
-	 * @global AIOWPS\Firewall\Config $aiowps_firewall_config
+	 * @global Config $aiowps_firewall_config
 	 */
 	public function __construct() {
 		global $aiowps_firewall_config;
@@ -31,21 +38,23 @@ class Rule_Ips_Blacklist extends Rule {
 		$this->family   = 'Blacklist';
 		$this->priority = 0;
 		$this->blocked_ips = $aiowps_firewall_config->get_value('aiowps_blacklist_ips');
+		$this->enabled = (bool) $aiowps_firewall_config->get_value('aiowps_enable_blacklisting');
 	}
 
 	/**
 	 * Determines whether the rule is active
 	 *
-	 * @global AIOWPS\Firewall\Constants $aiowps_constants
+	 * @global Constants $aiowps_firewall_constants
 	 *
 	 * @return boolean
 	 */
 	public function is_active() {
-		global $aiowps_constants;
-		if ($aiowps_constants->AIOS_DISABLE_BLACKLIST_IP_MANAGER) {
+		global $aiowps_firewall_constants;
+
+		if ($aiowps_firewall_constants->AIOS_DISABLE_BLACKLIST_IP_MANAGER) {
 			return false;
 		} else {
-			return !empty($this->blocked_ips);
+			return $this->enabled && !empty($this->blocked_ips);
 		}
 	}
 

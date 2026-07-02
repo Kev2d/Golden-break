@@ -36,8 +36,8 @@ class Loader {
 			
 			$this->init();
 
-			global $aiowps_constants;
-			if ($aiowps_constants->AIOS_NO_FIREWALL) return;
+			global $aiowps_firewall_constants;
+			if ($aiowps_firewall_constants->AIOS_NO_FIREWALL) return;
 	
 			//Allow list for bypassing PHP rules
 			if (Allow_List::is_ip_allowed()) return;
@@ -57,10 +57,9 @@ class Loader {
 			exit();
 		} catch (\Exception $e) {
 			$this->log_message($e->getMessage());
-		} catch (\Error $e) {
+		} catch (\Error $e) { // phpcs:ignore PHPCompatibility.Classes.NewClasses.errorFound -- this won't run on PHP 5.6 so we still want to catch it on other versions
 			$this->log_message($e->getMessage());
 		}
-
 	}
 
 	/**
@@ -107,16 +106,15 @@ class Loader {
 	 private function init_services() {
 
 		$workspace = $this->get_firewall_workspace();
-		
+
 		if (empty($workspace)) {
 			throw new \Exception('unable to locate workspace.');
 		}
 
-		
 		$GLOBALS['aiowps_firewall_config'] = new Config($workspace . 'settings.php');
-		$GLOBALS['aiowps_constants'] = new Constants();
+		$GLOBALS['aiowps_firewall_message_store'] = Message_Store::instance();
+		$GLOBALS['aiowps_firewall_constants'] = new Constants();
 		Allow_List::set_path($workspace.'allowlist.php');
-		
 	 }
 
 	 /**
@@ -184,6 +182,8 @@ class Loader {
 		$classes_dir = dirname(AIOWPS_FIREWALL_DIR);
 
 		$manual_files = array(
+			$classes_dir.'/wp-security-firewall-resource-unavailable.php',
+			$classes_dir.'/wp-security-firewall-resource.php',
 			$classes_dir.'/wp-security-helper.php',
 		);
 

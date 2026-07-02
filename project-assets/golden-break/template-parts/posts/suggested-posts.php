@@ -1,6 +1,6 @@
-<section class="suggested-posts" aria-labelledby="suggested-posts-title">
+﻿<section class="suggested-posts" aria-labelledby="suggested-posts-title">
     <h4 id="suggested-posts-title" class="suggested-posts__title small--size">
-        <?php _e('You might also like', 'keweb'); ?>
+        <?php _e('You might also like', 'golden-break'); ?>
     </h4>
     <?php
     // Step 1: Get the current post's categories
@@ -92,7 +92,7 @@
                                 <h5 class="suggested-posts__post-title"><?php the_title(); ?></h5>
                             </a>
                             <p class="suggested-posts__post-excerpt"><?php echo $excerpt; ?></p>
-                            <span class="suggested-posts__post-read-time"><?php echo $read_time; ?> <?php _e('min read', 'keweb'); ?></span>
+                            <span class="suggested-posts__post-read-time"><?php echo $read_time; ?> <?php _e('min read', 'golden-break'); ?></span>
                         </div>
                     </article>
                 <?php

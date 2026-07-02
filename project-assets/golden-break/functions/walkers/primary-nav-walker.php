@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 class PrimaryNavWalker extends Walker_Nav_Menu
 {
     private $is_mobile;
@@ -20,7 +20,7 @@ class PrimaryNavWalker extends Walker_Nav_Menu
             ob_start();
             get_template_part('template-parts/UI/back-button', null, [
                 'function' => 'back-to-previous-menu',
-                'label' => __('Back to previous menu', 'keweb')
+                'label' => __('Back to previous menu', 'golden-break')
             ]);
             $back_button_html = ob_get_clean();
 
@@ -70,7 +70,7 @@ class PrimaryNavWalker extends Walker_Nav_Menu
 
         if (!$this->is_mobile && $depth === 0) {
             $close_svg = GetSvg::import('/assets/img/icons/close.svg', true);
-            $output .= '<li class="nav-item-close"><button aria-label="' . __('Close submenu', 'keweb') . '" data-function="close-nav-menu">' . $close_svg . '</button></li>';
+            $output .= '<li class="nav-item-close"><button aria-label="' . __('Close submenu', 'golden-break') . '" data-function="close-nav-menu">' . $close_svg . '</button></li>';
         }
 
         // Add the limited-grid class conditionally to only the correct site-nav-links

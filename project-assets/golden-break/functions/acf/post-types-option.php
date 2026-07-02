@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 if( class_exists('acf_field') ) {
 
@@ -7,7 +7,7 @@ if( class_exists('acf_field') ) {
         // Constructor
         function __construct() {
             $this->name = 'select_post_types';
-            $this->label = __('Select Post Types', 'keweb');
+            $this->label = __('Select Post Types', 'golden-break');
             $this->category = 'choice';
             $this->defaults = array(
                 'post_types' => array() // No options initially
@@ -30,7 +30,7 @@ if( class_exists('acf_field') ) {
             echo '<select name="' . esc_attr($field['name']) . '">';  // Single select without []
             
             // Optionally, you can have a placeholder or empty option
-            echo '<option value="">' . __('Select a Post Type', 'keweb') . '</option>';
+            echo '<option value="">' . __('Select a Post Type', 'golden-break') . '</option>';
             
             // Loop through each post type and create an option
             foreach ( $post_types as $post_type ) {

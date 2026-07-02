@@ -1,4 +1,4 @@
-<head>
+﻿<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
@@ -31,10 +31,10 @@
                 $args = array(
                     'redirect' => admin_url(), // redirect to admin dashboard.
                     'form_id' => 'custom_loginform',
-                    'label_username' => __('Kasutajanimi/E-mail', 'keweb'),
-                    'label_password' => __('Parool', 'keweb'),
-                    'label_remember' => __('Salvesta konto', 'keweb'),
-                    'label_log_in' => __('Logi sisse', 'keweb'),
+                    'label_username' => __('Kasutajanimi/E-mail', 'golden-break'),
+                    'label_password' => __('Parool', 'golden-break'),
+                    'label_remember' => __('Salvesta konto', 'golden-break'),
+                    'label_log_in' => __('Logi sisse', 'golden-break'),
                     'remember' => true,
                     'echo' => false, // don't echo the form, return it instead
                 );

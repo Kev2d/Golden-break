@@ -1,10 +1,10 @@
-<?php
+﻿<?php
 
 function keweb_block_categories($categories, $post)
 {
     $categories[] = [
-        'slug' => 'keweb',
-        'title' => __('keweb', 'keweb')
+        'slug' => 'golden-break',
+        'title' => __('Golden Break', 'golden-break')
     ];
 
     return array_reverse($categories);
@@ -23,7 +23,7 @@ function my_acf_init_block_types()
             'title'             => __('Hero Block'),
             'description'       => __('Hero Block used for site header.'),
             'render_template'   => 'acf-blocks/hero-block.php',
-            'category'          => 'keweb',
+            'category'          => 'golden-break',
             'icon'              => 'welcome-view-site',
             'keywords'          => array('hero', 'hero block', 'header'),
         ));
@@ -33,7 +33,7 @@ function my_acf_init_block_types()
             'title'             => __('Text Image Block'),
             'description'       => __('Text Image Block.'),
             'render_template'   => 'acf-blocks/text-image-block.php',
-            'category'          => 'keweb',
+            'category'          => 'golden-break',
             'icon'              => 'email',
             'keywords'          => array('textimageblock'),
         ));
@@ -43,7 +43,7 @@ function my_acf_init_block_types()
             'title'             => __('Banner Block'),
             'description'       => __('Banner Block used for prominent site sections.'),
             'render_template'   => 'acf-blocks/banner-block.php',
-            'category'          => 'keweb',
+            'category'          => 'golden-break',
             'icon'              => 'megaphone',
             'keywords'          => array('banner', 'banner block', 'promo'),
         ));
@@ -53,7 +53,7 @@ function my_acf_init_block_types()
             'title'             => __('Text Image CTA Block'),
             'description'       => __('A custom block with text, image, and call to action.'),
             'render_template'   => 'acf-blocks/text-image-cta-block.php',
-            'category'          => 'keweb',
+            'category'          => 'golden-break',
             'icon'              => 'images-alt2',
             'keywords'          => array('text', 'image', 'cta'),
         ));
@@ -63,7 +63,7 @@ function my_acf_init_block_types()
             'title'             => __('Small Banner Block'),
             'description'       => __('Small Banner Block used for smaller site sections.'),
             'render_template'   => 'acf-blocks/small-banner-block.php',
-            'category'          => 'keweb',
+            'category'          => 'golden-break',
             'icon'              => 'admin-site-alt3',
             'keywords'          => array('small banner', 'banner block', 'promo'),
         ));
@@ -73,7 +73,7 @@ function my_acf_init_block_types()
             'title'             => __('Text Stats Block'),
             'description'       => __('A block that displays text with accompanying statistics.'),
             'render_template'   => 'acf-blocks/text-stats-block.php',
-            'category'          => 'keweb',
+            'category'          => 'golden-break',
             'icon'              => 'chart-bar',
             'keywords'          => array('text', 'stats', 'statistics', 'data'),
         ));
@@ -83,7 +83,7 @@ function my_acf_init_block_types()
             'title'             => __('Features Block'),
             'description'       => __('A block that displays key features in a grid layout.'),
             'render_template'   => 'acf-blocks/features-block.php',
-            'category'          => 'keweb',
+            'category'          => 'golden-break',
             'icon'              => 'grid-view',
             'keywords'          => array('features', 'grid', 'steps', 'benefits'),
         ));
@@ -93,7 +93,7 @@ function my_acf_init_block_types()
             'title'             => __('Promo Block'),
             'description'       => __('A block that highlights promotional content with text and an image.'),
             'render_template'   => 'acf-blocks/promo-block.php',
-            'category'          => 'keweb',
+            'category'          => 'golden-break',
             'icon'              => 'star-filled',
             'keywords'          => array('promo', 'highlight', 'promotion', 'banner'),
         ));
@@ -103,7 +103,7 @@ function my_acf_init_block_types()
             'title'             => __('Icon Text Block'),
             'description'       => __('A block that displays an icon alongside text.'),
             'render_template'   => 'acf-blocks/icon-text-block.php',
-            'category'          => 'keweb',
+            'category'          => 'golden-break',
             'icon'              => 'admin-customizer',
             'keywords'          => array('icon', 'text', 'feature', 'info'),
         ));
@@ -113,7 +113,7 @@ function my_acf_init_block_types()
             'title'             => __('Latest Posts Block'),
             'description'       => __('A block that displays the latest posts.'),
             'render_template'   => 'acf-blocks/latest-posts-block.php',
-            'category'          => 'keweb',
+            'category'          => 'golden-break',
             'icon'              => 'admin-post',
             'keywords'          => array('latest', 'posts', 'recent', 'blog', 'articles'),
         ));
@@ -123,7 +123,7 @@ function my_acf_init_block_types()
             'title'             => __('Contact Info Block'),
             'description'       => __('A custom block to display contact information.'),
             'render_template'   => 'acf-blocks/contact-info-block.php',
-            'category'          => 'keweb',
+            'category'          => 'golden-break',
             'icon'              => 'phone',
             'keywords'          => array('contact', 'info', 'address', 'phone', 'email'),
         ));
@@ -133,7 +133,7 @@ function my_acf_init_block_types()
             'title'             => __('Contact Form Block'),
             'description'       => __('A custom block to display a contact form.'),
             'render_template'   => 'acf-blocks/contact-form-block.php',
-            'category'          => 'keweb',
+            'category'          => 'golden-break',
             'icon'              => 'email-alt',
             'keywords'          => array('contact', 'form', 'email', 'message'),
         ));
@@ -143,7 +143,7 @@ function my_acf_init_block_types()
             'title'             => __('Accordion Block'),
             'description'       => __('A custom block for displaying collapsible accordion content.'),
             'render_template'   => 'acf-blocks/accordion-block.php',
-            'category'          => 'keweb',
+            'category'          => 'golden-break',
             'icon'              => 'list-view',
             'keywords'          => array('accordion', 'collapse', 'toggle', 'expand'),
         ));
@@ -153,7 +153,7 @@ function my_acf_init_block_types()
             'title'             => __('Content Features Block'),
             'description'       => __('A custom block for displaying content features like image/video addition, text customization, and more.'),
             'render_template'   => 'acf-blocks/content-features-block.php',
-            'category'          => 'keweb',
+            'category'          => 'golden-break',
             'icon'              => 'admin-settings',
             'keywords'          => array('content', 'features', 'customization', 'images', 'videos'),
         ));
@@ -163,7 +163,7 @@ function my_acf_init_block_types()
             'title'             => __('Text Image List Block'),
             'description'       => __('A custom block for displaying text, an image, and a list.'),
             'render_template'   => 'acf-blocks/text-image-list-block.php',
-            'category'          => 'keweb',
+            'category'          => 'golden-break',
             'icon'              => 'format-image',
             'keywords'          => array('text', 'image', 'list', 'custom', 'block'),
         ));
@@ -173,7 +173,7 @@ function my_acf_init_block_types()
             'title'             => __('Content Overview Block'),
             'description'       => __('A custom block to display an overview of different content sections.'),
             'render_template'   => 'acf-blocks/content-overview-block.php',
-            'category'          => 'keweb',
+            'category'          => 'golden-break',
             'icon'              => 'welcome-widgets-menus',
             'keywords'          => array('content', 'overview', 'navigation', 'custom', 'block'),
         ));
@@ -183,7 +183,7 @@ function my_acf_init_block_types()
             'title'             => __('Posts Display Block'),
             'description'       => __('A custom block to display posts in various layouts.'),
             'render_template'   => 'acf-blocks/posts-display-block.php',
-            'category'          => 'keweb',
+            'category'          => 'golden-break',
             'icon'              => 'grid-view',
             'keywords'          => array('posts', 'display', 'custom', 'block', 'layout'),
         ));
@@ -192,7 +192,7 @@ function my_acf_init_block_types()
             'title'             => __('Price List Block'),
             'description'       => __('A custom block to display a price list in various layouts.'),
             'render_template'   => 'acf-blocks/price-list-block.php',
-            'category'          => 'keweb',
+            'category'          => 'golden-break',
             'icon'              => 'money',
             'keywords'          => array('price', 'list', 'cost', 'block', 'layout'),
         ));
@@ -201,7 +201,7 @@ function my_acf_init_block_types()
             'title'             => __('Title Text Block'),
             'description'       => __('A custom block to display a title with accompanying text.'),
             'render_template'   => 'acf-blocks/title-text-block.php',
-            'category'          => 'keweb',
+            'category'          => 'golden-break',
             'icon'              => 'editor-textcolor',
             'keywords'          => array('title', 'text', 'heading', 'block', 'content'),
         ));
@@ -210,7 +210,7 @@ function my_acf_init_block_types()
             'title'             => __('Regular Image Block'),
             'description'       => __('A custom block to display an image styled and sized according to the template.'),
             'render_template'   => 'acf-blocks/regular-image-block.php',
-            'category'          => 'keweb',
+            'category'          => 'golden-break',
             'icon'              => 'format-image',
             'keywords'          => array('image', 'photo', 'media', 'block', 'content'),
         ));
@@ -219,7 +219,7 @@ function my_acf_init_block_types()
             'title'             => __('Selected Jobs Block'),
             'description'       => __('Selected Jobs Block.'),
             'render_template'   => 'acf-blocks/selected-jobs-block.php',
-            'category'          => 'keweb',
+            'category'          => 'golden-break',
             'icon'              => 'email',
             'keywords'          => array('selected', 'jobs', 'block'),
         ));
@@ -228,7 +228,7 @@ function my_acf_init_block_types()
             'title'             => __('Features Secondary Block'),
             'description'       => __('Features Secondary Block.'),
             'render_template'   => 'acf-blocks/features-secondary-block.php',
-            'category'          => 'keweb',
+            'category'          => 'golden-break',
             'icon'              => 'email',
             'keywords'          => array('features', 'block'),
         ));
@@ -237,7 +237,7 @@ function my_acf_init_block_types()
             'title'             => __('Feedback Block'),
             'description'       => __('Feedback Block.'),
             'render_template'   => 'acf-blocks/feedback-block.php',
-            'category'          => 'keweb',
+            'category'          => 'golden-break',
             'icon'              => 'format-chat',
             'keywords'          => array('feedback', 'block'),
         ));

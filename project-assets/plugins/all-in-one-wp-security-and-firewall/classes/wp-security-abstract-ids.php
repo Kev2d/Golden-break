@@ -46,6 +46,8 @@ class AIOS_Abstracted_Ids {
 		return array(
 			'automated-database-backup',
 			'ip-retrieval-settings',
+			'load-firewall-resources-failed',
+			'end-of-support-php-73',
 		);
 	}
 
@@ -116,4 +118,17 @@ class AIOS_Abstracted_Ids {
 		);
 	}
 
+	/**
+	 * Get genuine bots user agent and host.
+	 *
+	 * @return array
+	 */
+	public static function get_bots() {
+		return array(
+			array('user_agent' => 'Googlebot', 'host_name' => 'googlebot'),
+			array('user_agent' => 'bingbot', 'host_name' => 'msnbot'),
+			array('user_agent' => 'Slurp', 'host_name' => 'yahoo'),
+			array('user_agent' => 'Facebook', 'host_name' => 'facebook'),
+		);
+	}
 }

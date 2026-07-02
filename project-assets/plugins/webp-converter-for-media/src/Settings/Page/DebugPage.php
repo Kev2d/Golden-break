@@ -17,25 +17,16 @@ class DebugPage extends PageAbstract {
 	const PAGE_SLUG      = 'debug';
 	const PAGE_VIEW_PATH = 'views/settings-debug.php';
 
-	/**
-	 * @var PluginInfo
-	 */
-	private $plugin_info;
+	private PluginInfo $plugin_info;
 
-	/**
-	 * @var PluginData
-	 */
-	private $plugin_data;
+	private PluginData $plugin_data;
 
-	/**
-	 * @var FileLoader
-	 */
-	private $file_loader;
+	private FileLoader $file_loader;
 
 	public function __construct(
 		PluginInfo $plugin_info,
 		PluginData $plugin_data,
-		FileLoader $file_loader = null
+		?FileLoader $file_loader = null
 	) {
 		$this->plugin_info = $plugin_info;
 		$this->plugin_data = $plugin_data;
@@ -52,7 +43,7 @@ class DebugPage extends PageAbstract {
 	/**
 	 * {@inheritdoc}
 	 */
-	public function get_label(): string {
+	public static function get_label(): string {
 		return __( 'Help Center', 'webp-converter-for-media' );
 	}
 
@@ -103,23 +94,17 @@ class DebugPage extends PageAbstract {
 				true,
 				$ver_param
 			),
-			'plugin_settings'       => $this->plugin_data->get_public_settings(),
+			'plugin_settings'       => $this->plugin_data->get_plugin_settings_public(),
 			'url_debug_page'        => PageIntegrator::get_settings_page_url( self::PAGE_SLUG ),
 			'errors_messages'       => $errors_messages,
 			'errors_codes'          => $errors_codes,
 		];
 	}
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function do_action_before_load() {
+	public function do_action_before_load(): void {
 	}
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function do_action_after_load() {
+	public function do_action_after_load(): void {
 		do_action( LoaderAbstract::ACTION_NAME, true );
 	}
 }

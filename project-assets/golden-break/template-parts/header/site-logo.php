@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 $custom_logo_id = get_theme_mod('custom_logo');
 $dark_logo_url = get_theme_mod('dark_mode_logo');
 $default_logo_url = get_stylesheet_directory_uri() . '/assets/img/defaultimages/keweblogo.svg';
@@ -58,7 +58,7 @@ function render_logo($logo_input, $default_url, $default_alt, $extra_attributes 
 // Render each logo separately
 if (!empty($custom_logo_id)) : ?>
     <div class="site-logo" data-element="light">
-        <a href="<?php echo esc_url(home_url('/')); ?>" rel="home" aria-label="<?php esc_attr_e('Go to homepage', 'keweb'); ?>">
+        <a href="<?php echo esc_url(home_url('/')); ?>" rel="home" aria-label="<?php esc_attr_e('Go to homepage', 'golden-break'); ?>">
             <?php echo render_logo($custom_logo_id, $default_logo_url, $default_alt); ?>
         </a>
     </div>
@@ -66,7 +66,7 @@ if (!empty($custom_logo_id)) : ?>
 
 if (!empty($dark_logo_url)) : ?>
     <div class="site-logo" data-element="dark">
-        <a href="<?php echo esc_url(home_url('/')); ?>" rel="home" aria-label="<?php esc_attr_e('Go to homepage', 'keweb'); ?>">
+        <a href="<?php echo esc_url(home_url('/')); ?>" rel="home" aria-label="<?php esc_attr_e('Go to homepage', 'golden-break'); ?>">
             <?php echo render_logo($dark_logo_url, $default_dark_logo_url, $default_alt); ?>
         </a>
     </div>

@@ -10,7 +10,9 @@ use WebpConverter\Settings\Option\CloudflareApiTokenOption;
 use WebpConverter\Settings\Option\CloudflareZoneIdOption;
 use WebpConverter\Settings\Option\ExtraFeaturesOption;
 use WebpConverter\Settings\Option\HtaccessRewriteOutputOption;
+use WebpConverter\Settings\Option\HtaccessRewriteParentOption;
 use WebpConverter\Settings\Option\HtaccessRewritePathOption;
+use WebpConverter\Settings\Option\HtaccessRewriteFlagRedirectOption;
 use WebpConverter\Settings\Option\HtaccessRewriteRootOption;
 use WebpConverter\Settings\Option\RewriteInheritanceOption;
 use WebpConverter\Settings\Option\SupportedExtensionsOption;
@@ -32,26 +34,25 @@ class HtaccessLoader extends LoaderAbstract {
 	/**
 	 * {@inheritdoc}
 	 */
-	public function init_admin_hooks() {
-		add_filter( 'webpc_htaccess_rewrite_root', [ $this, 'modify_document_root_path' ], 0 );
-		add_filter( 'webpc_htaccess_rewrite_output', [ $this, 'modify_output_root_path' ], 0, 2 );
-		add_filter( 'webpc_htaccess_rewrite_root', [ $this, 'overwrite_htaccess_rewrite_root' ] );
-		add_filter( 'webpc_htaccess_rewrite_path', [ $this, 'overwrite_htaccess_rewrite_path' ] );
-		add_filter( 'webpc_htaccess_rewrite_output', [ $this, 'overwrite_htaccess_rewrite_output' ] );
+	public function init_admin_hooks(): void {
+		add_filter( 'webpc_htaccess_rewrite_root', [ $this, 'overwrite_htaccess_rewrite_root' ], 0 );
+		add_filter( 'webpc_htaccess_rewrite_path', [ $this, 'overwrite_htaccess_rewrite_path' ], 0 );
+		add_filter( 'webpc_htaccess_rewrite_parent', [ $this, 'overwrite_htaccess_rewrite_parent' ], 0 );
+		add_filter( 'webpc_htaccess_rewrite_output', [ $this, 'overwrite_htaccess_rewrite_output' ], 0, 2 );
 		add_filter( 'webpc_debug_image_url', [ $this, 'update_image_urls_to_bunny_cdn' ] );
 	}
 
 	/**
 	 * {@inheritdoc}
 	 */
-	public function init_front_end_hooks() {
+	public function init_front_end_hooks(): void {
 	}
 
 	/**
 	 * {@inheritdoc}
 	 */
-	public function activate_loader( bool $is_debug = false ) {
-		$settings = ( ! $is_debug ) ? $this->plugin_data->get_plugin_settings() : $this->plugin_data->get_debug_settings();
+	public function activate_loader( bool $is_debug = false ): void {
+		$settings = ( ! $is_debug ) ? $this->plugin_data->get_plugin_settings() : $this->plugin_data->get_plugin_settings_debug();
 
 		$this->deactivate_loader();
 
@@ -63,41 +64,12 @@ class HtaccessLoader extends LoaderAbstract {
 	/**
 	 * {@inheritdoc}
 	 */
-	public function deactivate_loader() {
+	public function deactivate_loader(): void {
 		$settings = $this->plugin_data->get_plugin_settings();
 
 		$this->add_rewrite_rules_to_wp_content( false, $settings );
 		$this->add_rewrite_rules_to_uploads( false, $settings );
 		$this->add_rewrite_rules_to_uploads_webp( false, $settings );
-	}
-
-	/**
-	 * @param string $original_path .
-	 *
-	 * @return string
-	 * @internal
-	 */
-	public function modify_document_root_path( string $original_path ): string {
-		if ( isset( $_SERVER['SERVER_ADMIN'] ) && strpos( $_SERVER['SERVER_ADMIN'], '.home.pl' ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
-			return '%{DOCUMENT_ROOT}' . str_replace( '//', '/', ABSPATH );
-		}
-
-		return $original_path;
-	}
-
-	/**
-	 * @param string $output_path .
-	 * @param string $root_path   .
-	 *
-	 * @return string
-	 * @internal
-	 */
-	public function modify_output_root_path( string $output_path, string $root_path ): string {
-		if ( $output_path === $root_path ) {
-			return '/';
-		}
-
-		return $output_path;
 	}
 
 	/**
@@ -108,13 +80,15 @@ class HtaccessLoader extends LoaderAbstract {
 	 */
 	public function overwrite_htaccess_rewrite_root( string $path ): string {
 		$settings = $this->plugin_data->get_plugin_settings();
-		$terms    = [
-			'ABSPATH' => ABSPATH,
-		];
+		if ( $settings[ HtaccessRewriteRootOption::OPTION_NAME ] !== '' ) {
+			return str_replace( 'ABSPATH', ABSPATH, $settings[ HtaccessRewriteRootOption::OPTION_NAME ] );
+		}
 
-		return ( $settings[ HtaccessRewriteRootOption::OPTION_NAME ] !== '' )
-			? str_replace( array_keys( $terms ), array_values( $terms ), $settings[ HtaccessRewriteRootOption::OPTION_NAME ] )
-			: $path;
+		if ( isset( $_SERVER['SERVER_ADMIN'] ) && strpos( $_SERVER['SERVER_ADMIN'], '.home.pl' ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+			return '%{DOCUMENT_ROOT}' . str_replace( '//', '/', ABSPATH );
+		}
+
+		return $path;
 	}
 
 	/**
@@ -125,8 +99,11 @@ class HtaccessLoader extends LoaderAbstract {
 	 */
 	public function overwrite_htaccess_rewrite_path( string $path ): string {
 		$settings = $this->plugin_data->get_plugin_settings();
+		if ( $settings[ HtaccessRewritePathOption::OPTION_NAME ] !== '' ) {
+			return str_replace( 'ABSPATH', ABSPATH, $settings[ HtaccessRewritePathOption::OPTION_NAME ] );
+		}
 
-		return ( $settings[ HtaccessRewritePathOption::OPTION_NAME ] !== '' ) ? $settings[ HtaccessRewritePathOption::OPTION_NAME ] : $path;
+		return $path;
 	}
 
 	/**
@@ -135,10 +112,33 @@ class HtaccessLoader extends LoaderAbstract {
 	 * @return string
 	 * @internal
 	 */
-	public function overwrite_htaccess_rewrite_output( string $path ): string {
+	public function overwrite_htaccess_rewrite_parent( string $path ): string {
 		$settings = $this->plugin_data->get_plugin_settings();
+		if ( $settings[ HtaccessRewriteParentOption::OPTION_NAME ] !== '' ) {
+			return $settings[ HtaccessRewriteParentOption::OPTION_NAME ];
+		}
 
-		return ( $settings[ HtaccessRewriteOutputOption::OPTION_NAME ] !== '' ) ? $settings[ HtaccessRewriteOutputOption::OPTION_NAME ] : $path;
+		return $path;
+	}
+
+	/**
+	 * @param string $output_path .
+	 * @param string $root_path   .
+	 *
+	 * @return string
+	 * @internal
+	 */
+	public function overwrite_htaccess_rewrite_output( string $output_path, string $root_path ): string {
+		$settings = $this->plugin_data->get_plugin_settings();
+		if ( $settings[ HtaccessRewriteOutputOption::OPTION_NAME ] !== '' ) {
+			return $settings[ HtaccessRewriteOutputOption::OPTION_NAME ];
+		}
+
+		if ( $output_path === $root_path ) {
+			return '/';
+		}
+
+		return $output_path;
 	}
 
 	/**
@@ -161,10 +161,8 @@ class HtaccessLoader extends LoaderAbstract {
 	 *
 	 * @param bool    $is_active Is loader active?
 	 * @param mixed[] $settings  Plugin settings.
-	 *
-	 * @return void
 	 */
-	private function add_rewrite_rules_to_wp_content( bool $is_active, array $settings ) {
+	private function add_rewrite_rules_to_wp_content( bool $is_active, array $settings ): void {
 		$path = dirname( apply_filters( 'webpc_dir_path', '', 'uploads' ) );
 		if ( ! $is_active ) {
 			$this->save_rewrites_in_htaccesss( $path );
@@ -194,10 +192,8 @@ class HtaccessLoader extends LoaderAbstract {
 	 *
 	 * @param bool    $is_active Is loader active?
 	 * @param mixed[] $settings  Plugin settings.
-	 *
-	 * @return void
 	 */
-	private function add_rewrite_rules_to_uploads( bool $is_active, array $settings ) {
+	private function add_rewrite_rules_to_uploads( bool $is_active, array $settings ): void {
 		$path = apply_filters( 'webpc_dir_path', '', 'uploads' );
 		if ( ! $is_active ) {
 			$this->save_rewrites_in_htaccesss( $path );
@@ -220,10 +216,8 @@ class HtaccessLoader extends LoaderAbstract {
 	 *
 	 * @param bool    $is_active Is loader active?
 	 * @param mixed[] $settings  Plugin settings.
-	 *
-	 * @return void
 	 */
-	private function add_rewrite_rules_to_uploads_webp( bool $is_active, array $settings ) {
+	private function add_rewrite_rules_to_uploads_webp( bool $is_active, array $settings ): void {
 		$path = apply_filters( 'webpc_dir_path', '', 'webp' );
 		if ( ! $is_active ) {
 			$this->save_rewrites_in_htaccesss( $path );
@@ -249,16 +243,18 @@ class HtaccessLoader extends LoaderAbstract {
 	 *
 	 * @return string Rules for .htaccess file.
 	 */
-	protected function get_mod_rewrite_rules( array $settings, string $output_path_suffix = null ): string {
+	protected function get_mod_rewrite_rules( array $settings, ?string $output_path_suffix = null ): string {
 		$content = '';
 		if ( ! $settings[ SupportedExtensionsOption::OPTION_NAME ] ) {
 			return $content;
 		}
 
+		$flag_redirect      = ( $settings[ HtaccessRewriteFlagRedirectOption::OPTION_NAME ] === 'yes' ) ? ',R=302' : '';
 		$document_root      = PathsGenerator::get_rewrite_root();
 		$root_suffix        = PathsGenerator::get_rewrite_path();
 		$root_suffix_output = apply_filters( 'webpc_htaccess_rewrite_output', $root_suffix, $document_root );
 		$output_path        = apply_filters( 'webpc_dir_name', '', 'webp' );
+		$output_parent      = apply_filters( 'webpc_htaccess_rewrite_parent', '' );
 		if ( $output_path_suffix !== null ) {
 			$output_path .= '/' . $output_path_suffix;
 		}
@@ -299,7 +295,7 @@ class HtaccessLoader extends LoaderAbstract {
 				if ( apply_filters( 'webpc_htaccess_mod_rewrite_referer', false ) === true ) {
 					$content .= "  RewriteCond %{HTTP_HOST}@@%{HTTP_REFERER} ^([^@]*)@@https?://\\1/.*" . PHP_EOL;
 				}
-				$content .= "  RewriteRule (.+)\.{$ext}$ {$root_suffix_output}{$output_path}/$1.{$ext}.{$format} [NC,T={$mime_type},L]" . PHP_EOL;
+				$content .= "  RewriteRule {$output_parent}(.+)\.{$ext}$ {$root_suffix_output}{$output_path}/$1.{$ext}.{$format} [NC,T={$mime_type},L{$flag_redirect}]" . PHP_EOL;
 			}
 		}
 
@@ -333,6 +329,7 @@ class HtaccessLoader extends LoaderAbstract {
 		}
 		if ( apply_filters( 'webpc_htaccess_cache_control_private', $cache_control ) ) {
 			$content .= '    Header always set Cache-Control "private"' . PHP_EOL;
+			$content .= '    Header always set X-LiteSpeed-Cache-Control "no-cache"' . PHP_EOL;
 		}
 		$content .= '    Header append Vary "Accept"' . PHP_EOL;
 		if ( $extensions ) {
@@ -412,10 +409,8 @@ class HtaccessLoader extends LoaderAbstract {
 	 *
 	 * @param string $path_dir Location of .htaccess file.
 	 * @param string $rules    Rules for .htaccess file.
-	 *
-	 * @return void
 	 */
-	private function save_rewrites_in_htaccesss( string $path_dir, string $rules = '' ) {
+	private function save_rewrites_in_htaccesss( string $path_dir, string $rules = '' ): void {
 		$path_file = $path_dir . '/.htaccess';
 
 		$code = ( is_readable( $path_file ) ) ? file_get_contents( $path_file ) ?: '' : '';

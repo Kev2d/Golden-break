@@ -15,28 +15,22 @@ use WebpConverter\Settings\Option\SupportedExtensionsOption;
  */
 class UploadFileHandler implements HookableInterface {
 
-	/**
-	 * @var PluginData
-	 */
-	private $plugin_data;
+	private PluginData $plugin_data;
 
-	/**
-	 * @var CronInitiator
-	 */
-	private $cron_initiator;
+	private CronInitiator $cron_initiator;
 
 	/**
 	 * Paths of converted images.
 	 *
 	 * @var string[]
 	 */
-	private $uploaded_paths = [];
+	private array $uploaded_paths = [];
 
 	public function __construct(
 		PluginData $plugin_data,
 		TokenRepository $token_repository,
 		FormatFactory $format_factory,
-		CronInitiator $cron_initiator = null
+		?CronInitiator $cron_initiator = null
 	) {
 		$this->plugin_data    = $plugin_data;
 		$this->cron_initiator = $cron_initiator ?: new CronInitiator( $plugin_data, $token_repository, $format_factory );
@@ -45,15 +39,14 @@ class UploadFileHandler implements HookableInterface {
 	/**
 	 * {@inheritdoc}
 	 */
-	public function init_hooks() {
+	public function init_hooks(): void {
 		add_action( 'init', [ $this, 'init_hooks_after_setup' ] );
 	}
 
 	/**
-	 * @return void
 	 * @internal
 	 */
-	public function init_hooks_after_setup() {
+	public function init_hooks_after_setup(): void {
 		$plugin_settings = $this->plugin_data->get_plugin_settings();
 		if ( ! $plugin_settings[ AutoConversionOption::OPTION_NAME ] ) {
 			return;
@@ -72,7 +65,7 @@ class UploadFileHandler implements HookableInterface {
 	 * @return mixed[]|null Attachment meta data.
 	 * @internal
 	 */
-	public function init_attachment_conversion( array $data = null, int $attachment_id = null ) {
+	public function init_attachment_conversion( ?array $data = null, ?int $attachment_id = null ): ?array {
 		if ( ( $data === null ) || ( $attachment_id === null )
 			|| ! isset( $data['file'] ) || ! isset( $data['sizes'] ) ) {
 			return $data;
@@ -176,11 +169,9 @@ class UploadFileHandler implements HookableInterface {
 	}
 
 	/**
-	 * @return void
-	 *
 	 * @internal
 	 */
-	public function save_paths_to_conversion() {
+	public function save_paths_to_conversion(): void {
 		$paths = array_unique( $this->uploaded_paths );
 		if ( ! $paths ) {
 			return;

@@ -1,4 +1,4 @@
-<section class="posts-display-block">
+﻿<section class="posts-display-block">
     <?php
     $title_tag = get_field('title_tag');
     if (!$title_tag) {
@@ -86,7 +86,7 @@
                                 <?php endif; ?>
 
                                 <?php if (get_post_type() !== 'portfolio') : ?>
-                                    <span class="posts-display-block__post-read-time"><?php echo $read_time; ?> <?php _e('min read', 'keweb'); ?></span>
+                                    <span class="posts-display-block__post-read-time"><?php echo $read_time; ?> <?php _e('min read', 'golden-break'); ?></span>
                                 <?php endif; ?>
                             </article>
                         </div>

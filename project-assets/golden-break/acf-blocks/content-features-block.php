@@ -1,4 +1,4 @@
-<section class="content-features-block layout-lg">
+﻿<section class="content-features-block layout-lg">
 
     <?php if (have_rows('features')) : ?>
 
@@ -21,7 +21,7 @@
                             $attachment_id = $icon['value']['ID'];
                             $size = 'regular-icon';
 
-                            $image_html = wp_get_attachment_image($attachment_id, $size, false, array('alt' => __('Social media icon', 'keweb')));
+                            $image_html = wp_get_attachment_image($attachment_id, $size, false, array('alt' => __('Social media icon', 'golden-break')));
                             echo wp_kses_post($image_html);
                         endif;
 
@@ -30,7 +30,7 @@
                         ?>
                             <img
                                 src="<?php echo esc_url($url); ?>"
-                                alt="<?php _e('Feature icon', 'keweb'); ?>"
+                                alt="<?php _e('Feature icon', 'golden-break'); ?>"
                                 width="32"
                                 height="32">
                         <?php endif; ?>

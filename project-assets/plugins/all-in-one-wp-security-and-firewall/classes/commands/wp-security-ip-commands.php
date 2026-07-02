@@ -16,23 +16,17 @@ trait AIOWPSecurity_Ip_Commands_Trait {
 	public function unlock_ip($data) {
 
 		if (!isset($data['ip'])) {
-			return array('status' => 'error', 'message' => AIOWPSecurity_Admin_Menu::show_msg_error_st(__('No IP provided.', 'all-in-one-wp-security-and-firewall'), true));
+			return $this->handle_response(false, __('No IP provided.', 'all-in-one-wp-security-and-firewall'));
 		}
 
 		if (!filter_var($data['ip'], FILTER_VALIDATE_IP)) {
-			return array('status' => 'error', 'message' => AIOWPSecurity_Admin_Menu::show_msg_error_st(__('Invalid IP provided.', 'all-in-one-wp-security-and-firewall'), true));
+			return $this->handle_response(false, __('Invalid IP provided.', 'all-in-one-wp-security-and-firewall'));
 		}
 
 		if (!AIOWPSecurity_Utility::unlock_ip($data['ip'])) {
-			return array(
-				'status' => 'error',
-				'message' => AIOWPSecurity_Admin_Menu::show_msg_error_st(__('Failed to unlock the selected IP address.', 'all-in-one-wp-security-and-firewall'), true)
-			);
+			return $this->handle_response(false, __('Failed to unlock the selected IP address.', 'all-in-one-wp-security-and-firewall'));
 		} else {
-			return array(
-				'status' => 'success',
-				'message' => AIOWPSecurity_Admin_Menu::show_msg_updated_st(__('The selected IP address was unlocked successfully.', 'all-in-one-wp-security-and-firewall'), true)
-			);
+			return $this->handle_response(true, __('The selected IP address was unlocked successfully.', 'all-in-one-wp-security-and-firewall'));
 		}
 	}
 
@@ -46,23 +40,17 @@ trait AIOWPSecurity_Ip_Commands_Trait {
 	public function unblacklist_ip($data) {
 
 		if (!isset($data['ip'])) {
-			return array('status' => 'error', 'message' => AIOWPSecurity_Admin_Menu::show_msg_error_st(__('No IP provided.', 'all-in-one-wp-security-and-firewall'), true));
+			return $this->handle_response(false, __('No IP provided.', 'all-in-one-wp-security-and-firewall'));
 		}
 
 		if (!filter_var($data['ip'], FILTER_VALIDATE_IP)) {
-			return array('status' => 'error', 'message' => AIOWPSecurity_Admin_Menu::show_msg_error_st(__('Invalid IP provided.', 'all-in-one-wp-security-and-firewall'), true));
+			return $this->handle_response(false, __('Invalid IP provided.', 'all-in-one-wp-security-and-firewall'));
 		}
 
 		if (!AIOWPSecurity_Utility::unblacklist_ip($data['ip'])) {
-			return array(
-				'status' => 'error',
-				'message' => AIOWPSecurity_Admin_Menu::show_msg_error_st(__('Failed to unblacklist the selected IP address.', 'all-in-one-wp-security-and-firewall'), true)
-			);
+			return $this->handle_response(false, __('Failed to unblacklist the selected IP address.', 'all-in-one-wp-security-and-firewall'));
 		} else {
-			return array(
-				'status' => 'success',
-				'message' => AIOWPSecurity_Admin_Menu::show_msg_updated_st(__('The selected IP address was unblacklisted successfully.', 'all-in-one-wp-security-and-firewall'), true)
-			);
+			return $this->handle_response(true, __('The selected IP address was unblacklisted successfully.', 'all-in-one-wp-security-and-firewall'));
 		}
 	}
 
@@ -76,17 +64,19 @@ trait AIOWPSecurity_Ip_Commands_Trait {
 	public function blocked_ip_list_unblock_ip($data) {
 
 		if (!isset($data['id'])) {
-			return array('status' => 'error', 'message' => AIOWPSecurity_Admin_Menu::show_msg_error_st(__('Invalid blocked IP ID provided.', 'all-in-one-wp-security-and-firewall'), true));
+			return $this->handle_response(false, __('Invalid blocked IP ID provided.', 'all-in-one-wp-security-and-firewall'));
 		}
 
 		include_once AIO_WP_SECURITY_PATH . '/admin/wp-security-list-permanent-blocked-ip.php'; // For rendering the AIOWPSecurity_List_Table
 		$blocked_ip_list = new AIOWPSecurity_List_Blocked_IP(); // For rendering the AIOWPSecurity_List_Table
 		$result = $blocked_ip_list->unblock_ip_address($data['id']);
 
-		return array(
-			'message' => $result,
-			'status' => 'success'
-		);
+		if (false === $result) {
+			$message = __('Failed to unblock and delete the selected record(s).', 'all-in-one-wp-security-and-firewall');
+		} else {
+			$message = __('Successfully unblocked and deleted the selected record(s).', 'all-in-one-wp-security-and-firewall');
+		}
+		return $this->handle_response(true, $message);
 	}
 
 	/**
@@ -97,25 +87,26 @@ trait AIOWPSecurity_Ip_Commands_Trait {
 	 * @return array
 	 */
 	public function lock_ip($data) {
-
 		if (!isset($data['ip'])) {
-			return array('status' => 'error', 'message' => AIOWPSecurity_Admin_Menu::show_msg_error_st(__('No IP provided.', 'all-in-one-wp-security-and-firewall'), true));
+			return $this->handle_response(false, __('No IP address has been provided.', 'all-in-one-wp-security-and-firewall'));
 		}
 
-		if (!filter_var($data['ip'], FILTER_VALIDATE_IP)) {
-			return array('status' => 'error', 'message' => AIOWPSecurity_Admin_Menu::show_msg_error_st(__('Invalid IP provided.', 'all-in-one-wp-security-and-firewall'), true));
+		$ip = sanitize_text_field($data['ip']);
+
+		if (AIOWPSecurity_Utility_IP::get_user_ip_address() == $ip) {
+			return $this->handle_response(false, __('You cannot lock your own IP address:', 'all-in-one-wp-security-and-firewall') . ' ' . $ip);
 		}
 
-		if (!isset($data['lock_reason'])) {
-			return array('status' => 'error', 'message' => AIOWPSecurity_Admin_Menu::show_msg_error_st(__('No lockout reason provided.', 'all-in-one-wp-security-and-firewall'), true));
+		if (!filter_var($ip, FILTER_VALIDATE_IP)) {
+			return $this->handle_response(false, __('The provided IP address is not valid:', 'all-in-one-wp-security-and-firewall') . ' ' . $ip);
 		}
 
-		AIOWPSecurity_Utility::lock_ip($data['ip'], $data['lock_reason']);
+		$reason = isset($data['lock_reason']) ? sanitize_text_field($data['lock_reason']) : '';
+		$username = isset($data['username']) ? sanitize_user($data['username']) : '';
 
-		return array(
-			'status' => 'success',
-			'message' => AIOWPSecurity_Admin_Menu::show_msg_updated_st(__('The selected IP address is now temporarily locked.', 'all-in-one-wp-security-and-firewall'), true)
-		);
+		AIOWPSecurity_Utility::lock_ip($ip, $reason, $username);
+
+		return $this->handle_response(true, __('The selected IP address is now temporarily locked.', 'all-in-one-wp-security-and-firewall'));
 	}
 
 	/**
@@ -128,25 +119,19 @@ trait AIOWPSecurity_Ip_Commands_Trait {
 	public function blacklist_ip($data) {
 
 		if (!isset($data['ip'])) {
-			return array('status' => 'error', 'message' => AIOWPSecurity_Admin_Menu::show_msg_error_st(__('No IP provided.', 'all-in-one-wp-security-and-firewall'), true));
+			return $this->handle_response(false, __('No IP provided.', 'all-in-one-wp-security-and-firewall'));
 		}
 
 		if (!filter_var($data['ip'], FILTER_VALIDATE_IP)) {
-			return array('status' => 'error', 'message' => AIOWPSecurity_Admin_Menu::show_msg_error_st(__('Invalid IP provided.', 'all-in-one-wp-security-and-firewall'), true));
+			return $this->handle_response(false, __('Invalid IP provided.', 'all-in-one-wp-security-and-firewall'));
 		}
 
 		$result = AIOWPSecurity_Utility::blacklist_ip($data['ip']);
 
 		if (is_wp_error($result)) {
-			return array(
-				'status' => 'error',
-				'message' => AIOWPSecurity_Admin_Menu::show_msg_error_st(nl2br($result->get_error_message()), true)
-			);
+			return $this->handle_response(false, nl2br($result->get_error_message()));
 		} else {
-			return array(
-				'status' => 'success',
-				'message' => AIOWPSecurity_Admin_Menu::show_msg_updated_st(__('The selected IP address has been added to the blacklist.', 'all-in-one-wp-security-and-firewall'), true)
-			);
+			return $this->handle_response(true, __('The selected IP address has been added to the blacklist.', 'all-in-one-wp-security-and-firewall'));
 		}
 	}
 }

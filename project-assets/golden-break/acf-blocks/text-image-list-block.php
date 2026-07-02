@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 function generate_id_from_title($index, $title)
 {
     $sanitized_title = sanitize_title_with_dashes($title); // Converts to lowercase and replaces spaces with dashes
@@ -27,7 +27,7 @@ function generate_id_from_title($index, $title)
                 <?php if (have_rows('content_list')) : ?>
 
                     <div class="text-image-list-block__table-of-contents">
-                        <h4 class="text-image-list-block__table-of-contents-title"><?php _e('Table of Contents', 'keweb'); ?></h4>
+                        <h4 class="text-image-list-block__table-of-contents-title"><?php _e('Table of Contents', 'golden-break'); ?></h4>
                         <ul class="text-image-list-block__table-of-contents-list">
                             <?php while (have_rows('content_list')) : the_row(); ?>
                                 <li class="text-image-list-block__table-of-contents-list-item">

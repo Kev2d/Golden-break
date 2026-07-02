@@ -1,6 +1,6 @@
 <?php
 if (!defined('ABSPATH')) {
-	exit;//Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
 
 require_once(AIO_WP_SECURITY_PATH.'/classes/wp-security-base-tasks.php');
@@ -19,6 +19,9 @@ class AIOWPSecurity_Uninstallation_Tasks extends AIOWPSecurity_Base_Tasks {
 
 	/**
 	 * Run uninstallation task for a single site.
+	 *
+	 * This method overrides {@see AIOWPSecurity_Base_Tasks::run_for_a_site()}.
+	 * It drops database tables, deletes options/configs, and removes firewall files when the plugin is uninstalled.
 	 *
 	 * @return void
 	 */
@@ -56,6 +59,7 @@ class AIOWPSecurity_Uninstallation_Tasks extends AIOWPSecurity_Base_Tasks {
 		// check and drop database tables
 		if ('1' == $aio_wp_security->configs->get_value('aiowps_on_uninstall_delete_db_tables')) {
 			foreach ($database_tables as $table_name) {
+				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- PCP warning. Ignore.
 				$wpdb->query("DROP TABLE IF EXISTS `$table_name`");
 			}
 		}
@@ -65,11 +69,15 @@ class AIOWPSecurity_Uninstallation_Tasks extends AIOWPSecurity_Base_Tasks {
 			if (is_main_site()) {
 				$firewall_rules_path = AIOWPSecurity_Utility_Firewall::get_firewall_rules_path();
 				AIOWPSecurity_Utility_File::remove_local_directory($firewall_rules_path);
+
+				delete_metadata('user', '0', 'aiowps_account_status', '', true);
+				delete_metadata('user', '0', 'aiowps_registrant_ip', '', true);
 			}
 
 			delete_option('aio_wp_security_configs');
 			delete_option('aiowpsec_db_version');
 			delete_option('aiowpsec_firewall_version');
+			delete_option('aiowpsec_htaccess_version');
 			delete_option('aios_antibot_key_map_info');
 		}
 	}

@@ -7,67 +7,75 @@ if (!defined('ABSPATH')) {
 class AIOWPSecurity_List_Registered_Users extends AIOWPSecurity_List_Table {
 
 	public function __construct() {
-
-		
 		//Set parent defaults
 		parent::__construct(array(
 			'singular'  => 'item',     //singular name of the listed records
 			'plural'    => 'items',    //plural name of the listed records
 			'ajax'      => false        //does this table support ajax?
 		));
-		
-	}
-
-	public function column_default($item, $column_name) {
-		return $item[$column_name];
 	}
 
 	/**
-	 * Returns ID column html to be rendered.
+	 * Renders ID column html.
 	 *
 	 * @param array $item - data for the columns on the current row
 	 *
-	 * @return string - the html to be rendered
+	 * @return void
 	 */
 	public function column_ID($item) {
 		//Build row actions
 		$actions = array(
-			'view' => '<a href="user-edit.php?user_id='.$item['ID'].'" target="_blank">'.__('View', 'all-in-one-wp-security-and-firewall').'</a>',
-			'approve_acct' => '<a class="aios-approve-user-acct" href="" data-id="'.esc_attr($item['ID']).'" data-message="'.esc_js(__('Are you sure you want to approve this account?', 'all-in-one-wp-security-and-firewall')).'">'. __('Approve', 'all-in-one-wp-security-and-firewall') . '</a>',
-			'delete_acct' => '<a class="aios-delete-user-acct" href="" data-id="'.esc_attr($item['ID']).'" data-message="'.esc_js(__('Are you sure you want to delete this account?', 'all-in-one-wp-security-and-firewall')).'">'. __('Delete', 'all-in-one-wp-security-and-firewall') . '</a>',
-			'block_ip' => '<a class="aios-block-ip" href="" data-ip="'.esc_attr($item['ip_address']).'" data-message="'.esc_js(__('Are you sure you want to block this IP address?', 'all-in-one-wp-security-and-firewall')).'">'. __('Block IP', 'all-in-one-wp-security-and-firewall') . '</a>',
+			'view' => array(
+				'text' => __('View', 'all-in-one-wp-security-and-firewall'),
+				'attributes' => array(
+					'href' => 'user-edit.php?user_id=' . $item['ID'],
+					'target' => '_blank',
+				),
+			),
+			'approve_acct' => array(
+				'text' => __('Approve', 'all-in-one-wp-security-and-firewall'),
+				'attributes' => array(
+					'class' => 'aios-approve-user-acct',
+					'data-id' => $item['ID'],
+					'data-message' => __('Are you sure you want to approve this account?', 'all-in-one-wp-security-and-firewall'),
+				),
+			),
+			'delete_acct' => array(
+				'text' => __('Delete', 'all-in-one-wp-security-and-firewall'),
+				'attributes' => array(
+					'class' => 'aios-delete-user-acct',
+					'data-id' => $item['ID'],
+					'data-message' => __('Are you sure you want to delete this account?', 'all-in-one-wp-security-and-firewall'),
+				),
+			),
+			'block_ip' => array(
+				'text' => __('Block IP', 'all-in-one-wp-security-and-firewall'),
+				'attributes' => array(
+					'class' => 'aios-block-ip',
+					'data-ip' => $item['ip_address'],
+					'data-message' => __('Are you sure you want to block this IP address?', 'all-in-one-wp-security-and-firewall'),
+				),
+			),
 		);
-		
-		//Return the user_login contents
-		return sprintf('%1$s <span style="color:silver"></span>%2$s',
-			/*$1%s*/ $item['ID'],
-			/*$2%s*/ $this->row_actions($actions)
-		);
+
+		echo esc_html($item['ID']);
+		$this->row_actions($actions);
 	}
 
 	/**
-	 * Returns IP address column html to be rendered.
+	 * Renders IP address column html.
 	 *
 	 * @param array $item - data for the columns on the current row
 	 *
-	 * @return string - the html to be rendered
+	 * @return void
 	 */
 	public function column_ip_address($item) {
 		if (AIOWPSecurity_Blocking::is_ip_blocked($item['ip_address'])) {
-			return $item['ip_address'].'<br /><span class="aiowps-label aiowps-label-success">'.__('blocked', 'all-in-one-wp-security-and-firewall').'</span>';
+			echo esc_html($item['ip_address']).'<br /><span class="aiowps-label aiowps-label-success">'.esc_html__('blocked', 'all-in-one-wp-security-and-firewall').'</span>';
 		} else {
-			return $item['ip_address'];
+			echo esc_html($item['ip_address']);
 		}
 	}
-
-	public function column_cb($item) {
-		return sprintf(
-			'<input type="checkbox" name="%1$s[]" value="%2$s" />',
-			/*$1%s*/ $this->_args['singular'],  //Let's simply repurpose the table's singular label
-			/*$2%s*/ $item['ID']                //The value of the checkbox should be the record's id
-		);
-	}
-
 
 	/**
 	 * Returns array of columns to be rendered.
@@ -113,31 +121,31 @@ class AIOWPSecurity_List_Registered_Users extends AIOWPSecurity_List_Table {
 	 * @return void
 	 */
 	private function process_bulk_action() {
-		if (empty($_REQUEST['_wpnonce']) || !isset($_REQUEST['_wp_http_referer'])) return;
-		$result = AIOWPSecurity_Utility_Permissions::check_nonce_and_user_cap($_REQUEST['_wpnonce'], 'bulk-items');
+		if (empty($_REQUEST['_wpnonce']) || !isset($_REQUEST['_wp_http_referer'])) return; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- pcp check ignore this
+		$result = AIOWPSecurity_Utility_Permissions::check_nonce_and_user_cap(sanitize_text_field(wp_unslash($_REQUEST['_wpnonce'])), 'bulk-items'); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- pcp check ignore this
 		if (is_wp_error($result)) return;
 
 		if ('approve' == $this->current_action()) { //Process approve bulk actions
-			if (!isset($_REQUEST['item'])) {
+			if (!isset($_REQUEST['item'])) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- pcp check ignore this
 				AIOWPSecurity_Admin_Menu::show_msg_error_st(__('Please select some records using the checkboxes', 'all-in-one-wp-security-and-firewall'));
 			} else {
-				$this->approve_selected_accounts(($_REQUEST['item']));
+				$this->approve_selected_accounts(array_map('sanitize_text_field', wp_unslash($_REQUEST['item']))); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- pcp check ignore this
 			}
 		}
 		
 		if ('delete' == $this->current_action()) { //Process delete bulk actions
-			if (!isset($_REQUEST['item'])) {
+			if (!isset($_REQUEST['item'])) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- pcp check ignore this
 				AIOWPSecurity_Admin_Menu::show_msg_error_st(__('Please select some records using the checkboxes', 'all-in-one-wp-security-and-firewall'));
 			} else {
-				$this->delete_selected_accounts(($_REQUEST['item']));
+				$this->delete_selected_accounts(array_map('sanitize_text_field', wp_unslash($_REQUEST['item']))); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- pcp check ignore this
 			}
 		}
 
 		if ('block' == $this->current_action()) { //Process block bulk actions
-			if (!isset($_REQUEST['item'])) {
+			if (!isset($_REQUEST['item'])) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- pcp check ignore this
 				AIOWPSecurity_Admin_Menu::show_msg_error_st(__('Please select some records using the checkboxes', 'all-in-one-wp-security-and-firewall'));
 			} else {
-				$this->block_selected_ips(($_REQUEST['item']));
+				$this->block_selected_ips(array_map('sanitize_text_field', wp_unslash($_REQUEST['item']))); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- pcp check ignore this
 			}
 		}
 
@@ -201,15 +209,16 @@ class AIOWPSecurity_List_Registered_Users extends AIOWPSecurity_List_Table {
 		$to_email_address = $user->user_email;
 		$email_msg = '';
 		$subject = '['.network_site_url().'] '. __('Your account is now active', 'all-in-one-wp-security-and-firewall');
+		/* translators: %s: Username */
 		$email_msg .= sprintf(__('Your account with username: %s is now active', 'all-in-one-wp-security-and-firewall'), $user->user_login) . "\n";
 		$subject = apply_filters('aiowps_register_approval_email_subject', $subject);
 		$email_msg = apply_filters('aiowps_register_approval_email_msg', $email_msg, $user); //also pass the WP_User object
 		
-		$sendMail = wp_mail($to_email_address, $subject, $email_msg);
-		if (false === $sendMail) {
+		$mail_send = AIOWPSecurity_Reporting::notification(array('to' => $to_email_address, 'subject' => $subject, 'message' => $email_msg));
+		if (false === $mail_send) {
 			$aio_wp_security->debug_logger->log_debug("Manual account approval notification email failed to send to " . $to_email_address, 4);
 		}
-		return $sendMail;
+		return $mail_send;
 	}
 
 	/**
@@ -254,17 +263,24 @@ class AIOWPSecurity_List_Registered_Users extends AIOWPSecurity_List_Table {
 			}
 			$entries = array_map('esc_sql', $entries); // Escape every array element
 			//Let's go through each entry and block IP
+			$total_success = 0;
 			foreach ($entries as $id) {
 				$ip_address = get_user_meta($id, 'aiowps_registrant_ip', true);
 				$result = AIOWPSecurity_Blocking::add_ip_to_block_list($ip_address, 'registration_spam');
 				if (false === $result) {
+					if (AIOWPSecurity_Utility_IP::get_user_ip_address() == $ip_address) {
+						AIOWPSecurity_Admin_Menu::show_msg_error_st(__('You cannot block your own IP address:', 'all-in-one-wp-security-and-firewall') . ' ' . $ip_address);
+					}
 					$aio_wp_security->debug_logger->log_debug("AIOWPSecurity_List_Registered_Users::block_selected_ips() - could not block IP : $ip_address", 4);
+				} else {
+					$total_success++;
 				}
 			}
-
-			$msg = __('The selected IP addresses were successfully added to the permanent block list.', 'all-in-one-wp-security-and-firewall');
-			$msg .= ' <a href="admin.php?page='.AIOWPSEC_MAIN_MENU_SLUG.'&tab=permanent-block" target="_blank">'.__('View Blocked IPs', 'all-in-one-wp-security-and-firewall').'</a>';
-			AIOWPSecurity_Admin_Menu::show_msg_updated_st($msg);
+			if ($total_success > 0) {
+				$msg = __('The selected IP addresses were successfully added to the permanent block list.', 'all-in-one-wp-security-and-firewall');
+				$msg .= ' <a href="admin.php?page='.AIOWPSEC_MAIN_MENU_SLUG.'&tab=permanent-block" target="_blank">'.__('View Blocked IPs', 'all-in-one-wp-security-and-firewall').'</a>';
+				AIOWPSecurity_Admin_Menu::show_msg_updated_st($msg);
+			}
 		}
 	}
 
@@ -282,7 +298,7 @@ class AIOWPSecurity_List_Registered_Users extends AIOWPSecurity_List_Table {
 		$offset = ($current_page - 1) * $per_page;
 		$hidden = array();
 		$sortable = $this->get_sortable_columns();
-		$search = isset($_REQUEST['s']) ? sanitize_text_field($_REQUEST['s']) : '';
+		$search = isset($_REQUEST['s']) ? sanitize_text_field(wp_unslash($_REQUEST['s'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- pcp check ignore this
 
 		$this->_column_headers = array($columns, $hidden, $sortable);
 		
@@ -319,7 +335,7 @@ class AIOWPSecurity_List_Registered_Users extends AIOWPSecurity_List_Table {
 	 */
 	public function get_registered_user_data($status = '', $search = '', $per_page = null, $offset = 0) {
 		$user_fields = array( 'ID', 'user_login', 'user_email', 'user_registered');
-		$user_query = new WP_User_Query(array('meta_key' => 'aiowps_account_status', 'meta_value' => $status, 'fields' => $user_fields, 'number' => $per_page, 'offset' => $offset));
+		$user_query = new WP_User_Query(array('meta_key' => 'aiowps_account_status', 'meta_value' => $status, 'fields' => $user_fields, 'number' => $per_page, 'offset' => $offset)); // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key, WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- ignore this
 		$user_results = $user_query->results;
 		$user_total = $user_query->get_total();
 

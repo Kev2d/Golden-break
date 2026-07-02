@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 // Add a checkbox field to the WordPress settings page
 function add_maintenance_mode_checkbox()
@@ -14,7 +14,7 @@ function maintenance_mode_checkbox_html()
 ?>
     <label>
         <input type="checkbox" name="maintenance_mode_checkbox" value="1" <?php checked($maintenance_mode, 1); ?>>
-        <?php echo __('Enable maintenance mode', 'keweb'); ?>
+        <?php echo __('Enable maintenance mode', 'golden-break'); ?>
     </label>
 <?php
 }

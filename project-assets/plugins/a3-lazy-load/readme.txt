@@ -2,8 +2,8 @@
 Contributors: a3rev, a3rev Software, nguyencongtuan
 Tags: a3 lazy load, Lazy Loading, image lazy load, lazyload
 Requires at least: 6.0
-Tested up to: 6.7
-Stable tag: 2.7.3
+Tested up to: 7.0
+Stable tag: 2.7.8
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -201,6 +201,31 @@ Filter tags to add to class name of theme to exclude lazy load on images or vide
 
 
 == Changelog ==
+
+= 2.7.8 - 2026/05/07 =
+* This release contains an important security fix - please update right away.
+* Security - Fixed a cross-site scripting (XSS) issue.
+
+= 2.7.7 - 2026/04/17 =
+* This maintenance release has compatibility with WordPress 7.0 and a small improvement for sites that use WP Rocket.
+* Tweak - Tested for compatibility with WordPress 7.0
+* Tweak - Lazy load works more reliably when WP Rocket is active on your site
+* Tweak - Admin LESS compiler and settings screen brought in line with our other plugins for smoother use on current PHP.
+* Tweak - Clearer premium-feature wording on admin pages and tidier support and upgrade links.
+
+= 2.7.6 - 2025/10/13 =
+* This release has a security hardening patch and compatibility with WordPress 6.8.3 - please upgrade now. 
+* Tweak - Tested for compatibility with WordPress 6.8.3
+* Security - Fixed HTML attribute injection vulnerability
+
+= 2.7.5 - 2025/06/19 =
+* This maintenance release has 1 bug fix
+* Fix - Make the _load_textdomain_just_in_time is called correctly
+
+= 2.7.4 - 2025/06/17 =
+* This maintenance release has 1 bug fix and compatibility with WordPress 6.8.1
+* Tweak - Tested for compatibility with WordPress 6.8.1
+* Security - Escape all variable before output
 
 = 2.7.3 - 2024/07/15 =
 * This release has various tweaks for compatibility with WordPress 6.6
@@ -640,6 +665,21 @@ Filter tags to add to class name of theme to exclude lazy load on images or vide
 
 
 == Upgrade Notice ==
+
+= 2.7.8 =
+Important security fix. Please upgrade now.
+
+= 2.7.7 =
+Compatibility with WordPress 7.0. Recommended if you use WP Rocket together with a3 Lazy Load.
+
+= 2.7.6 =
+This release has a security hardening patch please upgrade now.
+
+= 2.7.5 =
+* This maintenance release has 1 bug fix
+
+= 2.7.4 =
+This maintenance release has 1 bug fix and compatibility with WordPress 6.8.1
 
 = 2.7.3 =
 This release has various tweaks for compatibility with WordPress 6.6

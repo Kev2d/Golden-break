@@ -1,4 +1,4 @@
-<?php get_header(); ?>
+﻿<?php get_header(); ?>
 
 <main class="single-blog layout-xl">
 
@@ -33,9 +33,9 @@
                     <?php endif; ?>
 
                     <div class="single-blog__post-meta">
-                        <span class="author"><?php _e('By', 'keweb'); ?> <?php the_author(); ?></span>
+                        <span class="author"><?php _e('By', 'golden-break'); ?> <?php the_author(); ?></span>
                         <time class="date" datetime="<?php echo get_the_date('c'); ?>"><?php echo get_the_date(); ?></time>
-                        <span class="read-time">- <?php echo $read_time; ?> <?php _e('min read', 'keweb'); ?></span>
+                        <span class="read-time">- <?php echo $read_time; ?> <?php _e('min read', 'golden-break'); ?></span>
                     </div>
 
                     <div class="single-blog__post-categories">
