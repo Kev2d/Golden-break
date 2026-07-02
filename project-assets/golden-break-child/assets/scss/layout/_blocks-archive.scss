@@ -1,0 +1,44 @@
+.blocks-archive {
+    display: grid;
+    gap: 1.5rem;
+    @media (width > $screen-sm-min) {
+        grid-template-columns: repeat(5, 1fr);
+        margin-top: 3rem;
+    }
+    @media (width <= $screen-sm-min) {
+        grid-template-columns: repeat(2, 1fr);
+        margin-top: 1.5rem;
+    }
+    @include default-component-spacing;
+    &__block {
+        background: $secondary-color;
+        border-radius: $radius-l;
+        box-shadow: $box-shadow;
+        @media (width <= $screen-sm-min) {
+            &:nth-child(odd):last-child {
+                grid-column: span 2;
+            }
+        }
+        &-link {
+            width: 100%;
+            height: 100%;
+            display: block;
+            padding: 1.5rem;
+            &:hover {
+                > * {
+                    color: $primary-color-hover;
+                }
+            }
+        }
+        &-emoji {
+            @extend h3;
+        }
+        &-title {
+            @include smooth-transition;
+            color: $primary-color;
+            line-height: 1.75rem;
+            font-weight: 500;
+            margin-top: 0.625rem;
+        }
+    }
+}

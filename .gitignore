@@ -1,0 +1,13 @@
+project-assets/plugins/akismet/views/activate.php
+project-assets/plugins/akismet/_inc/akismet.css
+project-assets/plugins/akismet/_inc/akismet.js
+project-assets/plugins/akismet/
+project-assets/uploads/
+project-assets/plugins/hello.php
+project-assets/plugins/keweb-wp-vue-blog/
+
+
+project-assets/keweb-theme/node_modules/
+project-assets/keweb-theme/package-lock.json
+project-assets/keweb-theme/assets/dist/css/main.min.css
+project-assets/keweb-theme/assets/dist/js/main.min.js

@@ -1,0 +1,45 @@
+@use "sass:map";
+@use "../abstracts" as *;
+
+$link-states: (
+    "primary": (
+        color: $text,
+        hover: $primary-color-hover
+    )
+);
+
+.link {
+    @each $state, $styles in $link-states {
+        &--#{$state} {
+            @include smooth-transition;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            text-decoration: none;
+
+            font-weight: if(map.has-key($styles, font-weight), map.get($styles, font-weight), 400);
+            color: map.get($styles, color);
+
+            @if $state == "primary" {
+                padding: 0.625rem 0;
+            }
+
+            // Nested rules
+            svg {
+                * {
+                    @include smooth-transition;
+                    stroke: map.get($styles, color);
+                }
+            }
+
+            &:hover {
+                color: map.get($styles, hover);
+                svg {
+                    * {
+                        stroke: map.get($styles, hover);
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,41 @@
+@use "../abstracts" as *;
+@use "../base" as *;
+
+.site-header {
+    @include smooth-transition;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    gap: 3rem;
+    z-index: 5;
+    @media (width <= $screen-sm-min) {
+        &.open {
+            background: $background-secondary;
+            border-radius: $radius-l;
+            box-shadow: $box-shadow;
+            padding: 0.75rem;
+        }
+    }
+
+    &__left {
+        display: flex;
+        align-items: center;
+        gap: 3rem;
+        @media (width <= $screen-sm-min) {
+            width: 100%;
+            justify-content: space-between;
+            flex-direction: row-reverse;
+        }
+        .settings-menu {
+            @include hide-on-desktop;
+        }
+    }
+
+    &__right {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        @include hide-on-mobile;
+    }
+}

@@ -1,0 +1,36 @@
+@use "../abstracts" as *;
+@use "../base" as *;
+
+.contact-form-block {
+    display: grid;
+    @media (width > $screen-sm-min) {
+        grid-template-columns: repeat(2, 1fr);
+        align-items: center;
+        gap: 3rem;
+    }
+    @media (width <= $screen-sm-min) {
+        gap: 1.5em;
+        @include full-viewport-width;
+    }
+    @include default-component-spacing;
+    &__image {
+        @media (width > $screen-sm-min) {
+            border-radius: $radius-l;
+            overflow: hidden;
+            picture,
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+            &.right {
+                order: 1;
+            }
+        }
+    }
+    &__form {
+        @media (width <= $screen-sm-min) {
+            padding: 0 1.5rem;
+        }
+    }
+}

@@ -1,0 +1,26 @@
+@use "../abstracts" as *;
+
+[data-function="accordion-toggle"] {
+    &[aria-expanded="true"] {
+        svg {
+            transform: rotate(180deg);
+        }
+    }
+    svg {
+        @include smooth-transition;
+        width: 1.5rem;
+        min-width: 1.5rem;
+        height: auto;
+        * {
+            stroke: $text;
+        }
+    }
+}
+
+[data-role="accordion-content"] {
+    @include smooth-transition;
+    overflow: hidden;
+    &[aria-hidden="true"] {
+        max-height: 0;
+    }
+}

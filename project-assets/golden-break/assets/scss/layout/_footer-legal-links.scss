@@ -1,0 +1,25 @@
+@use "../abstracts" as *;
+
+.footer-legal-links {
+    &__menu {
+        display: flex;
+        @media (width > $screen-sm-min) {
+            gap: 1.5rem;
+        }
+        @media (width <= $screen-sm-min) {
+            gap: 1rem;
+        }
+        &-item {
+            @media (width > $screen-sm-min) {
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+            @media (width <= $screen-sm-min) {
+                a {
+                    font-size: 0.875rem;
+                }
+            }
+        }
+    }
+}

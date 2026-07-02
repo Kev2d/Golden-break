@@ -1,0 +1,44 @@
+@use "../abstracts" as *;
+@use "../base" as *;
+
+.site-footer {
+    @include default-component-spacing;
+    &__main {
+        padding-bottom: 2.25rem;
+        @media (width > $screen-sm-min) {
+            display: grid;
+            grid-template-columns: minmax(auto, 35%) minmax(auto, 65%);
+            justify-content: space-between;
+            gap: 3rem;
+        }
+        @media (width <= $screen-sm-min) {
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 2.25rem;
+        }
+    }
+
+    &__bottom {
+        @include full-viewport-width;
+        padding: 0 1.25rem;
+        border-top: 2px solid $primary-color;
+        &-copyright {
+            @media (width <= $screen-sm-min) {
+                font-size: 0.875rem;
+            }
+        }
+        &-inside {
+            padding-top: 1.5rem;
+            @media (width > $screen-sm-min) {
+                display: flex;
+                justify-content: space-between;
+                padding-bottom: 3rem;
+            }
+            @media (width <= $screen-sm-min) {
+                display: grid;
+                gap: 1.5rem;
+                padding-bottom: 1.75rem;
+            }
+        }
+    }
+}

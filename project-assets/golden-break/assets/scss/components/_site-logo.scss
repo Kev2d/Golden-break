@@ -1,0 +1,17 @@
+@use "../abstracts" as *;
+
+.site-logo {
+    display: flex;
+    align-items: center;
+    svg,
+    img {
+        max-width: 12.5rem;
+        width: 100%;
+        height: auto;
+        min-height: 2.75rem;
+        @media (width <= $screen-sm-min) {
+            max-width: 10.875em;
+            min-height: 2rem;
+        }
+    }
+}

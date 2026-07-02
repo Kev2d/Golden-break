@@ -1,0 +1,73 @@
+@use "../abstracts" as *;
+@use "../base" as *;
+
+.text-stats-block {
+    display: grid;
+    gap: 1.5rem;
+    justify-items: center;
+    text-align: center;
+    @include default-component-spacing;
+    &__icon {
+        max-height: 6rem;
+        max-width: 6rem;
+        width: 100%;
+        height: auto;
+    }
+
+    &__title {
+        font-weight: 500;
+        @media (width > $screen-sm-min) {
+            font-size: calc(2.5rem + ((1vw - 0.48rem) * 0.1));
+            line-height: 3.125rem;
+        }
+        @media (width <= $screen-sm-min) {
+            font-size: 1.5rem;
+            line-height: 2rem;
+        }
+    }
+
+    &__text {
+        > p {
+            @media (width > $screen-sm-min) {
+                font-weight: 300;
+                font-size: 2rem;
+                line-height: normal;
+            }
+            @media (width <= $screen-sm-min) {
+                font-size: 1.125rem;
+                line-height: 1.75rem;
+            }
+        }
+    }
+
+    &__stats {
+        display: grid;
+        @media (width > $screen-sm-min) {
+            grid-auto-flow: column;
+            grid-template-columns: repeat(auto-fit, minmax(1fr, auto));
+            gap: 3rem;
+        }
+        @media (width <= $screen-sm-min) {
+            gap: 0.75rem;
+        }
+        &-statistic {
+            display: grid;
+            gap: 0.625rem;
+            @media (width > $screen-sm-min) {
+                max-width: 12.5rem;
+            }
+            .statistic-number {
+                @include default-gradient-mark;
+                font-weight: 500;
+                @media (width > $screen-sm-min) {
+                    font-size: calc(4rem + ((1vw - 0.48rem) * 0.1));
+                    line-height: 5.25rem;
+                }
+                @media (width <= $screen-sm-min) {
+                    font-size: 2rem;
+                    line-height: 2rem;
+                }
+            }
+        }
+    }
+}

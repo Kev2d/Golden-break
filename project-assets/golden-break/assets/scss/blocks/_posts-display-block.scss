@@ -1,0 +1,59 @@
+@use "../abstracts" as *;
+@use "../base" as *;
+
+.posts-display-block {
+    @include default-component-spacing;
+    &-title {
+        @extend h2;
+        font-weight: 500;
+    }
+
+    &__wrapper {
+        @media (width > $screen-sm-min) {
+            margin-top: 3rem;
+        }
+    }
+
+    &__posts {
+        display: grid;
+        @media (width > $screen-sm-min) {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+        @media (width <= $screen-sm-min) {
+            @include mobile-swiper-wrapper;
+            margin-top: 1rem;
+        }
+    }
+
+    &__post {
+        @media (width <= $screen-sm-min) {
+            @include mobile-swiper-slide;
+        }
+        &-thumbnail {
+            @include default-thumbnail;
+        }
+        &-title {
+            font-weight: 500;
+        }
+        &-link {
+            img {
+                @include default-thumbnail-hover;
+            }
+        }
+        &-excerpt,
+        &-read-time {
+            color: $light-gray;
+        }
+        &-title,
+        &-excerpt,
+        &-read-time {
+            margin-top: 0.625rem;
+        }
+
+        &-read-time {
+            line-height: 1.5rem;
+            display: block;
+        }
+    }
+}

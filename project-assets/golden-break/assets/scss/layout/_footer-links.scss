@@ -1,0 +1,96 @@
+@use "../abstracts" as *;
+@use "../base" as *;
+
+.footer-links {
+    display: flex;
+    @media (width > $screen-sm-min) {
+        justify-content: space-between;
+        gap: 1.5rem;
+    }
+    @media (width <= $screen-sm-min) {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    &--desktop {
+        @include hide-on-mobile;
+    }
+    &--mobile {
+        @include hide-on-desktop;
+    }
+    &__column {
+        @media (width > $screen-sm-min) {
+            max-width: 12rem;
+        }
+
+        @at-root {
+            .footer-links--mobile & {
+                &:has([data-function="accordion-toggle"][aria-expanded="true"]) {
+                    box-shadow: $box-shadow;
+                    overflow: hidden;
+                }
+                &:has([data-function="accordion-toggle"]) {
+                    background: $background-secondary;
+                    border-radius: $radius-m;
+                }
+
+                &:not(:has([data-function="accordion-toggle"])) {
+                    margin-top: 1.5rem;
+                }
+            }
+        }
+        &-title {
+            &:not([data-function="accordion-toggle"]) {
+                margin-bottom: 0.75rem;
+                font-weight: 500;
+            }
+
+            &[aria-expanded="true"] {
+                background: $secondary-color;
+                font-weight: 500;
+            }
+
+            @at-root .footer-links--mobile &[data-function="accordion-toggle"] {
+                @include smooth-transition;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+                padding: 0.625rem 0.75rem;
+                border-radius: $radius-m;
+            }
+        }
+    }
+
+    &__list {
+        display: grid;
+        @at-root &:not([data-role="accordion-content"] &) {
+            gap: 0.25rem;
+        }
+        &-item {
+            &-link {
+                display: flex;
+                gap: 0.375rem;
+                align-items: center;
+                @media (width > $screen-sm-min) {
+                    &:hover {
+                        text-decoration: underline;
+                    }
+                }
+                @at-root [data-role="accordion-content"] & {
+                    padding: 0.625rem 0.75rem;
+                }
+                img,
+                svg {
+                    width: 1rem;
+                    min-width: 1rem;
+                    height: auto;
+                }
+                svg {
+                    * {
+                        fill: $primary-color;
+                    }
+                }
+            }
+        }
+    }
+}

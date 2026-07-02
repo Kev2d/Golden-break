@@ -1,0 +1,153 @@
+@use "../abstracts" as *;
+
+@mixin dynamic-mobile-menu-height {
+    //100dvh - header height - spacing between header and menu - padding top - extra padding spacing to bottom
+    height: calc(100dvh - 4.25rem - 0.75rem - 1.5rem - 1.25rem);
+}
+
+@mixin hide-on-desktop {
+    @media (width > $screen-sm-min) {
+        display: none;
+    }
+}
+
+@mixin hide-on-mobile {
+    @media (width <= $screen-sm-min) {
+        display: none;
+    }
+}
+
+@mixin full-viewport-width {
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    width: 100vw;
+}
+
+@mixin reset-mark {
+    background-color: transparent;
+}
+
+@mixin gray-mark {
+    @include reset-mark;
+    color: $light-gray;
+}
+
+@mixin default-gradient-mark {
+    @include reset-mark;
+    background: $default-gradient;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: $text;
+    //Fix colored text geting cut
+    padding-bottom: 0.2ch;
+    margin-bottom: -0.2ch;
+}
+
+@mixin secondary-gradient-mark {
+    @include reset-mark;
+    background: $secondary-gradient;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: $text; // Fallback for browsers that do not support text clipping
+    //Fix colored text geting cut
+    padding-bottom: 0.2ch;
+    margin-bottom: -0.2ch;
+}
+
+@mixin default-component-spacing {
+    @media (width > $screen-sm-min) {
+        margin-top: 6rem;
+    }
+
+    @media (width <= $screen-sm-min) {
+        margin-top: 3rem;
+    }
+}
+
+@mixin mobile-swiper-wrapper {
+    transform: translate3d(0px, 0, 0);
+    position: relative;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    display: flex;
+    transition-property: transform;
+    transition-timing-function: var(--swiper-wrapper-transition-timing-function, initial);
+    box-sizing: content-box;
+}
+
+@mixin mobile-swiper-slide($enable-width: true) {
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    flex-shrink: 0;
+    position: relative;
+    transition-property: transform;
+    display: block;
+    height: auto;
+    @if $enable-width {
+        width: 80vw !important;
+    }
+}
+
+.custom-swiper-slide {
+    > * {
+        height: 100%;
+    }
+}
+
+@mixin default-thumbnail {
+    position: relative;
+    border-radius: $radius-l;
+    overflow: hidden;
+    @media (width > $screen-sm-min) {
+        aspect-ratio: 2 / 1;
+    }
+    @media (width <= $screen-sm-min) {
+        aspect-ratio: 5 / 3;
+    }
+    > img,
+    picture {
+        object-fit: cover;
+        width: 100%;
+        height: 100%;
+    }
+    > picture {
+        object-fit: cover;
+        width: 100%;
+        height: 100%;
+        img {
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+        }
+    }
+}
+
+@mixin default-thumbnail-hover {
+    @media (width > $screen-sm-min) {
+        @include smooth-transition;
+        &:hover {
+            transform: scale(1.005);
+        }
+    }
+}
+
+// Central Dark Mode Wrapper with Conditional Check
+@mixin dark-mode-wrapper {
+    @if $enable-dark-mode {
+        @at-root [data-theme="dark"] & {
+            @content;
+        }
+        @if $enable-auto-dark-mode {
+            @media (prefers-color-scheme: dark) {
+                html:not([data-theme]) & {
+                    @content;
+                }
+            }
+        }
+    }
+}

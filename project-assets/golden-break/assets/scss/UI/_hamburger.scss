@@ -1,0 +1,62 @@
+@use "../abstracts" as *;
+@use "../base" as *;
+
+.hamburger-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 0.4rem;
+    background-color: $secondary-color;
+    border-radius: 50%;
+    width: 2.75rem;
+    height: 2.75rem;
+    min-width: 2.75rem;
+    @include hide-on-desktop;
+    .hamburger {
+        @include smooth-transition(0.3s);
+        position: relative;
+        cursor: pointer;
+        width: 1.125rem;
+        height: 0.8rem;
+        span {
+            @include smooth-transition(0.3s);
+            position: absolute;
+            margin: auto;
+            width: 100%;
+            top: 0;
+            height: 0.15rem;
+            border-radius: 0.2em;
+            transform: translateY(-50%) translateX(-50%);
+            left: 50%;
+            background-color: $text;
+            &:nth-child(2) {
+                top: 50%;
+            }
+            &:nth-child(3) {
+                top: 100%;
+            }
+            &:nth-child(1),
+            &:nth-child(3) {
+                width: 60%;
+            }
+        }
+        &.open {
+            transform: rotate(135deg);
+            width: 1.5rem;
+            span {
+                top: 50%;
+                left: 0;
+                transform: scale(0.6) translateY(-50%);
+                &:nth-child(2) {
+                    transition-delay: 0.1s;
+                    transform: scale(0.6) translateY(-50%) rotate(90deg);
+                }
+                &:nth-child(1),
+                &:nth-child(3) {
+                    width: 100%;
+                }
+            }
+        }
+    }
+}

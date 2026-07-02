@@ -1,0 +1,40 @@
+.single-blocks {
+    @include default-component-spacing;
+    &__post {
+        &-top {
+            display: grid;
+            @media (width > $screen-sm-min) {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    }
+    &__info {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        @media (width > $screen-sm-min) {
+            padding: 2.25rem;
+        }
+        @media (width <= $screen-sm-min) {
+            padding: 2.25rem 0;
+        }
+        &-inside {
+            @media (width > $screen-sm-min) {
+                max-width: 32.5rem;
+            }
+        }
+        &-title {
+            @extend h2;
+            font-weight: 700;
+        }
+        &-excerpt {
+            margin-top: 2rem;
+        }
+        &-thumbnail {
+            img {
+                border-radius: $radius-l;
+                height: auto;
+            }
+        }
+    }
+}

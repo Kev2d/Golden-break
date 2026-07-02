@@ -1,0 +1,19 @@
+@use "../abstracts" as *;
+
+.back-button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1rem 0.625rem 0.75rem;
+    background: $secondary-color;
+    border-radius: 2em;
+    font-weight: 500;
+    svg {
+        width: 1.875rem;
+        height: auto;
+        * {
+            fill: $text;
+        }
+    }
+}

@@ -1,0 +1,42 @@
+{
+  "name": "keweb",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "npx babel assets/js --out-file dist/main.min.js && npm run scss",
+    "watch:js": "webpack --watch",
+    "watch:css": "sass --watch assets/scss/main.scss:assets/dist/css/main.min.css --style=compressed --no-source-map",
+    "watch": "concurrently \"npm run watch:js\" \"npm run watch:css\"",
+    "scss": "sass --watch assets/scss/style.scss:dist/style.min.css --style compressed --no-source-map",
+    "sync": "browser-sync start --proxy \"localhost:8000\" --files \"**/*\""
+  },
+  "type": "commonjs",
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/cli": "^7.19.3",
+    "babel-preset-minify": "^0.5.2",
+    "concurrently": "^8.0.1",
+    "css-loader": "^6.7.3",
+    "css-minimizer-webpack-plugin": "^5.0.0",
+    "fork-ts-checker-webpack-plugin": "^8.0.0",
+    "glob-all": "^3.3.1",
+    "mini-css-extract-plugin": "^2.7.5",
+    "nodemon": "^3.1.4",
+    "purgecss-webpack-plugin": "^7.0.2",
+    "purgecss-with-wordpress": "^7.0.2",
+    "sass": "^1.78.0",
+    "sass-loader": "^13.2.2",
+    "style-loader": "^3.3.2",
+    "terser-webpack-plugin": "^5.3.8",
+    "ts-loader": "^9.4.4",
+    "typescript": "^5.1.6",
+    "watch": "^0.13.0",
+    "webpack": "^5.82.0",
+    "webpack-cli": "^5.1.0"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "abbrev": "^1.1.1"
+  },
+  "description": ""
+}

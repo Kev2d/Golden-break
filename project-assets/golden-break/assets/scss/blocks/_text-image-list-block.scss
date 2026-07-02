@@ -1,0 +1,127 @@
+@use "../abstracts" as *;
+@use "../base" as *;
+
+.text-image-list-block {
+    @include default-component-spacing;
+    &__top {
+        display: grid;
+        align-items: center;
+        @media (width > $screen-sm-min) {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    &__content-wrapper {
+        @media (width > $screen-sm-min) {
+            padding: 3rem;
+        }
+        @media (width <= $screen-sm-min) {
+            padding: 2.25rem 0;
+        }
+    }
+    &__content {
+        display: grid;
+        align-items: center;
+        justify-content: center;
+        @media (width > $screen-sm-min) {
+            max-width: 32.5rem;
+            width: 100%;
+        }
+        &-title {
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6 {
+                line-height: 130%;
+                font-weight: 700;
+            }
+            mark {
+                @include default-gradient-mark;
+            }
+        }
+        &-description {
+            margin-top: 2rem;
+            > p {
+                line-height: 1.75rem;
+            }
+        }
+    }
+    &__table-of-contents {
+        margin-top: 2rem;
+        &-title {
+            @extend h4;
+            font-weight: 500;
+            text-decoration: underline;
+            text-decoration-thickness: 0.1rem;
+            text-underline-offset: 40%;
+            margin-bottom: 1rem;
+        }
+
+        &-list {
+            margin-top: 1rem;
+            &-item {
+                @extend p;
+                @include smooth-transition;
+                display: flex;
+                gap: 0.75rem;
+                &:hover {
+                    color: $primary-color;
+                }
+                .table-of-contents-number {
+                    font-weight: 600;
+                }
+                &:not(:first-child) {
+                    margin-top: 0.625rem;
+                }
+            }
+        }
+    }
+    &__image {
+        border-radius: $radius-l;
+        overflow: hidden;
+        img {
+            width: 100%;
+            height: auto;
+        }
+    }
+
+    &__list-content {
+        @include default-component-spacing;
+        &-item {
+            &:not(:first-child) {
+                margin-top: 3rem;
+            }
+            &-title {
+                @extend h3;
+                font-weight: 500;
+            }
+            &-text {
+                margin-top: 1.5rem;
+                @include text-formatting;
+                ul {
+                    padding-inline-start: 0;
+                    li {
+                        list-style: none;
+                        position: relative;
+                        padding-left: 2.25rem;
+                        &:not(:first-child) {
+                            margin-top: 0.625rem;
+                        }
+                        &::before {
+                            content: "";
+                            position: absolute;
+                            left: 0;
+                            top: 0.2rem;
+                            width: 1.5rem;
+                            height: 1.5rem;
+                            background-image: url("../../img/icons/checkmark.svg");
+                            background-size: contain;
+                            background-repeat: no-repeat;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

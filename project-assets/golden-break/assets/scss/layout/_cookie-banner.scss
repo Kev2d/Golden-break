@@ -1,0 +1,15 @@
+@use "../abstracts" as *;
+
+.keweb-cookie-banner {
+    background: $background-secondary;
+    color: $text;
+    box-shadow: $box-shadow;
+
+    .keweb-cookie-button--primary {
+        border-radius: $radius-m;
+    }
+
+    .keweb-cookie-button--secondary {
+        color: $text;
+    }
+}

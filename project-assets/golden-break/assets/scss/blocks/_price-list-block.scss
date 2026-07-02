@@ -1,0 +1,94 @@
+@use "../abstracts" as *;
+@use "../base" as *;
+
+.price-list-block {
+    @include default-component-spacing;
+
+    &__wrapper {
+        @media (width > $screen-sm-min) {
+            display: grid;
+            grid-auto-flow: column;
+            grid-template-columns: repeat(auto-fit, minmax(1fr, auto));
+            gap: 1.5rem;
+        }
+        @media (width <= $screen-sm-min) {
+            margin-top: 1rem;
+            @include mobile-swiper-wrapper;
+        }
+    }
+    &__item {
+        border-radius: $radius-l;
+        background: $soft-gray;
+        @media (width > $screen-sm-min) {
+            padding: 3rem 1.5rem;
+        }
+        @media (width <= $screen-sm-min) {
+            @include mobile-swiper-slide;
+            padding: 3rem 1rem;
+        }
+        @include dark-mode-wrapper {
+            background: $background-secondary;
+        }
+
+        hr,
+        &-price,
+        &-cta,
+        &-list {
+            margin-top: 1rem;
+        }
+
+        hr {
+            height: 0.1rem;
+            width: 6.25rem;
+            background: $medium-primary-color;
+        }
+
+        &-content {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        &-title {
+            @extend h4;
+            @include secondary-gradient-mark;
+            font-weight: 500;
+        }
+
+        &-description,
+        &-price-text {
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+        }
+
+        &-price {
+            @extend h2;
+            font-weight: 500;
+        }
+
+        &-cta {
+            width: 100%;
+        }
+
+        &-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            &-text {
+                @extend p;
+                font-weight: 500;
+            }
+            &-item {
+                @extend p;
+                display: flex;
+                align-items: flex-start;
+                gap: 0.75rem;
+                svg {
+                    width: 1.5rem;
+                    min-width: 1.5rem;
+                    height: auto;
+                }
+            }
+        }
+    }
+}

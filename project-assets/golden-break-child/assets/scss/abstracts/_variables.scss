@@ -1,0 +1,102 @@
+:root {
+    color-scheme: dark light;
+    /* Light Mode Variables */
+    --blue: #283983;
+    --white: #ffffff;
+    --background: #ffffff;
+    --background-secondary: #ffffff;
+    --light-gray: #777777;
+    --lighter-gray: #f9f9f9;
+    --soft-gray: #f4f4f4;
+    --gray: #231f20;
+    --success-green: #43b984;
+    --medium-primary: #deeefe;
+    --medium-primary-darker: rgba(2, 118, 253, 0.4);
+    --backshadow: rgba(17, 17, 17, 0.7); /* 70% opacity */
+    --error-red: #810000;
+    --primary: #003366;
+    --primary-hover: #0276fd;
+    --secondary: #f1f8ff;
+    --text: #111111;
+    --dark: #111111;
+
+    /*Gradients*/
+
+    --default-gradient: linear-gradient(90.34deg, #0076b8 0.05%, #babe0d 99.95%);
+    --secondary-gradient: linear-gradient(91.37deg, #0076b8 0.2%, #babe0d 5.04%);
+
+    /* Dark Mode Variables */
+    --dark-background-secondary: #1b1b1b;
+    --dark-background: #090909;
+    --dark-primary: rgba(2, 118, 253, 0.9); /* 90% opacity */
+    --dark-white: #e4e5eb;
+    --dark-light-gray: #cbcbcc;
+    --dark-secondary-blue: rgba(2, 118, 253, 0.2); /* 20% opacity */
+    --dark-secondary-blue-darker: rgba(2, 118, 253, 0.2); /* 20% opacity */
+
+    //Breakpoints
+    --screen-sm-min: #{$screen-sm-min};
+}
+
+@mixin dark-theme {
+    --white: var(--dark-white);
+    --text: var(--dark-white);
+    --background: var(--dark-background);
+    --background-secondary: var(--dark-background-secondary);
+    --primary: var(--dark-primary);
+    --secondary: var(--dark-secondary-blue);
+    --light-gray: var(--dark-light-gray);
+    --medium-primary: var(--medium-primary-darker);
+    /* Override other current variables as needed */
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        @include dark-theme;
+    }
+}
+
+[data-theme="dark"] {
+    @include dark-theme;
+}
+
+$white: var(--white);
+$dark: var(--dark);
+$light-gray: var(--light-gray);
+$lighter-gray: var(--lighter-gray);
+$soft-gray: var(--soft-gray);
+$background: var(--background);
+$background-secondary: var(--background-secondary);
+$text: var(--text);
+$primary-color: var(--primary);
+$primary-color-hover: var(--primary-hover);
+$medium-primary-color: var(--medium-primary);
+$secondary-color: var(--secondary);
+
+$default-gradient: var(--default-gradient);
+$secondary-gradient: var(--secondary-gradient);
+
+$main-font: "Inter", sans-serif;
+
+//Colors
+
+$primary-white: #ffffff;
+$primary-black: #000;
+$keweb-blue: #036;
+$keweb-light-blue: #0276fd;
+$keweb-gray: #252525;
+
+$box-shadow: 0 0 1.25rem rgba(0, 0, 0, 0.08);
+
+$radius-l: 0.75rem;
+$radius-m: 0.5rem;
+
+//transition
+
+@mixin smooth-transition($time: 0.2s) {
+    transition: all $time ease-in-out;
+}
+
+@mixin cubic-transition($time: 0.2) {
+    transition: 0.3s cubic-bezier(0.25, 0.1, 0.343, 2.461);
+}

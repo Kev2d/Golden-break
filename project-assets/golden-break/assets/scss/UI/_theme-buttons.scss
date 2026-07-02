@@ -1,0 +1,94 @@
+@use "sass:map";
+@use "../abstracts" as *;
+@use "../base" as *;
+
+$button-states: (
+  "primary": (
+    background: $primary-color,
+    color: $white,
+    hover: $primary-color-hover,
+    font-weight: 600
+  ),
+  "secondary": (
+    color: $text,
+    hover: $text
+  ),
+  "default": (
+    background: $dark,
+    hover: $primary-color-hover,
+    color: $white
+  ),
+  "light": (
+    background: $white,
+    hover: $primary-color-hover,
+    color: $dark
+  )
+);
+
+.button {
+  @each $state, $styles in $button-states {
+    &--#{$state} {
+      @include smooth-transition;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      text-decoration: none;
+      font-weight: if(map.has-key($styles, font-weight), map.get($styles, font-weight), 400);
+      background: if(map.has-key($styles, background), map.get($styles, background), transparent);
+      color: map.get($styles, color);
+
+      @if $state == "primary" {
+        padding: 1rem 1.5rem;
+      }
+
+      @if $state == "secondary" {
+        padding: 0.625rem 1.5rem;
+        font-size: 1.25rem;
+        border: 2px solid map.get($styles, color);
+
+        &:hover {
+          color: $white;
+          @include dark-mode-wrapper {
+            color: $dark;
+          }
+        }
+      }
+
+      @if $state == "default" {
+        padding: 0.625rem 1.5rem;
+        font-size: 1.25rem;
+        @include dark-mode-wrapper {
+          background: $light-gray;
+          color: $dark;
+        }
+      }
+
+      @if $state == "light" {
+        padding: 0.625rem 1.5rem;
+        font-size: 1.25rem;
+
+        &:hover {
+          color: $white;
+        }
+      }
+
+      &:hover {
+        background: if(map.has-key($styles, hover), map.get($styles, hover), map.get($styles, background));
+      }
+
+      &:not(a) {
+        cursor: pointer;
+      }
+
+      &:not(&-rounded-md) {
+        border-radius: 2em;
+      }
+
+      &-rounded-md {
+        @extend .button--#{$state};
+        border-radius: $radius-m;
+      }
+    }
+  }
+}

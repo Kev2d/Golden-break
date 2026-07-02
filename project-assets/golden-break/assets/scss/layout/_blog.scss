@@ -1,0 +1,89 @@
+@use "../abstracts" as *;
+@use "../base" as *;
+
+.kwp-post-archive {
+    @media (width <= $screen-sm-min) {
+        margin-top: 1.5rem;
+    }
+}
+
+.kwp-post-item {
+    &__image-container {
+        @include default-thumbnail;
+    }
+    &__title {
+        color: $text;
+    }
+    &__link {
+        img {
+            @include default-thumbnail-hover;
+        }
+    }
+    &__category {
+        background: $secondary-color;
+        color: $primary-color;
+        border-radius: $radius-s;
+    }
+    &__excerpt,
+    &__read-time {
+        color: $light-gray;
+    }
+    &__no-image {
+        @include dark-mode-wrapper {
+            background: $background-secondary;
+        }
+    }
+}
+
+.kwp-pagination {
+    @media (width <= $screen-sm-min) {
+        margin-top: 2.25rem;
+    }
+    &__button {
+        color: $text;
+        &:hover {
+            color: $primary-color;
+        }
+        svg {
+            * {
+                stroke: $text;
+            }
+        }
+        &:disabled {
+            color: $light-gray;
+            svg {
+                * {
+                    stroke: $light-gray;
+                }
+            }
+        }
+        &:hover {
+            &:not(:disabled) {
+                svg {
+                    * {
+                        stroke: $primary-color;
+                    }
+                }
+            }
+        }
+    }
+    &__info {
+        color: $text;
+    }
+    &__skeleton-block {
+        @include dark-mode-wrapper {
+            background: $background-secondary;
+        }
+    }
+}
+
+.kwp-skeleton-post-item {
+    &__image,
+    &__title,
+    &__excerpt,
+    &__line {
+        @include dark-mode-wrapper {
+            background: $background-secondary;
+        }
+    }
+}

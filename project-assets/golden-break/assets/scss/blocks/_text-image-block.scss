@@ -1,0 +1,53 @@
+@use "../abstracts" as *;
+@use "../base" as *;
+
+.text-image-block {
+    display: grid;
+    align-items: center;
+    @media (width > $screen-sm-min) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    @media (width <= $screen-sm-min) {
+        @include full-viewport-width;
+    }
+    @include default-component-spacing;
+    &__content {
+        display: grid;
+        align-items: center;
+        @media (width > $screen-sm-min) {
+            padding: 3rem;
+            justify-content: center;
+            > div:not(.content-wide) {
+                max-width: 24.75rem;
+                width: 100%;
+            }
+        }
+        @media (width <= $screen-sm-min) {
+            padding: 2.25rem 1.5rem;
+        }
+        &-description {
+            margin-top: 2rem;
+            @include text-formatting;
+            > p {
+                line-height: 1.75rem;
+            }
+        }
+        &-button {
+            margin-top: 1.5rem;
+        }
+    }
+    &__media {
+        img,
+        video {
+            width: 100%;
+            height: auto;
+        }
+        @media (width > $screen-sm-min) {
+            border-radius: $radius-l;
+            overflow: hidden;
+            &.left {
+                order: 1;
+            }
+        }
+    }
+}

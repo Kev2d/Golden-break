@@ -1,0 +1,91 @@
+@use "../abstracts/index" as *;
+
+body {
+    h1,
+    .keweb-text--xl {
+        @media (width > $screen-sm-min) {
+            font-size: calc(4rem + ((1vw - 0.48rem) * 0.1));
+            line-height: 4.625rem;
+        }
+        @media (width <= $screen-sm-min) {
+            font-size: 2.5rem;
+            line-height: 3.25rem;
+        }
+    }
+
+    h2,
+    .keweb-text--lg {
+        @media (width > $screen-sm-min) {
+            font-size: calc(2.5rem + ((1vw - 0.48rem) * 0.1));
+            line-height: 3.125rem;
+        }
+        @media (width <= $screen-sm-min) {
+            font-size: calc(2rem + ((1vw - 0.48rem) * 0.4));
+            line-height: 2rem;
+            &.small--size {
+                @media (width <= $screen-sm-min) {
+                    font-size: 1.25rem;
+                    line-height: 1.75rem;
+                }
+            }
+        }
+    }
+
+    h3,
+    .keweb-text--md {
+        @media (width > $screen-sm-min) {
+            font-size: calc(2rem + ((1vw - 0.48rem) * 0.1));
+            line-height: 2.625rem;
+        }
+        @media (width <= $screen-sm-min) {
+            font-size: 1.25rem;
+            line-height: 2rem;
+        }
+    }
+
+    h4,
+    .keweb-text--sm {
+        @media (width > $screen-sm-min) {
+            font-size: calc(1.25rem + ((1vw - 0.48rem) * 0.1));
+            line-height: 1.75rem;
+        }
+        @media (width <= $screen-sm-min) {
+            font-size: 1.25rem;
+            line-height: 1.75rem;
+        }
+    }
+
+    h5,
+    .keweb-text--xs {
+        @media (width > $screen-sm-min) {
+            font-size: calc(1.125rem + ((1vw - 0.48rem) * 0.1));
+            line-height: 1.5rem;
+        }
+        @media (width <= $screen-sm-min) {
+            font-size: 1.125rem;
+            line-height: 1.5rem;
+        }
+    }
+
+    h6,
+    a,
+    .keweb-text--xxs {
+        @media (width > $screen-sm-min) {
+            font-size: calc(1rem + ((1vw - 0.48rem) * 0.1));
+        }
+        @media (width <= $screen-sm-min) {
+            font-size: 1rem;
+        }
+    }
+
+    p {
+        @media (width > $screen-sm-min) {
+            font-size: calc(1rem + ((1vw - 0.48rem) * 0.1));
+            line-height: 1.5rem;
+        }
+        @media (width <= $screen-sm-min) {
+            font-size: 1rem;
+            line-height: 1.5rem;
+        }
+    }
+}

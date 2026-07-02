@@ -1,0 +1,24 @@
+@use "../abstracts" as *;
+@use "../base" as *;
+
+.title-text-block {
+    @include default-component-spacing;
+    @media (width > $screen-sm-min) {
+        text-align: center;
+    }
+    &__title {
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            @extend h2;
+            font-weight: 600;
+        }
+    }
+
+    &__text {
+        margin-top: 0.75rem;
+    }
+}

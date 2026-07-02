@@ -1,0 +1,64 @@
+@use "../abstracts" as *;
+
+.language-menu {
+    .language {
+        &__toggle {
+            font-weight: 500;
+
+            svg {
+                @include smooth-transition;
+
+                * {
+                    stroke: $text;
+                }
+            }
+
+            &:hover {
+                color: $primary-color;
+
+                svg {
+                    * {
+                        stroke: $primary-color;
+                    }
+                }
+            }
+
+            @media (width <=$screen-sm-min) {
+                svg {
+                    transform: rotate(-90deg);
+                }
+            }
+
+            @media (width > $screen-sm-min) {
+                &.open {
+                    svg {
+                        transform: rotate(180deg);
+                    }
+                }
+            }
+        }
+
+        &__menu {
+            margin-bottom: 0.75rem;
+
+            @media (width <=$screen-sm-min) {
+                top: 0;
+            }
+
+            >.list-back-button {
+                margin-bottom: 0.75rem;
+            }
+
+            >li {
+                >a {
+                    color: $text;
+                    text-decoration: none;
+
+                    &.active {
+                        font-weight: 500;
+                    }
+                }
+            }
+        }
+    }
+}

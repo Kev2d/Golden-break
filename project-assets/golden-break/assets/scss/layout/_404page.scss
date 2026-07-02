@@ -1,0 +1,36 @@
+@use "../abstracts" as *;
+@use "../base" as *;
+
+.error-page {
+    text-align: center;
+    @include default-component-spacing;
+    @media (width > $screen-sm-min) {
+        padding: 10rem 0;
+    }
+    @media (width <= $screen-sm-min) {
+        padding: 6rem 0;
+    }
+    &-title{
+        font-weight: 700;
+    }
+    &-title,
+    &-emoji {
+        @media (width > $screen-sm-min) {
+            font-size: 9rem;
+            line-height: 10rem;
+        }
+
+        @media (width <= $screen-sm-min) {
+            font-size: 6rem;
+            line-height: 7rem;
+        }
+    }
+    &-text {
+        @extend h3;
+        font-weight: 500;
+        margin-top: 2rem;
+    }
+    &-button {
+        margin-top: 1.5rem;
+    }
+}

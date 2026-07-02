@@ -1,0 +1,17 @@
+.footer-branding {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 3rem;
+
+    &__logo {
+        max-width: 12.5rem;
+        width: 100%;
+        height: auto;
+    }
+
+    &__tagline {
+        max-width: 26rem;
+        margin-top: 1.25rem;
+    }
+}

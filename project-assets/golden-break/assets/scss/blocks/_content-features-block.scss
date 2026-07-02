@@ -1,0 +1,57 @@
+@use "../abstracts" as *;
+@use "../base" as *;
+
+.content-features-block {
+    display: grid;
+    @media (width > $screen-sm-min) {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 3rem;
+    }
+    @media (width <= $screen-sm-min) {
+        gap: 1.5em;
+    }
+    @include default-component-spacing;
+    &__item {
+        display: grid;
+        gap: 0.75rem;
+        @media (width > $screen-sm-min) {
+            grid-template-columns: auto 1fr;
+        }
+        &-icon {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            width: 3rem;
+            height: 3rem;
+            background: $success-green;
+            border-radius: $radius-m;
+            svg,
+            img {
+                width: 1.5rem;
+                min-width: 1.5rem;
+                height: auto;
+            }
+            svg {
+                * {
+                    fill: $text;
+                }
+            }
+            img {
+                @include dark-mode-wrapper {
+                    filter: brightness(0) invert(1);
+                }
+            }
+        }
+        &-content {
+            .title {
+                @extend h4;
+                font-weight: 500;
+                line-height: 1.75rem;
+            }
+            .text {
+                margin-top: 0.25rem;
+            }
+        }
+    }
+}
