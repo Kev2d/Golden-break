@@ -29,9 +29,7 @@
         color: $light-gray;
     }
     &__no-image {
-        @include dark-mode-wrapper {
-            background: $background-secondary;
-        }
+        background: $background-secondary;
     }
 }
 
@@ -71,9 +69,7 @@
         color: $text;
     }
     &__skeleton-block {
-        @include dark-mode-wrapper {
-            background: $background-secondary;
-        }
+        background: $background-secondary;
     }
 }
 
@@ -82,8 +78,6 @@
     &__title,
     &__excerpt,
     &__line {
-        @include dark-mode-wrapper {
-            background: $background-secondary;
-        }
+        background: $background-secondary;
     }
 }

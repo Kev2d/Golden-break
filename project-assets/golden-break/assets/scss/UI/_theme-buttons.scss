@@ -49,19 +49,12 @@ $button-states: (
 
         &:hover {
           color: $white;
-          @include dark-mode-wrapper {
-            color: $dark;
-          }
         }
       }
 
       @if $state == "default" {
         padding: 0.625rem 1.5rem;
         font-size: 1.25rem;
-        @include dark-mode-wrapper {
-          background: $light-gray;
-          color: $dark;
-        }
       }
 
       @if $state == "light" {

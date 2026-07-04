@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // Fetch the languages
 $languages = function_exists('icl_get_languages') ? icl_get_languages('skip_missing=0&orderby=code') : array();
 

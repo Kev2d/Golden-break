@@ -1,4 +1,4 @@
-﻿<section class="posts-display-block">
+<section class="posts-display-block">
     <?php
     $title_tag = get_field('title_tag');
     if (!$title_tag) {

@@ -26,8 +26,8 @@
             "label": "Title",
             "name": "title",
             "aria-label": "",
-            "type": "text",
-            "instructions": "",
+            "type": "wysiwyg",
+            "instructions": "Use mark to highlight part of the title.",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -36,39 +36,11 @@
                 "id": ""
             },
             "default_value": "",
-            "maxlength": "",
-            "placeholder": "",
-            "prepend": "",
-            "append": "",
+            "tabs": "all",
+            "toolbar": "full",
+            "media_upload": 0,
+            "delay": 0,
             "wpml_cf_preferences": 2
-        },
-        {
-            "key": "field_66a128e3ec84a",
-            "label": "Title Size",
-            "name": "title_size",
-            "aria-label": "",
-            "type": "button_group",
-            "instructions": "Select title tag.",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "wpml_cf_preferences": 1,
-            "choices": {
-                "h1": "h1",
-                "h2": "h2",
-                "h3": "h3",
-                "h4": "h4",
-                "h5": "h5",
-                "h6": "h6"
-            },
-            "default_value": "h2",
-            "return_format": "label",
-            "allow_null": 0,
-            "layout": "horizontal"
         },
         {
             "key": "field_6485c833d9af6",
@@ -106,7 +78,7 @@
                 "id": ""
             },
             "wpml_cf_preferences": 1,
-            "message": "Removes the width of title, text and button containers and takes up 100% of parent container",
+            "message": "Removes the content max-width and takes up 100% of the text column",
             "default_value": 0,
             "ui_on_text": "Not Wide",
             "ui_off_text": "Wide",
@@ -258,5 +230,5 @@
     "description": "",
     "show_in_rest": 0,
     "acfml_field_group_mode": "translation",
-    "modified": 1736099466
+    "modified": 1783064752
 }

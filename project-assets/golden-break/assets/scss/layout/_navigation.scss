@@ -7,16 +7,21 @@
     @media (width <=$screen-sm-min) {
         @include smooth-transition;
         position: absolute;
-        border-radius: $radius-l;
+        overflow: hidden;
         box-shadow: $box-shadow;
-        background: $background-secondary;
-        padding: 0.75rem;
-        top: calc(100% + 0.75rem);
+        background: $background;
+        padding: 0;
+        top: 100%;
         width: 100%;
-        left: -100vw;
+        left: 0;
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(-0.5rem);
 
         &.open {
-            left: 0;
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
         }
     }
 
@@ -25,13 +30,74 @@
     }
 
     &--mobile {
-        overflow-y: auto;
-        @include dynamic-mobile-menu-height;
         @include hide-on-desktop;
+        z-index: 20;
+        max-height: calc(100dvh - 3.5rem);
+
+        .site-nav__menu {
+            li {
+                &:not(.current-menu-item) {
+                    > a {
+                        color: #a0a0a0;
+                    }
+                }
+
+                &.current-menu-item {
+                    > a {
+                        color: $primary-color;
+                    }
+                }
+            }
+        }
 
         .sub-menu {
             z-index: 10;
             @include dynamic-mobile-menu-height;
+        }
+    }
+
+    .site-nav-mobile__panel {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        padding: 1rem;
+        box-sizing: border-box;
+        background: $background;
+        border-top: 1px solid $border-color;
+    }
+
+    .site-nav-mobile__content {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+
+    .site-nav-mobile__cta {
+        display: flex;
+        width: 100%;
+        padding-top: 0.75rem;
+    }
+
+    .site-nav-mobile__cta .header-booking-cta {
+        width: 100%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 2.375rem;
+        padding: 0.625rem 1.25rem;
+        border-radius: $radius-m;
+        border: 0;
+        background: $primary-color;
+        color: $primary-foreground;
+        font-size: 0.875rem;
+        font-weight: 500;
+        line-height: 1.25;
+        text-align: center;
+        text-decoration: none;
+        white-space: nowrap;
+
+        &:hover {
+            background: $primary-color-hover;
         }
     }
 
@@ -44,13 +110,18 @@
 
     &__menu {
         display: flex;
+        align-items: center;
 
         @media (width > $screen-sm-min) {
-            gap: 3rem;
+            gap: 1.75rem;
+            justify-content: flex-end;
+            flex-wrap: nowrap;
         }
 
         @media (width <=$screen-sm-min) {
             flex-direction: column;
+            align-items: stretch;
+            gap: 0.5rem;
         }
 
         >.nav-item-controls {
@@ -86,14 +157,18 @@
 
             a {
                 text-decoration: none;
-                color: $text;
-                font-weight: 500;
+                color: $light-gray;
+                font-size: 0.875rem;
+                font-weight: 400;
+                line-height: 1.4;
+                white-space: nowrap;
 
                 @media (width <=$screen-sm-min) {
                     display: flex;
                     justify-content: space-between;
-                    padding: 0.75rem 0;
+                    padding: 0.5rem 0;
                     width: 100%;
+                    font-size: 0.875rem;
                 }
 
                 &:hover {

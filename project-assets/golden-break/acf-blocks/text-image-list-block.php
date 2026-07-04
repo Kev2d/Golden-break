@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 function generate_id_from_title($index, $title)
 {
     $sanitized_title = sanitize_title_with_dashes($title); // Converts to lowercase and replaces spaces with dashes

@@ -28,10 +28,6 @@
             padding: 3rem;
             @include mobile-swiper-slide($enable-width: false);
 
-            @include dark-mode-wrapper {
-                background: $background-secondary;
-            }
-
             &-content {
                 display: flex;
                 flex-direction: column;

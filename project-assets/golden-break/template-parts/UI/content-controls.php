@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $slider_id_attr = isset($args['slider_id']) && !empty($args['slider_id']) ? 'aria-controls="' . esc_attr($args['slider_id']) . '"' : '';
 ?>
 

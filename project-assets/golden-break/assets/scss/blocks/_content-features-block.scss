@@ -37,11 +37,6 @@
                     fill: $text;
                 }
             }
-            img {
-                @include dark-mode-wrapper {
-                    filter: brightness(0) invert(1);
-                }
-            }
         }
         &-content {
             .title {

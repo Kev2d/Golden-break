@@ -2,93 +2,212 @@
 @use "../base" as *;
 
 .price-list-block {
-    @include default-component-spacing;
+    @include full-viewport-width;
 
-    &__wrapper {
-        @media (width > $screen-sm-min) {
-            display: grid;
-            grid-auto-flow: column;
-            grid-template-columns: repeat(auto-fit, minmax(1fr, auto));
-            gap: 1.5rem;
-        }
+    padding: 5rem 0;
+    background: $background-secondary;
+
+    @media (width <= $screen-sm-min) {
+        padding: 3rem 0;
+    }
+
+    &__inner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        padding: 0 1.25rem;
+
         @media (width <= $screen-sm-min) {
-            margin-top: 1rem;
-            @include mobile-swiper-wrapper;
+            padding: 0 1rem;
         }
     }
-    &__item {
-        border-radius: $radius-l;
-        background: $soft-gray;
+
+    &__header {
+        text-align: center;
+    }
+
+    &__title {
+        margin: 0;
+        color: $white;
+        font-size: 1.5rem;
+        font-weight: 700;
+        line-height: 1.2;
+        letter-spacing: 0;
+
+        mark,
+        strong,
+        b {
+            @include reset-mark;
+            color: $primary-color;
+            font-weight: 700;
+        }
+
         @media (width > $screen-sm-min) {
-            padding: 3rem 1.5rem;
+            font-size: 1.625rem;
         }
-        @media (width <= $screen-sm-min) {
-            @include mobile-swiper-slide;
-            padding: 3rem 1rem;
-        }
-        @include dark-mode-wrapper {
-            background: $background-secondary;
-        }
+    }
 
-        hr,
-        &-price,
-        &-cta,
-        &-list {
-            margin-top: 1rem;
-        }
+    &__description {
+        margin-top: 1rem;
+        color: $light-gray;
 
-        hr {
-            height: 0.1rem;
-            width: 6.25rem;
-            background: $medium-primary-color;
-        }
-
-        &-content {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        &-title {
-            @extend h4;
-            @include secondary-gradient-mark;
-            font-weight: 500;
-        }
-
-        &-description,
-        &-price-text {
+        p {
+            margin: 0;
             font-size: 0.875rem;
-            line-height: 1.25rem;
+            line-height: 1.5;
+        }
+    }
+
+    &__cards {
+        display: grid;
+        width: min(100%, 56rem);
+        gap: 1.5rem;
+        margin-top: 2.25rem;
+
+        @media (width > $screen-sm-min) {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            align-items: center;
         }
 
-        &-price {
-            @extend h2;
-            font-weight: 500;
-        }
-
-        &-cta {
-            width: 100%;
-        }
-
-        &-list {
-            display: flex;
-            flex-direction: column;
+        @media (width <= $screen-sm-min) {
+            grid-template-columns: 1fr;
             gap: 1rem;
-            &-text {
-                @extend p;
-                font-weight: 500;
+            margin-top: 2rem;
+        }
+    }
+
+    &__card {
+        position: relative;
+        display: flex;
+        min-height: 10rem;
+        flex-direction: column;
+        align-items: center;
+        padding: 1.5rem 1rem;
+        border: 1px solid rgba(212, 175, 55, 0.1);
+        border-radius: $radius-m;
+        background: $background;
+        color: $light-gray;
+        text-align: center;
+
+        &--popular {
+            border-width: 2px;
+            border-color: $primary-color;
+            background: rgba(212, 175, 55, 0.08);
+        }
+    }
+
+    &__card-badge {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        min-height: 1.375rem;
+        padding: 0.25rem 0.625rem;
+        border-radius: 999rem;
+        background: $primary-color;
+        color: $primary-foreground;
+        font-size: 0.6875rem;
+        font-weight: 700;
+        line-height: 1;
+        transform: translate(-50%, -50%);
+    }
+
+    &__card-title {
+        margin: 0;
+        color: $white;
+        font-size: 0.875rem;
+        font-weight: 700;
+        line-height: 1.35;
+    }
+
+    &__card-price {
+        margin-top: 0.5rem;
+        color: $primary-color;
+        font-size: 1.75rem;
+        font-weight: 800;
+        line-height: 1.1;
+    }
+
+    &__card-price--text {
+        max-width: 8.75rem;
+        margin-right: auto;
+        margin-left: auto;
+        font-size: 1.25rem;
+        line-height: 1.05;
+    }
+
+    &__card-price-text {
+        margin-top: 0.25rem;
+        font-size: 0.6875rem;
+        line-height: 1.35;
+    }
+
+    &__card-list {
+        display: flex;
+        width: 100%;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        text-align: left;
+    }
+
+    &__card-list-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        color: $light-gray;
+        font-size: 0.6875rem;
+        line-height: 1.45;
+
+        p {
+            margin: 0;
+        }
+
+        mark,
+        strong,
+        b {
+            @include reset-mark;
+            color: $primary-color;
+            font-weight: 700;
+        }
+
+        svg {
+            width: 0.75rem;
+            min-width: 0.75rem;
+            height: 0.75rem;
+            margin-top: 0.25rem;
+
+            path {
+                fill: $light-gray;
             }
-            &-item {
-                @extend p;
-                display: flex;
-                align-items: flex-start;
-                gap: 0.75rem;
-                svg {
-                    width: 1.5rem;
-                    min-width: 1.5rem;
-                    height: auto;
-                }
+        }
+    }
+
+    &__link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 1.75rem;
+        color: $primary-color;
+        font-size: 0.875rem;
+        font-weight: 500;
+        line-height: 1;
+        text-decoration: none;
+        @include smooth-transition;
+
+        svg {
+            width: 1rem;
+            height: 1rem;
+
+            * {
+                stroke: currentColor;
             }
+        }
+
+        &:hover,
+        &:focus-visible {
+            color: $primary-color-hover;
         }
     }
 }

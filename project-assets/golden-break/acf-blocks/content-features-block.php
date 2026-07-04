@@ -1,4 +1,4 @@
-﻿<section class="content-features-block layout-lg">
+<section class="content-features-block layout-lg">
 
     <?php if (have_rows('features')) : ?>
 

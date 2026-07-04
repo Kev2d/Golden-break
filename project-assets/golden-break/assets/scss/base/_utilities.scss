@@ -135,19 +135,3 @@
         }
     }
 }
-
-// Central Dark Mode Wrapper with Conditional Check
-@mixin dark-mode-wrapper {
-    @if $enable-dark-mode {
-        @at-root [data-theme="dark"] & {
-            @content;
-        }
-        @if $enable-auto-dark-mode {
-            @media (prefers-color-scheme: dark) {
-                html:not([data-theme]) & {
-                    @content;
-                }
-            }
-        }
-    }
-}

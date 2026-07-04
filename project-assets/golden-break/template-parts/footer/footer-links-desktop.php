@@ -14,10 +14,12 @@
                     <?php include 'footer-links-list.php'; ?>
                 </nav>
             </div>
+            <?php break; ?>
         <?php endwhile; ?>
 
     <?php endif; ?>
 
     <?php get_template_part('template-parts/footer/footer-contact-links'); ?>
+    <?php get_template_part('template-parts/footer/footer-opening-hours'); ?>
 
 </div>

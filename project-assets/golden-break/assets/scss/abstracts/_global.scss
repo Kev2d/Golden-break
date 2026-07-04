@@ -11,15 +11,6 @@ html body {
   color: $text;
 }
 
-body {
-  @media (width > $screen-sm-min) {
-    padding: 1.25rem 1.75rem;
-  }
-  @media (width <= $screen-sm-min) {
-    padding: 1.25rem;
-  }
-}
-
 #wpadminbar {
   display: none;
 }

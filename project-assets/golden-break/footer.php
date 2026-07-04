@@ -1,5 +1,6 @@
 <footer class="site-footer">
 
+    <?php if (function_exists('get_field') && function_exists('have_rows')) : ?>
     <section class="site-footer__main layout-xl">
 
         <?php get_template_part('template-parts/footer/footer-branding'); ?>
@@ -20,6 +21,7 @@
         </div>
 
     </section>
+    <?php endif; ?>
 
 </footer>
 <?php wp_footer(); ?>

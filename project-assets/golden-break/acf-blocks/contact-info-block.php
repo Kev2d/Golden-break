@@ -1,4 +1,4 @@
-﻿<?php $title_tag = get_field('title_tag');
+<?php $title_tag = get_field('title_tag');
 if (!$title_tag) {
     $title_tag = 'h2';
 }

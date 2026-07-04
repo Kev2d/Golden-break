@@ -3,22 +3,25 @@
 .footer-legal-links {
     &__menu {
         display: flex;
-        @media (width > $screen-sm-min) {
-            gap: 1.5rem;
-        }
+        flex-wrap: wrap;
+        gap: 1rem;
+        justify-content: flex-end;
+
         @media (width <= $screen-sm-min) {
-            gap: 1rem;
+            justify-content: flex-start;
         }
-        &-item {
-            @media (width > $screen-sm-min) {
-                &:hover {
-                    text-decoration: underline;
-                }
-            }
-            @media (width <= $screen-sm-min) {
-                a {
-                    font-size: 0.875rem;
-                }
+    }
+
+    &__menu-item {
+        a {
+            color: $light-gray;
+            font-size: 0.75rem;
+            line-height: 1.5;
+            text-decoration: none;
+
+            &:hover,
+            &:focus-visible {
+                color: $primary-color;
             }
         }
     }

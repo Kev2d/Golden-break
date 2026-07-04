@@ -1,4 +1,4 @@
-﻿<nav role="navigation" class="site-nav site-nav--desktop" aria-label="<?php _e('Primary navigation', 'golden-break'); ?>">
+<nav role="navigation" class="site-nav site-nav--desktop" aria-label="<?php _e('Primary navigation', 'golden-break'); ?>">
 
     <?php
     wp_nav_menu(array(

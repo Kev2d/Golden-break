@@ -5,12 +5,10 @@
 .kwcf-form {
     input,
     textarea {
-        @include dark-mode-wrapper {
-            background: $secondary-color;
+        background: $input-background-color;
 
-            &:not(.kwcf-field-error) {
-                border-color: $secondary-color;
-            }
+        &:not(.kwcf-field-error) {
+            border-color: $input-color;
         }
     }
 

@@ -1,11 +1,17 @@
-<section class="title-text-block layout-md">
+<?php
+$title = get_field('title');
+$text = get_field('text');
+?>
 
-    <?php if (get_field('title')) : ?>
-        <div class="title-text-block__title"><?php echo get_field('title'); ?></div>
-    <?php endif; ?>
+<section class="title-text-block">
+    <div class="title-text-block__inner layout-md">
+        <?php if ($title) : ?>
+            <div class="title-text-block__title"><?php echo wp_kses_post($title); ?></div>
+        <?php endif; ?>
 
-    <?php if (get_field('text')) : ?>
-        <div class="title-text-block__text"> <?php echo get_field('text'); ?></div>
-    <?php endif; ?>
+        <?php if ($text) : ?>
+            <div class="title-text-block__text"><?php echo wp_kses_post($text); ?></div>
+        <?php endif; ?>
+    </div>
 
 </section>

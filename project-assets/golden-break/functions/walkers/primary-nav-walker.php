@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 class PrimaryNavWalker extends Walker_Nav_Menu
 {
     private $is_mobile;

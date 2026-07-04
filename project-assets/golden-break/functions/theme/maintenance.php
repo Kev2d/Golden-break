@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 // Add a checkbox field to the WordPress settings page
 function add_maintenance_mode_checkbox()

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $function = isset($args['function']) ? $args['function'] : '';
 $text = isset($args['text']) ? $args['text'] : __('Back', 'golden-break');
 $label = isset($args['label']) ? $args['label'] : __('Go back', 'golden-break');

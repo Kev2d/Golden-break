@@ -1,9 +1,9 @@
-<div class="features-block layout-lg">
+<div class="features-secondary-block layout-lg">
     <?php if (get_field('title')) : ?>
         <h3 class="main-title"><?php echo esc_html(get_field('title')); ?></h3>
     <?php endif; ?>
     
-    <div class="features-block__repeater <?php echo get_field('block_wide') ? 'wide' : '' ?>">
+    <div class="features-secondary-block__repeater <?php echo get_field('block_wide') ? 'wide' : '' ?>">
         <?php if (have_rows('features')) :
             while (have_rows('features')) : the_row(); ?>
                 <div>

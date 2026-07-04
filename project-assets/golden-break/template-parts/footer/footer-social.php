@@ -1,4 +1,4 @@
-﻿<?php if (have_rows('footer_social_media_icons', 'option')) : ?>
+<?php if (have_rows('footer_social_media_icons', 'option')) : ?>
 
     <nav class="footer-social" aria-label="<?php _e('Social media links', 'golden-break'); ?>">
         <ul class="footer-social__list">

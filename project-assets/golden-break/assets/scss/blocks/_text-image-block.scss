@@ -2,52 +2,132 @@
 @use "../base" as *;
 
 .text-image-block {
-    display: grid;
-    align-items: center;
-    @media (width > $screen-sm-min) {
-        grid-template-columns: repeat(2, 1fr);
-    }
+    @include full-viewport-width;
+
+    padding: 5rem 0;
+    background: $background-secondary;
+
     @media (width <= $screen-sm-min) {
-        @include full-viewport-width;
+        padding: 3rem 0;
     }
-    @include default-component-spacing;
-    &__content {
+
+    &__inner {
         display: grid;
+        width: 100%;
         align-items: center;
+        gap: 5rem;
+        padding: 0 1.25rem;
+
         @media (width > $screen-sm-min) {
-            padding: 3rem;
-            justify-content: center;
-            > div:not(.content-wide) {
-                max-width: 24.75rem;
-                width: 100%;
-            }
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
         }
+
         @media (width <= $screen-sm-min) {
-            padding: 2.25rem 1.5rem;
-        }
-        &-description {
-            margin-top: 2rem;
-            @include text-formatting;
-            > p {
-                line-height: 1.75rem;
-            }
-        }
-        &-button {
-            margin-top: 1.5rem;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            padding: 0 1rem;
         }
     }
+
+    &--media-left {
+        .text-image-block__content {
+            order: 2;
+        }
+
+        .text-image-block__media {
+            order: 1;
+        }
+    }
+
+    &__content {
+        display: flex;
+        align-items: center;
+
+        > div:not(.content-wide) {
+            width: 100%;
+            max-width: 25rem;
+        }
+
+        > .content-wide {
+            width: 100%;
+            max-width: none;
+        }
+    }
+
+    &__title {
+        color: $white;
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        p {
+            margin: 0;
+            font-size: 2.25rem;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: 0;
+
+            @media (width <= $screen-sm-min) {
+                font-size: 1.75rem;
+            }
+        }
+
+        mark,
+        strong,
+        b {
+            @include reset-mark;
+            color: $primary-color;
+            font-weight: 700;
+        }
+    }
+
+    &__content-description {
+        margin-top: 1rem;
+        color: $light-gray;
+
+        p {
+            margin: 0;
+            font-size: 0.875rem;
+            line-height: 1.55;
+
+            + p {
+                margin-top: 1rem;
+            }
+        }
+
+        mark,
+        strong,
+        b {
+            @include reset-mark;
+            color: $primary-color;
+            font-weight: 700;
+        }
+    }
+
+    &__content-button {
+        margin-top: 1.5rem;
+    }
+
     &__media {
+        overflow: hidden;
+        border-radius: $radius-m;
+        aspect-ratio: 1.48 / 1;
+        background: $background;
+
+        picture,
         img,
         video {
+            display: block;
             width: 100%;
-            height: auto;
+            height: 100%;
         }
-        @media (width > $screen-sm-min) {
-            border-radius: $radius-l;
-            overflow: hidden;
-            &.left {
-                order: 1;
-            }
+
+        img,
+        video {
+            object-fit: cover;
         }
     }
 }

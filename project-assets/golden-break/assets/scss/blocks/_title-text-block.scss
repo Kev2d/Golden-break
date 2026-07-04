@@ -2,23 +2,65 @@
 @use "../base" as *;
 
 .title-text-block {
-    @include default-component-spacing;
-    @media (width > $screen-sm-min) {
+    @include full-viewport-width;
+
+    margin-top: 0;
+    padding: 5rem 1.25rem;
+    background: $background-secondary;
+
+    @media (width <= $screen-sm-min) {
+        padding: 4rem 1rem;
+    }
+
+    &__inner {
+        max-width: 46rem;
         text-align: center;
     }
+
     &__title {
+        color: $white;
+
         h1,
         h2,
         h3,
         h4,
         h5,
-        h6 {
-            @extend h2;
-            font-weight: 600;
+        h6,
+        p {
+            margin: 0;
+            font-size: clamp(1.75rem, 2.4vw, 2rem);
+            font-weight: 700;
+            line-height: 1.25;
+            letter-spacing: 0;
         }
     }
 
     &__text {
-        margin-top: 0.75rem;
+        margin-top: 1.5rem;
+        color: $light-gray;
+
+        p {
+            margin: 0;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        p + p {
+            margin-top: 1.5rem;
+        }
+
+        mark,
+        a,
+        strong,
+        b {
+            @include reset-mark;
+            color: $primary-color;
+            font-weight: 700;
+        }
+
+        a:hover,
+        a:focus-visible {
+            color: $primary-color-hover;
+        }
     }
 }

@@ -6,3 +6,4 @@ import './language-menu';
 import './button-functions';
 import './mobile-swiper';
 import './desktop-swiper';
+import './hero-slider';

@@ -2,42 +2,75 @@
 @use "../base" as *;
 
 .site-footer {
-    @include default-component-spacing;
+    @include full-viewport-width;
+
+    position: relative;
+    overflow: hidden;
+    margin-top: 0;
+    padding: 3.5rem 0 0;
+    border-top: 1px solid $border-color;
+    background: $background-secondary;
+    color: $light-gray;
+
+    &::after {
+        content: "";
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        height: 5rem;
+        background-image: url("../../../assets/img/goldenbreakpattern.svg");
+        background-repeat: repeat-x;
+        background-size: 17rem auto;
+        background-position: left bottom;
+        opacity: 0.12;
+        pointer-events: none;
+    }
+
+    @media (width <= $screen-sm-min) {
+        padding-top: 2.5rem;
+    }
+
+    &__main,
+    &__bottom {
+        position: relative;
+        z-index: 1;
+    }
+
     &__main {
-        padding-bottom: 2.25rem;
+        display: grid;
+        gap: 4.5rem;
+        padding: 0 1.25rem 3rem;
+
         @media (width > $screen-sm-min) {
-            display: grid;
-            grid-template-columns: minmax(auto, 35%) minmax(auto, 65%);
-            justify-content: space-between;
-            gap: 3rem;
+            grid-template-columns: 1.25fr 3.75fr;
+            align-items: start;
         }
+
         @media (width <= $screen-sm-min) {
-            display: flex;
-            flex-direction: column-reverse;
-            gap: 2.25rem;
+            grid-template-columns: 1fr;
+            padding: 0 1rem 2rem;
         }
     }
 
     &__bottom {
-        @include full-viewport-width;
-        padding: 0 1.25rem;
-        border-top: 2px solid $primary-color;
+        border-top: 1px solid rgba(212, 175, 55, 0.08);
+
         &-copyright {
-            @media (width <= $screen-sm-min) {
-                font-size: 0.875rem;
-            }
+            margin: 0;
+            font-size: 0.75rem;
+            line-height: 1.5;
         }
+
         &-inside {
-            padding-top: 1.5rem;
-            @media (width > $screen-sm-min) {
-                display: flex;
-                justify-content: space-between;
-                padding-bottom: 3rem;
-            }
+            display: flex;
+            justify-content: space-between;
+            gap: 1.5rem;
+            padding: 1.5rem 1.25rem 2rem;
+
             @media (width <= $screen-sm-min) {
-                display: grid;
-                gap: 1.5rem;
-                padding-bottom: 1.75rem;
+                flex-direction: column;
+                padding: 1.5rem 1rem 2rem;
             }
         }
     }

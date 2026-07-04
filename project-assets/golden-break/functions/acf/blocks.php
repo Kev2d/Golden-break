@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 function keweb_block_categories($categories, $post)
 {
@@ -195,6 +195,33 @@ function my_acf_init_block_types()
             'category'          => 'golden-break',
             'icon'              => 'money',
             'keywords'          => array('price', 'list', 'cost', 'block', 'layout'),
+        ));
+        acf_register_block_type(array(
+            'name'              => 'atmosphere-block',
+            'title'             => __('Atmosphere Block'),
+            'description'       => __('A custom block to display a gallery section with title and link.'),
+            'render_template'   => 'acf-blocks/atmosphere-block.php',
+            'category'          => 'golden-break',
+            'icon'              => 'format-gallery',
+            'keywords'          => array('atmosphere', 'gallery', 'images', 'photos', 'block'),
+        ));
+        acf_register_block_type(array(
+            'name'              => 'location-block',
+            'title'             => __('Location Block'),
+            'description'       => __('A custom block to display location highlights with a map image.'),
+            'render_template'   => 'acf-blocks/location-block.php',
+            'category'          => 'golden-break',
+            'icon'              => 'location-alt',
+            'keywords'          => array('location', 'map', 'address', 'contact', 'block'),
+        ));
+        acf_register_block_type(array(
+            'name'              => 'cta-block',
+            'title'             => __('CTA Block'),
+            'description'       => __('A centered call to action section with primary and secondary links.'),
+            'render_template'   => 'acf-blocks/cta-block.php',
+            'category'          => 'golden-break',
+            'icon'              => 'megaphone',
+            'keywords'          => array('cta', 'call to action', 'buttons', 'booking', 'block'),
         ));
         acf_register_block_type(array(
             'name'              => 'title-text-block',

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // Helper Function for Enqueuing Scripts and Styles
 function enqueue_script_style($handle, $src = '', $deps = array(), $ver = false, $media = 'all', $in_footer = false)
 {
@@ -50,25 +50,6 @@ function keweb_custom_logo_setup()
     add_theme_support('custom-logo', $defaults);
 }
 add_action('after_setup_theme', 'keweb_custom_logo_setup');
-
-function keweb_customize_register($wp_customize)
-{
-    // Add a setting for the dark mode logo
-    $wp_customize->add_setting('dark_mode_logo', array(
-        'default'           => '',
-        'sanitize_callback' => 'esc_url', // Ensures a valid URL is used
-    ));
-
-    // Add a control for the dark mode logo
-    $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, 'dark_mode_logo_control', array(
-        'label'    => __('Dark Mode Logo', 'golden-break'),
-        'section'  => 'title_tagline', // Adds to the "Site Identity" section
-        'settings' => 'dark_mode_logo',
-        'priority' => 8, // Display order
-    )));
-}
-add_action('customize_register', 'keweb_customize_register');
-
 
 // Save all ACF JSONs to acf-json folder
 function set_acf_json_save_folder($path)

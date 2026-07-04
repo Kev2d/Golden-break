@@ -1,0 +1,148 @@
+@use "../abstracts" as *;
+@use "../base" as *;
+
+.atmosphere-block {
+    @include full-viewport-width;
+
+    padding: 5rem 0;
+    background: $background;
+
+    @media (width <= $screen-sm-min) {
+        padding: 3rem 0;
+    }
+
+    &__inner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        padding: 0 1.25rem;
+
+        @media (width <= $screen-sm-min) {
+            padding: 0 1rem;
+        }
+    }
+
+    &__header {
+        text-align: center;
+    }
+
+    &__title {
+        color: $white;
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        p {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: 0;
+
+            @media (width > $screen-sm-min) {
+                font-size: 2.25rem;
+            }
+        }
+
+        mark,
+        strong,
+        b {
+            @include reset-mark;
+            color: $primary-color;
+            font-weight: 700;
+        }
+    }
+
+    &__description {
+        margin-top: 1rem;
+        color: $light-gray;
+
+        p {
+            margin: 0;
+            font-size: 0.875rem;
+            line-height: 1.5;
+
+            @media (width > $screen-sm-min) {
+                font-size: 1.125rem;
+            }
+        }
+    }
+
+    &__gallery {
+        display: grid;
+        width: min(100%, 68.5rem);
+        gap: 1rem;
+        margin-top: 3rem;
+
+        @media (width > $screen-sm-min) {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+
+        @media (width <= $screen-sm-min) {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.75rem;
+            margin-top: 2rem;
+        }
+    }
+
+    &__gallery-item {
+        overflow: hidden;
+        border-radius: $radius-m;
+        aspect-ratio: 1 / 1;
+        background: $background-secondary;
+
+        picture,
+        img {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        img {
+            object-fit: cover;
+            @include smooth-transition(0.3s);
+        }
+
+        @media (width > $screen-sm-min) {
+            &:hover,
+            &:focus-within {
+                img {
+                    transform: scale(1.1);
+                }
+            }
+        }
+    }
+
+    &__link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 2rem;
+        color: $primary-color;
+        font-size: 0.875rem;
+        font-weight: 500;
+        line-height: 1;
+        text-decoration: none;
+        @include smooth-transition;
+
+        svg {
+            width: 1rem;
+            height: 1rem;
+
+            * {
+                stroke: currentColor;
+            }
+        }
+
+        &:hover,
+        &:focus-visible {
+            color: $primary-color-hover;
+            text-decoration: underline;
+        }
+    }
+}

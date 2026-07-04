@@ -1,4 +1,4 @@
-﻿<?php get_header(); ?>
+<?php get_header(); ?>
 
 <div class="error-page layout-xl">
     <h1 class="error-page-emoji">🙁</h1>

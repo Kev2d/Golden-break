@@ -1,4 +1,4 @@
-﻿<section class="suggested-posts" aria-labelledby="suggested-posts-title">
+<section class="suggested-posts" aria-labelledby="suggested-posts-title">
     <h4 id="suggested-posts-title" class="suggested-posts__title small--size">
         <?php _e('You might also like', 'golden-break'); ?>
     </h4>

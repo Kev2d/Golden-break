@@ -14,7 +14,6 @@ $theme_includes = [
   'security/security.php',
   'classes/get-svg.php',
   'classes/theme-config.php',
-  'classes/get-theme-from-cookie.php',
   'classes/breadcrumbs.php',
   'classes/svgrenderer.php',
   'classes/custom-document-title-manager.php',

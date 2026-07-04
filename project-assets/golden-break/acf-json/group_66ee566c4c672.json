@@ -22,8 +22,50 @@
             "endpoint": 0
         },
         {
+            "key": "field_price_list_section_title",
+            "label": "Section Title",
+            "name": "title",
+            "aria-label": "",
+            "type": "wysiwyg",
+            "instructions": "Use mark or bold to highlight part of the title.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "wpml_cf_preferences": 2,
+            "default_value": "",
+            "tabs": "all",
+            "toolbar": "basic",
+            "media_upload": 0,
+            "delay": 0
+        },
+        {
+            "key": "field_price_list_description",
+            "label": "Description",
+            "name": "description",
+            "aria-label": "",
+            "type": "wysiwyg",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "wpml_cf_preferences": 2,
+            "default_value": "",
+            "tabs": "all",
+            "toolbar": "basic",
+            "media_upload": 0,
+            "delay": 0
+        },
+        {
             "key": "field_66ee567fe482b",
-            "label": "Price List",
+            "label": "Price Cards",
             "name": "price_list",
             "aria-label": "",
             "type": "repeater",
@@ -40,13 +82,57 @@
             "pagination": 1,
             "rows_per_page": 4,
             "min": 0,
-            "max": 0,
-            "collapsed": "",
-            "button_label": "Add Row",
+            "max": 3,
+            "collapsed": "field_66ee584ae482c",
+            "button_label": "Add Card",
             "sub_fields": [
                 {
+                    "key": "field_price_list_is_popular",
+                    "label": "Popular Card",
+                    "name": "is_popular",
+                    "aria-label": "",
+                    "type": "true_false",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "50",
+                        "class": "",
+                        "id": ""
+                    },
+                    "wpml_cf_preferences": 1,
+                    "message": "",
+                    "default_value": 0,
+                    "ui_on_text": "",
+                    "ui_off_text": "",
+                    "ui": 1,
+                    "parent_repeater": "field_66ee567fe482b"
+                },
+                {
+                    "key": "field_price_list_badge_text",
+                    "label": "Badge Text",
+                    "name": "badge_text",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "50",
+                        "class": "",
+                        "id": ""
+                    },
+                    "wpml_cf_preferences": 2,
+                    "default_value": "Populaarne",
+                    "maxlength": "",
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": "",
+                    "parent_repeater": "field_66ee567fe482b"
+                },
+                {
                     "key": "field_66ee584ae482c",
-                    "label": "Product Title",
+                    "label": "Card Title",
                     "name": "product_title",
                     "aria-label": "",
                     "type": "text",
@@ -89,41 +175,19 @@
                         "h5": "h5",
                         "h6": "h6"
                     },
-                    "default_value": "h4",
+                    "default_value": "h3",
                     "return_format": "label",
                     "allow_null": 0,
                     "layout": "horizontal",
                     "parent_repeater": "field_66ee567fe482b"
                 },
                 {
-                    "key": "field_66ee585be482d",
-                    "label": "Product Short Description",
-                    "name": "product_short_description",
-                    "aria-label": "",
-                    "type": "textarea",
-                    "instructions": "",
-                    "required": 0,
-                    "conditional_logic": 0,
-                    "wrapper": {
-                        "width": "",
-                        "class": "",
-                        "id": ""
-                    },
-                    "wpml_cf_preferences": 2,
-                    "default_value": "",
-                    "maxlength": "",
-                    "rows": "",
-                    "placeholder": "",
-                    "new_lines": "",
-                    "parent_repeater": "field_66ee567fe482b"
-                },
-                {
                     "key": "field_66ee5873e482e",
-                    "label": "Price",
+                    "label": "Price Text",
                     "name": "price",
                     "aria-label": "",
                     "type": "text",
-                    "instructions": "",
+                    "instructions": "Use plain text, for example 15€, 40€, or Küsi pakkumist.",
                     "required": false,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -162,46 +226,6 @@
                     "parent_repeater": "field_66ee567fe482b"
                 },
                 {
-                    "key": "field_66ee58aae4831",
-                    "label": "CTA",
-                    "name": "cta",
-                    "aria-label": "",
-                    "type": "link",
-                    "instructions": "",
-                    "required": 0,
-                    "conditional_logic": 0,
-                    "wrapper": {
-                        "width": "",
-                        "class": "",
-                        "id": ""
-                    },
-                    "wpml_cf_preferences": 1,
-                    "return_format": "array",
-                    "parent_repeater": "field_66ee567fe482b"
-                },
-                {
-                    "key": "field_66ee58b6e4832",
-                    "label": "List Text",
-                    "name": "list_text",
-                    "aria-label": "",
-                    "type": "text",
-                    "instructions": "Small Text Before List",
-                    "required": 0,
-                    "conditional_logic": 0,
-                    "wrapper": {
-                        "width": "",
-                        "class": "",
-                        "id": ""
-                    },
-                    "wpml_cf_preferences": 2,
-                    "default_value": "",
-                    "maxlength": "",
-                    "placeholder": "",
-                    "prepend": "",
-                    "append": "",
-                    "parent_repeater": "field_66ee567fe482b"
-                },
-                {
                     "key": "field_66ee58d4e4833",
                     "label": "Features List",
                     "name": "features_list",
@@ -220,8 +244,8 @@
                     "pagination": 0,
                     "min": 0,
                     "max": 0,
-                    "collapsed": "",
-                    "button_label": "Add Row",
+                    "collapsed": "field_66ee58dfe4834",
+                    "button_label": "Add Feature",
                     "rows_per_page": 20,
                     "parent_repeater": "field_66ee567fe482b",
                     "sub_fields": [
@@ -230,8 +254,8 @@
                             "label": "List Item",
                             "name": "list_item",
                             "aria-label": "",
-                            "type": "text",
-                            "instructions": "",
+                            "type": "wysiwyg",
+                            "instructions": "Use mark or bold to highlight feature text.",
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
@@ -241,15 +265,32 @@
                             },
                             "wpml_cf_preferences": 2,
                             "default_value": "",
-                            "maxlength": "",
-                            "placeholder": "",
-                            "prepend": "",
-                            "append": "",
+                            "tabs": "all",
+                            "toolbar": "basic",
+                            "media_upload": 0,
+                            "delay": 0,
                             "parent_repeater": "field_66ee58d4e4833"
                         }
                     ]
                 }
             ]
+        },
+        {
+            "key": "field_price_list_bottom_link",
+            "label": "Bottom Link",
+            "name": "bottom_link",
+            "aria-label": "",
+            "type": "link",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "wpml_cf_preferences": 1,
+            "return_format": "array"
         }
     ],
     "location": [
@@ -271,5 +312,5 @@
     "description": "",
     "show_in_rest": 0,
     "acfml_field_group_mode": "translation",
-    "modified": 1744746639
+    "modified": 1783062362
 }

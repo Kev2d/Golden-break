@@ -1,91 +1,92 @@
-<section class="price-list-block custom-swiper-container">
+<?php
+$title = get_field('title');
+$description = get_field('description');
+$bottom_link = get_field('bottom_link');
 
-    <?php
-    $slider_id = 'content-slider-' . substr(uniqid(), -5);
-    ?>
+if ($title) {
+    $title = trim($title);
+    $title = preg_replace('/^<p>(.*)<\/p>$/s', '$1', $title);
+}
+?>
 
-    <?php get_template_part('template-parts/UI/content-controls', null, array(
-        'slider_id' => $slider_id,
-    )); ?> <!-- Mobile only -->
+<section class="price-list-block">
+    <div class="price-list-block__inner layout-xl">
+        <?php if ($title || $description) : ?>
+            <div class="price-list-block__header layout-md">
+                <?php if ($title) : ?>
+                    <h2 class="price-list-block__title"><?php echo wp_kses_post($title); ?></h2>
+                <?php endif; ?>
 
-    <div id="<?php echo esc_attr($slider_id); ?>" class="price-list-block__wrapper custom-swiper-wrapper">
+                <?php if ($description) : ?>
+                    <div class="price-list-block__description"><?php echo wp_kses_post($description); ?></div>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
+
         <?php if (have_rows('price_list')) : ?>
+            <div class="price-list-block__cards">
+                <?php while (have_rows('price_list')) : the_row();
+                    $title_tag = get_sub_field('title_tag') ?: 'h3';
+                    $product_title = get_sub_field('product_title');
+                    $price = trim((string) get_sub_field('price'));
+                    $price_small_text = get_sub_field('price_small_text');
+                    $is_popular = (bool) get_sub_field('is_popular');
+                    $badge_text = get_sub_field('badge_text') ?: __('Populaarne', 'golden-break');
+                    $is_numeric_price = $price !== '' && preg_match('/^\d+([,.]\d+)?\s*(\x{20AC}|eur)?$/iu', $price);
 
-            <?php while (have_rows('price_list')) : the_row(); ?>
-
-                <?php $title_tag = get_sub_field('title_tag');
-                if (!$title_tag) {
-                    $title_tag = 'h4';
-                }
+                    if ($is_numeric_price && !preg_match('/(\x{20AC}|eur)$/iu', $price)) {
+                        $price .= "\u{20AC}";
+                    }
                 ?>
-
-                <div class="price-list-block__item custom-swiper-slide">
-                    <div>
-                        <div class="price-list-block__item-content">
-                            <?php if (get_sub_field('product_title')) : ?>
-                                <<?php echo esc_html($title_tag); ?> class="price-list-block__item-title"><?php echo esc_html(get_sub_field('product_title')); ?></<?php echo esc_html($title_tag); ?>>
-                            <?php endif; ?>
-
-                            <?php if (get_sub_field('product_short_description')) : ?>
-                                <p class="price-list-block__item-description"><?php echo get_sub_field('product_short_description'); ?></p>
-                            <?php endif; ?>
-                        </div>
-
-                        <hr>
-
-                        <div class="price-list-block__item-content">
-                            <?php
-                            $price = get_sub_field('price');
-                            ?>
-                            <span class="price-list-block__item-price">
-                                <?php
-                                echo trim($price) !== '' ? $price . '€' : '-';
-                                ?>
-                            </span>
-
-                            <?php if (get_sub_field('price_small_text')) : ?>
-                                <p class="price-list-block__item-price-text"><?php echo get_sub_field('price_small_text'); ?></p>
-                            <?php endif; ?>
-                        </div>
-
-                        <?php
-                        $link = get_sub_field('cta');
-                        if ($link):
-                            $link_url = $link['url'];
-                            $link_title = $link['title'];
-                            $link_target = $link['target'] ? $link['target'] : '_self';
-                        ?>
-                            <a class="price-list-block__item-cta button--primary-rounded-md" role="button" aria-label="<?php echo esc_attr($link_title); ?>" href="<?php echo esc_url($link_url); ?>" target="<?php echo esc_attr($link_target); ?>"><?php echo esc_html($link_title); ?></a>
+                    <article class="price-list-block__card<?php echo $is_popular ? ' price-list-block__card--popular' : ''; ?>">
+                        <?php if ($is_popular) : ?>
+                            <span class="price-list-block__card-badge"><?php echo esc_html($badge_text); ?></span>
                         <?php endif; ?>
 
-                        <?php
-                        $list_text = get_sub_field('list_text');
-                        $features_list = get_sub_field('features_list');
-                        ?>
+                        <?php if ($product_title) : ?>
+                            <<?php echo esc_html($title_tag); ?> class="price-list-block__card-title"><?php echo esc_html($product_title); ?></<?php echo esc_html($title_tag); ?>>
+                        <?php endif; ?>
 
-                        <?php if ($list_text || $features_list) : ?>
+                        <?php if ($price !== '') : ?>
+                            <p class="price-list-block__card-price<?php echo !$is_numeric_price ? ' price-list-block__card-price--text' : ''; ?>"><?php echo esc_html($price); ?></p>
+                        <?php endif; ?>
 
-                            <ul class="price-list-block__item-list">
-                                <?php if ($list_text) : ?>
-                                    <li class="price-list-block__item-list-text"><?php echo $list_text; ?></li>
-                                <?php endif; ?>
+                        <?php if ($price_small_text) : ?>
+                            <p class="price-list-block__card-price-text"><?php echo esc_html($price_small_text); ?></p>
+                        <?php endif; ?>
 
-                                <?php if (have_rows('features_list')) : ?>
+                        <?php if (have_rows('features_list')) : ?>
+                            <ul class="price-list-block__card-list">
+                                <?php while (have_rows('features_list')) : the_row(); ?>
+                                    <?php
+                                    $list_item = get_sub_field('list_item');
 
-                                    <?php while (have_rows('features_list')) : the_row(); ?>
-
-                                        <?php if (get_sub_field('list_item')) : ?>
-                                            <li class="price-list-block__item-list-item"><?php GetSvg::import('/assets/img/icons/checkmark.svg'); ?><?php echo get_sub_field('list_item'); ?></li>
-                                        <?php endif; ?>
-                                    <?php endwhile; ?>
-                                <?php endif; ?>
-
+                                    if ($list_item) :
+                                        $list_item = trim($list_item);
+                                        $list_item = preg_replace('/^<p>(.*)<\/p>$/s', '$1', $list_item);
+                                    ?>
+                                        <li class="price-list-block__card-list-item">
+                                            <?php GetSvg::import('/assets/img/icons/checkmark.svg'); ?>
+                                            <span><?php echo wp_kses_post($list_item); ?></span>
+                                        </li>
+                                    <?php endif; ?>
+                                <?php endwhile; ?>
                             </ul>
                         <?php endif; ?>
-                    </div>
-                </div>
+                    </article>
+                <?php endwhile; ?>
+            </div>
+        <?php endif; ?>
 
-            <?php endwhile; ?>
+        <?php if (!empty($bottom_link['url'])) :
+            $link_url = $bottom_link['url'];
+            $link_title = $bottom_link['title'] ?: __('Vaata koiki hindu ja pakette', 'golden-break');
+            $link_target = $bottom_link['target'] ?: '_self';
+        ?>
+            <a class="price-list-block__link" href="<?php echo esc_url($link_url); ?>" target="<?php echo esc_attr($link_target); ?>">
+                <span><?php echo esc_html($link_title); ?></span>
+                <?php GetSvg::import('/assets/img/icons/button-arrow-right.svg'); ?>
+            </a>
         <?php endif; ?>
     </div>
 </section>
