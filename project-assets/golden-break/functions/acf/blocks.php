@@ -79,6 +79,16 @@ function my_acf_init_block_types()
         ));
 
         acf_register_block_type(array(
+            'name'              => 'stats-strip-block',
+            'title'             => __('Stats Strip Block'),
+            'description'       => __('A compact card with a title and statistics.'),
+            'render_template'   => 'acf-blocks/stats-strip-block.php',
+            'category'          => 'golden-break',
+            'icon'              => 'chart-bar',
+            'keywords'          => array('stats', 'statistics', 'numbers', 'strip', 'block'),
+        ));
+
+        acf_register_block_type(array(
             'name'              => 'features-block',
             'title'             => __('Features Block'),
             'description'       => __('A block that displays key features in a grid layout.'),
@@ -136,6 +146,16 @@ function my_acf_init_block_types()
             'category'          => 'golden-break',
             'icon'              => 'email-alt',
             'keywords'          => array('contact', 'form', 'email', 'message'),
+        ));
+
+        acf_register_block_type(array(
+            'name'              => 'contact-map-block',
+            'title'             => __('Contact Map Block'),
+            'description'       => __('A contact details section with direction notes and an embedded map.'),
+            'render_template'   => 'acf-blocks/contact-map-block.php',
+            'category'          => 'golden-break',
+            'icon'              => 'location-alt',
+            'keywords'          => array('contact', 'map', 'address', 'directions', 'location'),
         ));
 
         acf_register_block_type(array(
@@ -197,6 +217,24 @@ function my_acf_init_block_types()
             'keywords'          => array('price', 'list', 'cost', 'block', 'layout'),
         ));
         acf_register_block_type(array(
+            'name'              => 'price-table-block',
+            'title'             => __('Price Table Block'),
+            'description'       => __('A custom block to display a pricing table.'),
+            'render_template'   => 'acf-blocks/price-table-block.php',
+            'category'          => 'golden-break',
+            'icon'              => 'list-view',
+            'keywords'          => array('price', 'table', 'cost', 'block', 'layout'),
+        ));
+        acf_register_block_type(array(
+            'name'              => 'info-note-block',
+            'title'             => __('Info Note Block'),
+            'description'       => __('A bordered note list for important information.'),
+            'render_template'   => 'acf-blocks/info-note-block.php',
+            'category'          => 'golden-break',
+            'icon'              => 'info',
+            'keywords'          => array('note', 'info', 'notice', 'list', 'block'),
+        ));
+        acf_register_block_type(array(
             'name'              => 'atmosphere-block',
             'title'             => __('Atmosphere Block'),
             'description'       => __('A custom block to display a gallery section with title and link.'),
@@ -204,6 +242,15 @@ function my_acf_init_block_types()
             'category'          => 'golden-break',
             'icon'              => 'format-gallery',
             'keywords'          => array('atmosphere', 'gallery', 'images', 'photos', 'block'),
+        ));
+        acf_register_block_type(array(
+            'name'              => 'gallery-block',
+            'title'             => __('Gallery Block'),
+            'description'       => __('A centered image gallery grid.'),
+            'render_template'   => 'acf-blocks/gallery-block.php',
+            'category'          => 'golden-break',
+            'icon'              => 'format-gallery',
+            'keywords'          => array('gallery', 'images', 'photos', 'grid', 'block'),
         ));
         acf_register_block_type(array(
             'name'              => 'location-block',

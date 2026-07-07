@@ -27,7 +27,7 @@
             "name": "title",
             "aria-label": "",
             "type": "wysiwyg",
-            "instructions": "Use mark or bold to highlight part of the title.",
+            "instructions": "Use headings, mark, or bold to format the title.",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -38,7 +38,7 @@
             "wpml_cf_preferences": 2,
             "default_value": "",
             "tabs": "all",
-            "toolbar": "basic",
+            "toolbar": "full",
             "media_upload": 0,
             "delay": 0
         },
@@ -135,8 +135,8 @@
                     "label": "Card Title",
                     "name": "product_title",
                     "aria-label": "",
-                    "type": "text",
-                    "instructions": "",
+                    "type": "wysiwyg",
+                    "instructions": "Use headings, mark, or bold to format the title.",
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -146,39 +146,10 @@
                     },
                     "wpml_cf_preferences": 2,
                     "default_value": "",
-                    "maxlength": "",
-                    "placeholder": "",
-                    "prepend": "",
-                    "append": "",
-                    "parent_repeater": "field_66ee567fe482b"
-                },
-                {
-                    "key": "field_66f01350e60a1",
-                    "label": "Title Tag",
-                    "name": "title_tag",
-                    "aria-label": "",
-                    "type": "button_group",
-                    "instructions": "Select title tag.",
-                    "required": 0,
-                    "conditional_logic": 0,
-                    "wrapper": {
-                        "width": "",
-                        "class": "",
-                        "id": ""
-                    },
-                    "wpml_cf_preferences": 1,
-                    "choices": {
-                        "h1": "h1",
-                        "h2": "h2",
-                        "h3": "h3",
-                        "h4": "h4",
-                        "h5": "h5",
-                        "h6": "h6"
-                    },
-                    "default_value": "h3",
-                    "return_format": "label",
-                    "allow_null": 0,
-                    "layout": "horizontal",
+                    "tabs": "all",
+                    "toolbar": "full",
+                    "media_upload": 0,
+                    "delay": 0,
                     "parent_repeater": "field_66ee567fe482b"
                 },
                 {
@@ -226,6 +197,68 @@
                     "parent_repeater": "field_66ee567fe482b"
                 },
                 {
+                    "key": "field_price_list_original_price",
+                    "label": "Original Price",
+                    "name": "original_price",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "Optional crossed-out price shown below the main price.",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "wpml_cf_preferences": 2,
+                    "default_value": "",
+                    "maxlength": "",
+                    "placeholder": "45€",
+                    "prepend": "",
+                    "append": "",
+                    "parent_repeater": "field_66ee567fe482b"
+                },
+                {
+                    "key": "field_price_list_savings_text",
+                    "label": "Savings Text",
+                    "name": "savings_text",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "Optional savings line shown below the original price.",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "wpml_cf_preferences": 2,
+                    "default_value": "",
+                    "maxlength": "",
+                    "placeholder": "Säästad 5€",
+                    "prepend": "",
+                    "append": "",
+                    "parent_repeater": "field_66ee567fe482b"
+                },
+                {
+                    "key": "field_price_list_card_link",
+                    "label": "Card Link",
+                    "name": "card_link",
+                    "aria-label": "",
+                    "type": "link",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "wpml_cf_preferences": 1,
+                    "return_format": "array",
+                    "parent_repeater": "field_66ee567fe482b"
+                },
+                {
                     "key": "field_66ee58d4e4833",
                     "label": "Features List",
                     "name": "features_list",
@@ -254,21 +287,20 @@
                             "label": "List Item",
                             "name": "list_item",
                             "aria-label": "",
-                            "type": "wysiwyg",
-                            "instructions": "Use mark or bold to highlight feature text.",
-                            "required": 0,
+                            "type": "text",
+                            "instructions": "",
+                            "required": false,
                             "conditional_logic": 0,
                             "wrapper": {
                                 "width": "",
                                 "class": "",
                                 "id": ""
                             },
-                            "wpml_cf_preferences": 2,
                             "default_value": "",
-                            "tabs": "all",
-                            "toolbar": "basic",
-                            "media_upload": 0,
-                            "delay": 0,
+                            "maxlength": "",
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": "",
                             "parent_repeater": "field_66ee58d4e4833"
                         }
                     ]
@@ -311,6 +343,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "acfml_field_group_mode": "translation",
-    "modified": 1783062362
+    "modified": 1783365679
 }

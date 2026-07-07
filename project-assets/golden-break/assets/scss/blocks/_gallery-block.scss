@@ -1,0 +1,301 @@
+@use "../abstracts" as *;
+@use "../base" as *;
+
+.gallery-block {
+    @include full-viewport-width;
+
+    padding: 5rem 0 0;
+    background: $background;
+
+    @media (width <= $screen-sm-min) {
+        padding: 3rem 0 0;
+    }
+
+    &__inner {
+        display: flex;
+        width: 100%;
+        flex-direction: column;
+        align-items: center;
+        padding: 0 1.25rem;
+
+        @media (width <= $screen-sm-min) {
+            padding: 0 1rem;
+        }
+    }
+
+    &__header {
+        width: 100%;
+        text-align: center;
+    }
+
+    &__title {
+        color: $white;
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        p {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: 0;
+
+            @media (width > $screen-sm-min) {
+                font-size: 2rem;
+            }
+        }
+
+        mark,
+        strong,
+        b {
+            @include reset-mark;
+            color: $primary-color;
+            font-weight: 700;
+        }
+    }
+
+    &__description {
+        margin-top: 0.75rem;
+        color: $light-gray;
+
+        p {
+            margin: 0;
+            font-size: 0.75rem;
+            line-height: 1.45;
+        }
+
+        p + p {
+            margin-top: 0.25rem;
+        }
+    }
+
+    &__grid {
+        display: grid;
+        width: 100%;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.5rem;
+        margin-top: 2rem;
+
+        @media (width > $screen-sm-min) {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+    }
+
+    &__item {
+        overflow: hidden;
+        border-radius: 0.125rem;
+        aspect-ratio: 1 / 1;
+        background: $background-secondary;
+    }
+
+    &__trigger {
+        display: block;
+        width: 100%;
+        height: 100%;
+        border: 0;
+        border-radius: inherit;
+        padding: 0;
+        background: transparent;
+        cursor: zoom-in;
+
+        picture,
+        img {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        img {
+            object-fit: cover;
+            @include smooth-transition(0.3s);
+        }
+
+        @media (width > $screen-sm-min) {
+            &:hover,
+            &:focus-visible {
+                outline: 1px solid $primary-color;
+                outline-offset: 0.125rem;
+
+                img {
+                    transform: scale(1.05);
+                }
+            }
+        }
+    }
+}
+
+.gallery-lightbox-is-open {
+    overflow: hidden;
+}
+
+.gallery-lightbox {
+    position: fixed;
+    z-index: 1000;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 5rem 5.5rem 3rem;
+    background: rgba(10, 14, 15, 0.92);
+
+    &.is-open {
+        display: flex;
+    }
+
+    @media (width <= $screen-sm-min) {
+        padding: 4.5rem 1rem 2rem;
+    }
+
+    &__figure {
+        display: flex;
+        max-width: min(100%, 72rem);
+        max-height: 100%;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        margin: 0;
+    }
+
+    &__image {
+        display: block;
+        max-width: 100%;
+        max-height: calc(100dvh - 10rem);
+        border-radius: $radius-m;
+        object-fit: contain;
+
+        @media (width <= $screen-sm-min) {
+            max-height: calc(100dvh - 9rem);
+        }
+    }
+
+    &__caption,
+    &__counter {
+        margin: 0;
+        color: $light-gray;
+        font-size: 0.8125rem;
+        line-height: 1.4;
+        text-align: center;
+    }
+
+    &__close,
+    &__nav {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid $border-color;
+        border-radius: $radius-m;
+        background: $background-secondary;
+        color: $white;
+        cursor: pointer;
+        @include smooth-transition;
+
+        span {
+            display: block;
+            position: relative;
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+
+        &:hover,
+        &:focus-visible {
+            border-color: $primary-color;
+            color: $primary-color;
+        }
+    }
+
+    &__close {
+        position: absolute;
+        top: 1.25rem;
+        right: 1.25rem;
+        width: 2.75rem;
+        height: 2.75rem;
+
+        span {
+            &::before,
+            &::after {
+                content: "";
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 1rem;
+                height: 0.125rem;
+                border-radius: 999rem;
+                background: currentColor;
+            }
+
+            &::before {
+                transform: translate(-50%, -50%) rotate(45deg);
+            }
+
+            &::after {
+                transform: translate(-50%, -50%) rotate(-45deg);
+            }
+        }
+    }
+
+    &__nav {
+        position: absolute;
+        top: 50%;
+        width: 2.75rem;
+        height: 2.75rem;
+        transform: translateY(-50%);
+
+        span {
+            &::before {
+                content: "";
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 0.75rem;
+                height: 0.75rem;
+                border-top: 0.125rem solid currentColor;
+                border-left: 0.125rem solid currentColor;
+            }
+        }
+
+        &--previous {
+            left: 1.25rem;
+
+            span::before {
+                transform: translate(-35%, -50%) rotate(-45deg);
+            }
+        }
+
+        &--next {
+            right: 1.25rem;
+
+            span::before {
+                transform: translate(-65%, -50%) rotate(135deg);
+            }
+        }
+
+        @media (width <= $screen-sm-min) {
+            top: auto;
+            bottom: 1rem;
+            transform: none;
+
+            &--previous {
+                left: 1rem;
+            }
+
+            &--next {
+                right: 1rem;
+            }
+        }
+    }
+
+    &__controls {
+        position: absolute;
+        bottom: 1.25rem;
+        left: 50%;
+        transform: translateX(-50%);
+
+        @media (width <= $screen-sm-min) {
+            bottom: 1.875rem;
+        }
+    }
+}

@@ -4,11 +4,11 @@
 .cta-block {
     @include full-viewport-width;
 
-    padding: 4.5rem 0;
+    padding: 4.5rem 0 0;
     background: $background;
 
     @media (width <= $screen-sm-min) {
-        padding: 3rem 0;
+        padding: 3rem 0 0;
     }
 
     &__inner {
@@ -24,6 +24,18 @@
         }
     }
 
+    &__panel {
+        width: 100%;
+        padding: 2rem 1.5rem;
+        border: 1px solid $border-color;
+        border-radius: $radius-m;
+        background: $background-secondary;
+
+        @media (width <= $screen-sm-min) {
+            padding: 1.75rem 1rem;
+        }
+    }
+
     &__title {
         color: $white;
 
@@ -35,13 +47,13 @@
         h6,
         p {
             margin: 0;
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             font-weight: 700;
             line-height: 1.2;
             letter-spacing: 0;
 
             @media (width > $screen-sm-min) {
-                font-size: 2.25rem;
+                font-size: 1.5rem;
             }
         }
 
@@ -62,10 +74,6 @@
             margin: 0;
             font-size: 0.875rem;
             line-height: 1.5;
-
-            @media (width > $screen-sm-min) {
-                font-size: 1rem;
-            }
         }
     }
 
@@ -74,7 +82,7 @@
         flex-wrap: wrap;
         justify-content: center;
         gap: 1rem;
-        margin-top: 2rem;
+        margin-top: 1.5rem;
     }
 
     &__button {
@@ -125,5 +133,9 @@
                 color: $primary-color;
             }
         }
+    }
+
+    &--single-action &__actions {
+        gap: 0;
     }
 }

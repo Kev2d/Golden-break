@@ -33,6 +33,14 @@
             line-height: 1.25;
             letter-spacing: 0;
         }
+
+        mark,
+        strong,
+        b {
+            @include reset-mark;
+            color: $primary-color;
+            font-weight: 700;
+        }
     }
 
     &__text {

@@ -2,35 +2,371 @@
 @use "../base" as *;
 
 .contact-form-block {
-    display: grid;
-    @media (width > $screen-sm-min) {
-        grid-template-columns: repeat(2, 1fr);
-        align-items: center;
-        gap: 3rem;
-    }
+    @include full-viewport-width;
+
+    padding: 5rem 0 0;
+    background: $background;
+
     @media (width <= $screen-sm-min) {
-        gap: 1.5em;
-        @include full-viewport-width;
+        padding: 3rem 0 0;
     }
-    @include default-component-spacing;
-    &__image {
-        @media (width > $screen-sm-min) {
-            border-radius: $radius-l;
-            overflow: hidden;
-            picture,
-            img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-            }
-            &.right {
-                order: 1;
-            }
+
+    &__inner {
+        display: flex;
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+        padding: 0 1.25rem;
+
+        @media (width <= $screen-sm-min) {
+            padding: 0 1rem;
         }
     }
-    &__form {
+
+    &__card {
+        width: 100%;
+        padding: 1.5rem;
+        border: 1px solid $border-color;
+        border-radius: $radius-m;
+        background: $background-secondary;
+
         @media (width <= $screen-sm-min) {
+            padding: 1.5rem 1rem;
+        }
+    }
+
+    &__header {
+        margin-bottom: 2rem;
+    }
+
+    &__title {
+        color: $white;
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        p {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 700;
+            line-height: 1.25;
+            letter-spacing: 0;
+        }
+
+        mark,
+        strong,
+        b {
+            @include reset-mark;
+            color: $primary-color;
+            font-weight: 700;
+        }
+    }
+
+    &__description {
+        margin-top: 1.25rem;
+        color: $light-gray;
+
+        p {
+            margin: 0;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+    }
+
+    &__form {
+        color: $white;
+
+        .wpcf7 {
+            width: 100%;
+        }
+
+        .wpcf7-form {
+            display: grid;
+            gap: 2rem;
+        }
+
+        .hidden-fields-container {
+            display: none;
+        }
+
+        .contact-form-block__form-grid {
+            display: grid;
+            gap: 2rem 1.5rem;
+
+            @media (width > $screen-sm-min) {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            @media (width <= $screen-sm-min) {
+                gap: 1.25rem;
+            }
+        }
+
+        .contact-form-block__form-grid > p {
+            display: contents;
+        }
+
+        .contact-form-block__form-field {
+            display: flex;
+            min-width: 0;
+            flex-direction: column;
+            gap: 0.5rem;
+
+            &--full {
+                @media (width > $screen-sm-min) {
+                    grid-column: 1 / -1;
+                }
+            }
+        }
+
+        p {
+            margin: 0;
+        }
+
+        .wpcf7-form > p {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .wpcf7-form > p:has(input[type="submit"]) {
+            position: relative;
+            display: inline-flex;
+            width: fit-content;
+            min-width: 12rem;
+            height: 3rem;
+            box-sizing: border-box;
+            flex: 0 0 auto;
+            align-items: center;
+            justify-content: center;
+            gap: 0.625rem;
             padding: 0 1.5rem;
+            border: 1px solid $primary-color;
+            border-radius: $radius-m;
+            background: $primary-color;
+            color: $primary-foreground;
+            cursor: pointer;
+            @include smooth-transition;
+
+            &::before {
+                content: "";
+                display: block;
+                width: 1.25rem;
+                height: 1.25rem;
+                background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12.1135 18.0716C12.1452 18.1505 12.2002 18.2179 12.2712 18.2646C12.3423 18.3113 12.4259 18.3352 12.5109 18.333C12.5959 18.3308 12.6781 18.3027 12.7467 18.2524C12.8152 18.2021 12.8668 18.1321 12.8943 18.0516L18.311 2.2183C18.3377 2.14446 18.3428 2.06455 18.3257 1.98793C18.3086 1.9113 18.27 1.84113 18.2145 1.78561C18.159 1.7301 18.0888 1.69154 18.0122 1.67446C17.9356 1.65737 17.8557 1.66246 17.7818 1.68913L1.9485 7.1058C1.86808 7.13338 1.79802 7.1849 1.74772 7.25344C1.69743 7.32199 1.66931 7.40428 1.66713 7.48926C1.66495 7.57425 1.68883 7.65787 1.73555 7.7289C1.78226 7.79993 1.84959 7.85497 1.9285 7.88663L8.53683 10.5366C8.74574 10.6203 8.93554 10.7453 9.0948 10.9043C9.25406 11.0633 9.37948 11.2529 9.4635 11.4616L12.1135 18.0716Z' stroke='%230A0E0F' stroke-width='1.66667' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M18.2119 1.78906L9.09521 10.9049' stroke='%230A0E0F' stroke-width='1.66667' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+                background-repeat: no-repeat;
+                background-position: center;
+                background-size: contain;
+            }
+
+            &::after {
+                content: "Saada\00a0s\00f5num";
+                display: block;
+                flex: 0 0 auto;
+                min-width: max-content;
+                font-size: 0.875rem;
+                font-weight: 700;
+                line-height: 1;
+                white-space: nowrap;
+            }
+
+            &:hover,
+            &:focus-within {
+                border-color: $primary-color-hover;
+                background: $primary-color-hover;
+            }
+        }
+
+        br {
+            display: none;
+        }
+
+        label {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            color: $white;
+            font-size: 0.875rem;
+            font-weight: 700;
+            line-height: 1.35;
+        }
+
+        .wpcf7-form-control-wrap {
+            display: block;
+        }
+
+        input:not([type="submit"]),
+        textarea,
+        select {
+            width: 100%;
+            min-height: 3.125rem;
+            padding: 0.875rem 1.125rem;
+            border: 1px solid rgba(212, 175, 55, 0.18);
+            border-radius: $radius-s;
+            outline: none;
+            background: $input-background-color;
+            color: $white;
+            font: inherit;
+            font-size: 0.875rem;
+            font-weight: 600;
+            line-height: 1.4;
+            @include smooth-transition;
+
+            &::placeholder {
+                color: $light-gray;
+                font-weight: 400;
+                opacity: 1;
+            }
+
+            &:focus {
+                border-color: $primary-color;
+                box-shadow: 0 0 0 0.125rem rgba(212, 175, 55, 0.16);
+            }
+        }
+
+        textarea {
+            min-height: 15.25rem;
+            resize: vertical;
+        }
+
+        .wpcf7-submit,
+        input[type="submit"] {
+            display: inline-block;
+            width: fit-content;
+            min-width: 12rem;
+            height: 3rem;
+            padding: 0.875rem 1.5rem 0.875rem 3.25rem;
+            border: 1px solid $primary-color;
+            border-radius: $radius-m;
+            background-color: $primary-color;
+            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12.1135 18.0716C12.1452 18.1505 12.2002 18.2179 12.2712 18.2646C12.3423 18.3113 12.4259 18.3352 12.5109 18.333C12.5959 18.3308 12.6781 18.3027 12.7467 18.2524C12.8152 18.2021 12.8668 18.1321 12.8943 18.0516L18.311 2.2183C18.3377 2.14446 18.3428 2.06455 18.3257 1.98793C18.3086 1.9113 18.27 1.84113 18.2145 1.78561C18.159 1.7301 18.0888 1.69154 18.0122 1.67446C17.9356 1.65737 17.8557 1.66246 17.7818 1.68913L1.9485 7.1058C1.86808 7.13338 1.79802 7.1849 1.74772 7.25344C1.69743 7.32199 1.66931 7.40428 1.66713 7.48926C1.66495 7.57425 1.68883 7.65787 1.73555 7.7289C1.78226 7.79993 1.84959 7.85497 1.9285 7.88663L8.53683 10.5366C8.74574 10.6203 8.93554 10.7453 9.0948 10.9043C9.25406 11.0633 9.37948 11.2529 9.4635 11.4616L12.1135 18.0716Z' stroke='%230A0E0F' stroke-width='1.66667' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M18.2119 1.78906L9.09521 10.9049' stroke='%230A0E0F' stroke-width='1.66667' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: 1.5rem center;
+            background-size: 1.25rem 1.25rem;
+            color: $primary-foreground;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 700;
+            line-height: 1;
+            white-space: nowrap;
+            @include smooth-transition;
+
+            &:hover,
+            &:focus-visible {
+                border-color: $primary-color-hover;
+                background-color: $primary-color-hover;
+                color: $primary-foreground;
+            }
+        }
+
+        .wpcf7-form > p:has(input[type="submit"]) input[type="submit"] {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            width: 100%;
+            min-width: 0;
+            height: 100%;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            color: transparent;
+            opacity: 0;
+        }
+
+        .wpcf7-form > p:has(input[type="submit"]) .wpcf7-spinner {
+            position: absolute;
+            top: 50%;
+            left: calc(100% + 0.75rem);
+            margin: 0;
+            transform: translateY(-50%);
+        }
+
+        .contact-form-block__submit {
+            display: inline-flex;
+            width: fit-content;
+            min-width: 12rem;
+            height: 3rem;
+            box-sizing: border-box;
+            align-items: center;
+            justify-content: center;
+            gap: 0.625rem;
+            padding: 0 1.5rem;
+            border: 1px solid $primary-color;
+            border-radius: $radius-m;
+            background: $primary-color;
+            color: $primary-foreground;
+            cursor: pointer;
+            font: inherit;
+            font-size: 0.875rem;
+            font-weight: 700;
+            line-height: 1;
+            @include smooth-transition;
+
+            svg {
+                display: block;
+                width: 1.25rem;
+                height: 1.25rem;
+            }
+
+            span {
+                display: block;
+                flex: 0 0 auto;
+                min-width: max-content;
+                line-height: 1;
+                white-space: nowrap;
+            }
+
+            &:hover,
+            &:focus-visible {
+                border-color: $primary-color-hover;
+                background: $primary-color-hover;
+                color: $primary-foreground;
+            }
+        }
+
+        .wpcf7-spinner {
+            margin: 0 0 0 0.75rem;
+        }
+
+        .wpcf7-not-valid-tip {
+            margin-top: 0.375rem;
+            color: $error-red;
+            font-size: 0.75rem;
+            line-height: 1.35;
+        }
+
+        .wpcf7-response-output {
+            margin: 0;
+            padding: 0.75rem 1rem;
+            border-color: $border-color;
+            border-radius: $radius-s;
+            color: $light-gray;
+            font-size: 0.8125rem;
+            line-height: 1.45;
+        }
+    }
+
+    &__bottom-text {
+        margin-top: 1.5rem;
+        color: $light-gray;
+        text-align: center;
+
+        p {
+            margin: 0;
+            font-size: 0.75rem;
+            line-height: 1.5;
+        }
+
+        a,
+        mark,
+        strong,
+        b {
+            @include reset-mark;
+            color: $primary-color;
+            font-weight: 700;
         }
     }
 }

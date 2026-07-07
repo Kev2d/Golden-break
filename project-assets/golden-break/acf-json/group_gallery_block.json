@@ -1,10 +1,10 @@
 {
-    "key": "group_67388aa161a50",
-    "title": "Contact Form Block",
+    "key": "group_gallery_block",
+    "title": "Gallery Block",
     "fields": [
         {
-            "key": "field_67388aa205c6d",
-            "label": "Contact Form Block",
+            "key": "field_gallery_accordion",
+            "label": "Gallery Block",
             "name": "",
             "aria-label": "",
             "type": "accordion",
@@ -22,7 +22,7 @@
             "endpoint": 0
         },
         {
-            "key": "field_contact_form_title",
+            "key": "field_gallery_title",
             "label": "Title",
             "name": "title",
             "aria-label": "",
@@ -43,7 +43,7 @@
             "delay": 0
         },
         {
-            "key": "field_contact_form_description",
+            "key": "field_gallery_description",
             "label": "Description",
             "name": "description",
             "aria-label": "",
@@ -64,12 +64,12 @@
             "delay": 0
         },
         {
-            "key": "field_67388ab205c6e",
-            "label": "Form Shortcode",
-            "name": "form_shortcode",
+            "key": "field_gallery_images",
+            "label": "Images",
+            "name": "images",
             "aria-label": "",
-            "type": "text",
-            "instructions": "Paste the Contact Form 7 shortcode.",
+            "type": "gallery",
+            "instructions": "",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -77,34 +77,20 @@
                 "class": "",
                 "id": ""
             },
-            "wpml_cf_preferences": 2,
-            "default_value": "",
-            "maxlength": "",
-            "allow_in_bindings": 0,
-            "placeholder": "[contact-form-7 id=\"123\" title=\"Contact form\"]",
-            "prepend": "",
-            "append": ""
-        },
-        {
-            "key": "field_contact_form_bottom_text",
-            "label": "Bottom Text",
-            "name": "bottom_text",
-            "aria-label": "",
-            "type": "wysiwyg",
-            "instructions": "Optional small centered text below the form card.",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "wpml_cf_preferences": 2,
-            "default_value": "",
-            "tabs": "all",
-            "toolbar": "basic",
-            "media_upload": 0,
-            "delay": 0
+            "wpml_cf_preferences": 1,
+            "min": 0,
+            "max": 0,
+            "insert": "append",
+            "library": "all",
+            "min_width": "",
+            "min_height": "",
+            "min_size": "",
+            "max_width": "",
+            "max_height": "",
+            "max_size": "",
+            "mime_types": "jpg, jpeg, png, gif, webp, avif, heic, heif",
+            "return_format": "array",
+            "preview_size": "medium"
         }
     ],
     "location": [
@@ -112,7 +98,7 @@
             {
                 "param": "block",
                 "operator": "==",
-                "value": "acf\/contact-form-block"
+                "value": "acf\/gallery-block"
             }
         ]
     ],
@@ -126,5 +112,5 @@
     "description": "",
     "show_in_rest": 0,
     "acfml_field_group_mode": "translation",
-    "modified": 1783429000
+    "modified": 1783426400
 }

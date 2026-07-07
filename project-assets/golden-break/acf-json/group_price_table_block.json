@@ -1,0 +1,283 @@
+{
+    "key": "group_price_table_block",
+    "title": "Price Table Block",
+    "fields": [
+        {
+            "key": "field_price_table_accordion",
+            "label": "Price Table Block",
+            "name": "",
+            "aria-label": "",
+            "type": "accordion",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "wpml_cf_preferences": 1,
+            "open": 0,
+            "multi_expand": 0,
+            "endpoint": 0
+        },
+        {
+            "key": "field_price_table_section_title",
+            "label": "Section Title",
+            "name": "title",
+            "aria-label": "",
+            "type": "wysiwyg",
+            "instructions": "Use headings, mark, or bold to format the title.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "wpml_cf_preferences": 2,
+            "default_value": "",
+            "tabs": "all",
+            "toolbar": "full",
+            "media_upload": 0,
+            "delay": 0
+        },
+        {
+            "key": "field_price_table_description",
+            "label": "Description",
+            "name": "description",
+            "aria-label": "",
+            "type": "wysiwyg",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "wpml_cf_preferences": 2,
+            "default_value": "",
+            "tabs": "all",
+            "toolbar": "basic",
+            "media_upload": 0,
+            "delay": 0
+        },
+        {
+            "key": "field_price_table_table_title",
+            "label": "Table Title",
+            "name": "table_title",
+            "aria-label": "",
+            "type": "wysiwyg",
+            "instructions": "Use headings, mark, or bold to format the title.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "wpml_cf_preferences": 2,
+            "default_value": "",
+            "tabs": "all",
+            "toolbar": "full",
+            "media_upload": 0,
+            "delay": 0
+        },
+        {
+            "key": "field_price_table_first_column_label",
+            "label": "First Column Label",
+            "name": "first_column_label",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "33",
+                "class": "",
+                "id": ""
+            },
+            "wpml_cf_preferences": 2,
+            "default_value": "Kellaaeg",
+            "maxlength": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_price_table_second_column_label",
+            "label": "Second Column Label",
+            "name": "second_column_label",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "33",
+                "class": "",
+                "id": ""
+            },
+            "wpml_cf_preferences": 2,
+            "default_value": "E-N (t\u00f6\u00f6p\u00e4ev)",
+            "maxlength": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_price_table_third_column_label",
+            "label": "Third Column Label",
+            "name": "third_column_label",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "33",
+                "class": "",
+                "id": ""
+            },
+            "wpml_cf_preferences": 2,
+            "default_value": "R-P (n\u00e4dalavahetus)",
+            "maxlength": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_price_table_rows",
+            "label": "Table Rows",
+            "name": "table_rows",
+            "aria-label": "",
+            "type": "repeater",
+            "instructions": "Wrap prices in strong or mark tags to highlight them with the primary color.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "wpml_cf_preferences": 1,
+            "layout": "table",
+            "pagination": 0,
+            "min": 0,
+            "max": 0,
+            "collapsed": "field_price_table_first_column_text",
+            "button_label": "Add Row",
+            "rows_per_page": 20,
+            "sub_fields": [
+                {
+                    "key": "field_price_table_first_column_text",
+                    "label": "First Column",
+                    "name": "first_column_text",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "wpml_cf_preferences": 2,
+                    "default_value": "",
+                    "maxlength": "",
+                    "placeholder": "14:00 - 18:00 (p\u00e4ev)",
+                    "prepend": "",
+                    "append": "",
+                    "parent_repeater": "field_price_table_rows"
+                },
+                {
+                    "key": "field_price_table_second_column_text",
+                    "label": "Second Column",
+                    "name": "second_column_text",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "Example: <strong>12\u20ac</strong> / tund",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "wpml_cf_preferences": 2,
+                    "default_value": "",
+                    "maxlength": "",
+                    "placeholder": "<strong>12\u20ac</strong> / tund",
+                    "prepend": "",
+                    "append": "",
+                    "parent_repeater": "field_price_table_rows"
+                },
+                {
+                    "key": "field_price_table_third_column_text",
+                    "label": "Third Column",
+                    "name": "third_column_text",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "Example: <strong>15\u20ac</strong> / tund",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "wpml_cf_preferences": 2,
+                    "default_value": "",
+                    "maxlength": "",
+                    "placeholder": "<strong>15\u20ac</strong> / tund",
+                    "prepend": "",
+                    "append": "",
+                    "parent_repeater": "field_price_table_rows"
+                }
+            ]
+        },
+        {
+            "key": "field_price_table_note",
+            "label": "Table Note",
+            "name": "table_note",
+            "aria-label": "",
+            "type": "wysiwyg",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "wpml_cf_preferences": 2,
+            "default_value": "",
+            "tabs": "all",
+            "toolbar": "basic",
+            "media_upload": 0,
+            "delay": 0
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "block",
+                "operator": "==",
+                "value": "acf\/price-table-block"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "",
+    "show_in_rest": 0,
+    "acfml_field_group_mode": "translation",
+    "modified": 1783362816
+}
