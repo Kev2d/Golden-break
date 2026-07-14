@@ -37,7 +37,7 @@ if ($title) {
 <section class="<?php echo esc_attr(implode(' ', $block_classes)); ?>">
     <div class="price-list-block__inner layout-xl">
         <?php if ($title || $description) : ?>
-            <div class="price-list-block__header layout-md">
+            <div class="price-list-block__header">
                 <?php if ($title) : ?>
                     <div class="price-list-block__title"><?php echo wp_kses_post($title); ?></div>
                 <?php endif; ?>
