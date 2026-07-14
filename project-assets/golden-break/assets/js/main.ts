@@ -1,5 +1,6 @@
 
 import './navigation';
+import './smart-header';
 import './base-menu';
 import './settings-menu';
 import './language-menu';

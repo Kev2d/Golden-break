@@ -1,0 +1,137 @@
+<?php
+defined( 'ABSPATH' ) || exit;
+
+class Montonio_DPD_Courier extends Montonio_Shipping_Method {
+    public $default_title      = 'DPD courier';
+    public $default_max_weight = 31.5; // kg
+
+    /**
+     * Called from parent's constructor
+     *
+     * @return void
+     */
+    protected function init() {
+        $this->id                 = 'montonio_dpd_courier';
+        $this->method_title       = __( 'Montonio DPD courier', 'montonio-for-woocommerce' );
+        $this->method_description = __( 'DPD courier', 'montonio-for-woocommerce' );
+        $this->supports           = array(
+            'shipping-zones',
+            'instance-settings',
+            'instance-settings-modal'
+        );
+
+        $this->carrier_code = 'dpd';
+        $this->type_v2      = 'courier';
+        $this->title        = $this->get_option( 'title', __( 'DPD courier', 'montonio-for-woocommerce' ) );
+
+        if ( 'DPD courier' === $this->title ) {
+            $this->title = __( 'DPD courier', 'montonio-for-woocommerce' );
+        }
+    }
+
+    /**
+     * Initialize form fields for the shipping method settings.
+     */
+    public function init_form_fields() {
+        $this->instance_form_fields = require WC_MONTONIO_PLUGIN_PATH . '/includes/shipping/shipping-methods/dpd/dpd-settings.php';
+    }
+
+    /**
+     * Calculate shipping costs and taxes for a package.
+     *
+     * @since 9.3.2
+     * @param array $package The package to calculate shipping for.
+     */
+    public function calculate_shipping( $package = array() ) {
+        $rate = array(
+            'id'        => $this->get_rate_id(),
+            'label'     => $this->title,
+            'cost'      => 0,
+            'package'   => $package,
+            'meta_data' => array(
+                'carrier_code'      => $this->carrier_code,
+                'type_v2'           => $this->type_v2,
+                'method_class_name' => get_class( $this )
+            )
+        );
+
+        // Calculate the costs
+        $flat_rate_cost   = $this->get_option( 'price' );
+        $package_item_qty = $this->get_package_item_qty( $package );
+        $parcels          = $this->get_parcels_with_item_dimensions( $package );
+
+        if ( 'dynamic' === $this->get_option( 'pricing_type' ) ) {
+            $carrier_rates = WC_Montonio_Shipping_Rate::get_rates_for( 'dpd', 'courier', $parcels, $this->country );
+
+            if ( null === $carrier_rates ) {
+                return;
+            }
+
+            foreach ( $carrier_rates as $carrier_rate ) {
+                if ( 'standard' !== $carrier_rate['code'] ) {
+                    continue;
+                }
+
+                // Set cost
+                $rate['cost'] = $this->apply_dynamic_rate_markup( $carrier_rate['rate'] );
+                $rate['cost'] = $this->apply_free_shipping_rules( $rate['cost'], $package_item_qty, $package );
+
+                // Add the shipping rate
+                $this->add_rate( $rate );
+            }
+
+            return;
+        }
+
+        // Calculate the costs
+        if ( '' !== $flat_rate_cost ) {
+            $rate['cost'] = $this->evaluate_cost(
+                $flat_rate_cost,
+                array(
+                    'qty'  => $package_item_qty,
+                    'cost' => $package['contents_cost']
+                )
+            );
+        }
+
+        // Add shipping class costs
+        $shipping_classes = WC()->shipping()->get_shipping_classes();
+
+        if ( ! empty( $shipping_classes ) ) {
+            $found_shipping_classes = $this->find_shipping_classes( $package );
+            $highest_class_cost     = 0;
+
+            foreach ( $found_shipping_classes as $shipping_class => $products ) {
+                // Also handles BW compatibility when slugs were used instead of ids.
+                $shipping_class_term = get_term_by( 'slug', $shipping_class, 'product_shipping_class' );
+                $class_cost_string   = $shipping_class_term && $shipping_class_term->term_id ? $this->get_option( 'class_cost_' . $shipping_class_term->term_id, $this->get_option( 'class_cost_' . $shipping_class, '' ) ) : $this->get_option( 'no_class_cost', '' );
+
+                if ( '' === $class_cost_string ) {
+                    continue;
+                }
+
+                $class_cost = $this->evaluate_cost(
+                    $class_cost_string,
+                    array(
+                        'qty'  => array_sum( wp_list_pluck( $products, 'quantity' ) ),
+                        'cost' => array_sum( wp_list_pluck( $products, 'line_total' ) )
+                    )
+                );
+
+                if ( 'class' === $this->calc_type ) {
+                    $rate['cost'] += $class_cost;
+                } else {
+                    $highest_class_cost = $class_cost > $highest_class_cost ? $class_cost : $highest_class_cost;
+                }
+            }
+
+            if ( 'order' === $this->calc_type && $highest_class_cost ) {
+                $rate['cost'] += $highest_class_cost;
+            }
+        }
+
+        $rate['cost'] = $this->apply_free_shipping_rules( $rate['cost'], $package_item_qty, $package );
+
+        $this->add_rate( $rate );
+    }
+}

@@ -138,4 +138,17 @@
     &--single-action &__actions {
         gap: 0;
     }
+
+    &--double-action &__actions {
+        @media (width <= $screen-sm-min) {
+            flex-direction: column;
+            width: 100%;
+        }
+    }
+
+    &--double-action &__button {
+        @media (width <= $screen-sm-min) {
+            width: 100%;
+        }
+    }
 }

@@ -1,0 +1,84 @@
+<?php
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * Handles AJAX search functionality for Montonio shipping pickup points.
+ *
+ * @since 9.1.1
+ */
+class WC_Montonio_Shipping_Pickup_Points_Search {
+
+    /**
+     * Initialize hooks for pickup points search AJAX handlers.
+     *
+     * @since 9.5.0
+     * @return void
+     */
+    public static function init() {
+        add_action( 'wp_ajax_montonio_pickup_points_search', array( __CLASS__, 'search_pickup_points' ) );
+        add_action( 'wp_ajax_nopriv_montonio_pickup_points_search', array( __CLASS__, 'search_pickup_points' ) );
+    }
+
+    /**
+     * AJAX handler for searching pickup points.
+     *
+     * @since 9.1.1
+     * @return void Sends JSON response via wp_send_json_success() or wp_send_json_error()
+     * @throws Exception When API request fails or returns invalid JSON
+     */
+    public static function search_pickup_points() {
+        // Stop script execution if client disconnects before the API call
+        ignore_user_abort( false );
+
+        // Verify nonce
+        if ( ! wp_verify_nonce( $_POST['nonce'], 'montonio_pickup_nonce' ) ) {
+            wp_send_json_error( array( 'message' => 'Invalid security token' ) );
+        }
+
+        // Validate and sanitize input
+        $carrier = sanitize_text_field( $_POST['carrier'] ?? '' );
+        $country = sanitize_text_field( $_POST['country'] ?? '' );
+        $type    = sanitize_text_field( $_POST['type'] ?? '' );
+        $search  = sanitize_text_field( $_POST['search'] ?? '' );
+
+        if ( strlen( $search ) < 3 ) {
+            wp_send_json_error( array( 'message' => 'Search query must be at least 3 characters' ) );
+        }
+
+        // Check transient cache before making API call
+        $cache_key = 'montonio_pp_' . md5( $carrier . $country . $type . strtolower( $search ) );
+        $cached    = get_transient( $cache_key );
+
+        if ( false !== $cached ) {
+            wp_send_json_success( $cached );
+        }
+
+        // Best-effort check: skip API call if client already disconnected
+        if ( connection_aborted() ) {
+            exit;
+        }
+
+        try {
+            $api = new WC_Montonio_Shipping_API();
+
+            // Make API request with search parameter
+            $response = $api->get_pickup_points( $carrier, $country, $type, $search );
+            $response = sanitize_textarea_field( $response );
+
+            $data = json_decode( $response, true );
+
+            if ( json_last_error() !== JSON_ERROR_NONE ) {
+                throw new Exception( 'Invalid JSON response from API' );
+            }
+
+            // Cache results for 5 minutes to avoid redundant API calls
+            set_transient( $cache_key, $data, 5 * MINUTE_IN_SECONDS );
+
+            wp_send_json_success( $data );
+
+        } catch ( Exception $e ) {
+            $message = WC_Montonio_Helper::get_error_message( $e->getMessage() );
+            wp_send_json_error( array( 'message' => $message ) );
+        }
+    }
+}

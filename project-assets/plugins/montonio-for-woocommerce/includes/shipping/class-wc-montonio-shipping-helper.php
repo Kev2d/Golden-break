@@ -1,0 +1,238 @@
+<?php
+
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * Class WC_Montonio_Shipping_Helper for handling Montonio Shipping V2 helper functions
+ * @since 7.0.0
+ */
+class WC_Montonio_Shipping_Helper {
+    /**
+     * Gets the chosen Montonio shipping method at checkout. If the chosen shipping method is not Montonio, returns null.
+     *
+     * @since 7.0.0
+     * @return Montonio_Shipping_Method|null The chosen Montonio shipping method at checkout, or null if the chosen shipping method is not Montonio.
+     */
+    public static function get_chosen_montonio_shipping_method_at_checkout() {
+        if ( ! WC()->session ) {
+            return null;
+        }
+
+        $chosen_shipping_methods = WC()->session->get( 'chosen_shipping_methods', array() );
+
+        if ( empty( $chosen_shipping_methods ) ) {
+            return null;
+        }
+
+        WC()->shipping()->calculate_shipping( WC()->cart->get_shipping_packages() );
+    
+        $shipping_rate = null;
+        $chosen_shipping_method_id = null;
+
+        foreach ( WC()->shipping()->get_packages() as $i => $package ) {
+            if ( ! isset( $chosen_shipping_methods[$i] ) ) {
+                continue;
+            }
+
+            $chosen_shipping_method_id = $chosen_shipping_methods[$i];
+
+            if ( false === strpos( $chosen_shipping_method_id, 'montonio_' ) ) {
+                continue;
+            }
+
+            if ( isset( $package['rates'][$chosen_shipping_method_id] ) ) {
+                $shipping_rate = $package['rates'][$chosen_shipping_method_id];
+                break;
+            }
+        }
+
+        if ( empty( $shipping_rate ) ) {
+            return null;
+        }
+
+        $shipping_meta = $shipping_rate->get_meta_data();
+
+        if ( empty( $shipping_meta['carrier_code'] ) || empty( $shipping_meta['type_v2'] ) ) {
+            return null;
+        }
+
+        return (object) array(
+            'id'           => $chosen_shipping_method_id,
+            'carrier_code' => $shipping_meta['carrier_code'],
+            'type'         => $shipping_meta['type_v2'],
+            'operators'    => $shipping_meta['operators'] ?? null
+        );
+    }
+
+    /**
+     * Gets the order's chosen Montonio shipping method. If the chosen shipping method is not Montonio, returns null.
+     *
+     * @since 7.0.1 - fixed calling get_shipping_methods() on $order that does not have the method. For example WC_Coupon.
+     * @since 7.0.0
+     * @param WC_Order $order The order to get the chosen Montonio shipping method for.
+     * @return Montonio_Shipping_Method|null The chosen Montonio shipping method for the order, or null if the chosen shipping method is not Montonio.
+     */
+    public static function get_chosen_montonio_shipping_method_for_order( $order ) {
+        if ( empty( $order ) ) {
+            return;
+        }
+
+        if ( ! method_exists( (object) $order, 'get_shipping_methods' ) ) {
+            return;
+        }
+
+        $shipping_methods = $order->get_shipping_methods();
+
+        if ( empty( $shipping_methods ) ) {
+            return;
+        }
+
+        foreach ( $shipping_methods as $shipping_method ) {
+            $shipping_method_id = $shipping_method->get_method_id();
+
+            if ( strpos( $shipping_method_id, 'montonio_' ) !== false ) {
+                return $shipping_method;
+            }
+        }
+
+        return;
+    }
+
+    /**
+     * Create an instance of the shipping method class.
+     *
+     * @since 7.0.0
+     * @param string $method_id The shipping method ID.
+     * @param int $instance_id The shipping method instance ID.
+     * @return Montonio_Shipping_Method The shipping method instance.
+     */
+    public static function create_shipping_method_instance( $method_id, $instance_id = 0 ) {
+        $shipping_class_names = WC()->shipping->get_shipping_method_class_names();
+
+        return new $shipping_class_names[$method_id]( $instance_id );
+    }
+
+    /**
+     * Get shipping method instance.
+     *
+     * @since 9.2.0
+     * @param int $instance_id The shipping method instance ID.
+     * @return Montonio_Shipping_Method The shipping method instance.
+     */
+    public static function get_shipping_method_instance( $instance_id ) {
+        $shipping_method_instance = WC_Shipping_Zones::get_shipping_method( $instance_id );
+
+        if ( empty( $shipping_method_instance ) ) {
+            return null;
+        }
+
+        return $shipping_method_instance;
+    }
+
+    /**
+     * Gets the Montonio shipping method items for the given shipping method ID.
+     *
+     * @since 7.0.0
+     * @param Montonio_Shipping_Method $montonio_shipping_method The Montonio shipping method to get items for.
+     * @return array The Montonio shipping method items for the given ID. Returns an empty array if the shipping method ID does not exist or has no items.
+     */
+    public static function get_items_for_montonio_shipping_method( $carrier_code, $type, $country = null ) {
+        if ( ! in_array( $type, array( 'parcelMachine', 'parcelShop', 'postOffice' ) ) ) {
+            return array();
+        }
+
+        $country               = $country ? $country : self::get_customer_shipping_country();
+        $shipping_method_items = WC_Montonio_Shipping_Item_Manager::fetch_and_group_pickup_points( $country, $carrier_code, $type );
+
+        return is_array( $shipping_method_items ) ? $shipping_method_items : array();
+    }
+
+    /**
+     * Gets the customer's shipping country at checkout.
+     *
+     * @since 7.0.0
+     * @return string|null The chosen Montonio shipping method id at checkout, or null if the shipping country does not exist.
+     */
+    public static function get_customer_shipping_country() {
+        $customer = WC()->customer;
+
+        if ( empty( $customer ) ) {
+            return;
+        }
+
+        $country = $customer->get_shipping_country();
+
+        if ( empty( $country ) ) {
+            return;
+        }
+
+        if ( ! self::validate_country( $country ) ) {
+            return;
+        }
+
+        return $country;
+    }
+
+    /**
+     * Validates a country code.
+     *
+     * @since 7.0.0
+     * @param string $country The country code to validate.
+     * @return bool True if the country code is valid, false otherwise.
+     */
+    public static function validate_country( $country ) {
+        if ( ! ctype_upper( $country ) ) {
+            return false;
+        }
+
+        if ( strlen( $country ) != 2 ) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Get the phone number for the order.
+     *
+     * @since 7.0.0
+     * @param WC_Order $order The order to get the phone number for.
+     * @return string The phone number for the order.
+     */
+    public static function get_order_phone_number( $order ) {
+        // Check if the order object has a get_shipping_phone method and get the shipping phone number
+        $shipping_phone = method_exists( $order, 'get_shipping_phone' ) ? (string) $order->get_shipping_phone() : '';
+
+        // If the shipping phone number is not empty, return it
+        if ( ! empty( $shipping_phone ) ) {
+            return $shipping_phone;
+        }
+
+        // Get the billing phone number and return it
+        $billing_phone = (string) $order->get_billing_phone();
+        return $billing_phone;
+    }
+
+    /**
+     * Get the email address for the order.
+     *
+     * @since 7.0.0
+     * @param WC_Order $order The order to get the email address for.
+     * @return string The email address for the order.
+     */
+    public static function get_order_email( $order ) {
+        return method_exists( $order, 'get_shipping_email' ) ? (string) $order->get_shipping_email() : (string) $order->get_billing_email();
+    }
+
+    /**
+     * Check if it is time to sync the shipping method items
+     *
+     * @since 7.0.0
+     * @return boolean True if it is time to sync the shipping method items, false otherwise.
+     */
+    public static function is_time_to_sync_shipping_method_items() {
+        $last_synced_at = (int) get_option( 'montonio_shipping_sync_timestamp', 0 );
+
+        return $last_synced_at === 0 || ( time() - $last_synced_at ) > DAY_IN_SECONDS;
+    }
+}

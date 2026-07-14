@@ -1,0 +1,609 @@
+<?php
+
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * Class WC_Montonio_Shipping_Order handles Montonio shipping related order actions
+ * @since 7.0.0
+ */
+class WC_Montonio_Shipping_Order {
+
+    /**
+     * Initialize hooks for shipping order actions.
+     *
+     * @since 9.5.0
+     * @return void
+     */
+    public static function init() {
+        if ( WC_Montonio_Helper::is_hpos_enabled() ) {
+            // Add shipping method filter
+            add_action( 'woocommerce_order_list_table_restrict_manage_orders', array( __CLASS__, 'add_orders_filter' ) );
+            add_filter( 'woocommerce_orders_table_query_clauses', array( __CLASS__, 'hpos_output_filter_results' ), 10, 3 );
+            add_action( 'woocommerce_shop_order_list_table_custom_column', array( __CLASS__, 'modify_order_columns' ), 10, 2 );
+
+            // Add shipment status column
+            add_filter( 'woocommerce_shop_order_list_table_columns', array( __CLASS__, 'add_shipping_status_column' ), 20 );
+            add_action( 'woocommerce_shop_order_list_table_custom_column', array( __CLASS__, 'display_shipping_status_column_content' ), 20, 2 );
+        } else {
+            // Add shipping method filter
+            add_action( 'restrict_manage_posts', array( __CLASS__, 'add_orders_filter' ) );
+            add_filter( 'posts_where', array( __CLASS__, 'output_filter_results' ), 10, 2 );
+            add_action( 'manage_shop_order_posts_custom_column', array( __CLASS__, 'modify_order_columns' ), 10, 2 );
+
+            // Add shipment status column
+            add_filter( 'manage_edit-shop_order_columns', array( __CLASS__, 'add_shipping_status_column' ), 20 );
+            add_action( 'manage_shop_order_posts_custom_column', array( __CLASS__, 'display_shipping_status_column_content' ), 20, 2 );
+        }
+
+        // Add print label action button
+        add_filter( 'woocommerce_admin_order_actions', array( __CLASS__, 'add_montonio_print_label_action' ), 999, 2 );
+
+        // Add custom order status
+        add_action( 'init', array( __CLASS__, 'add_custom_order_status' ) );
+        add_filter( 'wc_order_statuses', array( __CLASS__, 'add_custom_order_status_to_order_statuses' ) );
+        add_filter( 'woocommerce_admin_order_actions', array( __CLASS__, 'add_custom_status_order_action' ), 10, 2 );
+
+        // Hide metadata fields from order view
+        add_filter( 'woocommerce_hidden_order_itemmeta', array( __CLASS__, 'hide_custom_order_itemmeta' ) );
+
+        // Add Montonio shipping panel in order page
+        add_action( 'woocommerce_admin_order_data_after_shipping_address', array( __CLASS__, 'add_order_shipping_panel' ) );
+
+        // Add pickup point select in order view
+        add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_required_admin_scripts' ), 15 );
+        add_action( 'wp_ajax_get_country_select', array( __CLASS__, 'get_country_select' ) );
+        add_action( 'wp_ajax_get_pickup_point_select', array( __CLASS__, 'get_pickup_point_select' ) );
+        add_action( 'wp_ajax_process_selected_pickup_point', array( __CLASS__, 'process_selected_pickup_point' ) );
+    }
+
+    /**
+     * Enqueue required admin scripts
+     * @since 7.0.0
+     */
+    public static function enqueue_required_admin_scripts() {
+        wp_enqueue_script( 'montonio-shipping-pickup-points-admin' );
+
+        wp_localize_script(
+            'montonio-shipping-pickup-points-admin',
+            'montonio_shipping_pickup_points_admin_params',
+            array(
+                'nonce' => wp_create_nonce( 'montonio_shipping_pickup_points_admin_nonce' )
+            )
+        );
+    }
+
+    /**
+     * Add shipping methods dropdown as a filter option for order list
+     * @since 7.0.0
+     * @return void
+     */
+    public static function add_orders_filter() {
+        if ( ( ! isset( $_GET['post_type'] ) || $_GET['post_type'] !== 'shop_order' ) && ( ! isset( $_GET['page'] ) || $_GET['page'] !== 'wc-orders' ) ) {
+            return;
+        }
+
+        $selected_method  = ! empty( $_GET['montonio_shipping_method'] ) ? sanitize_text_field( wp_unslash( $_GET['montonio_shipping_method'] ) ) : '';
+        $shipping_methods = WC()->shipping()->get_shipping_methods();
+
+        echo '<select id="montonio_shipping_method" name="montonio_shipping_method">';
+        echo '<option value="">' . esc_html__( 'All shipping methods', 'montonio-for-woocommerce' ) . '</option>';
+
+        foreach ( $shipping_methods as $id => $shipping_method ) {
+            $selected = ( $selected_method === $id ) ? ' selected' : '';
+
+            echo '<option value="' . esc_attr( $id ) . '"' . esc_attr( $selected ) . '>' . esc_html( $shipping_method->get_method_title() ) . '</option>';
+        }
+
+        echo '</select>';
+    }
+
+    /**
+     * Filter orders list by selected shipping method for classic orders
+     *
+     * @since 7.0.0
+     * @param string $where The existing WHERE clauses of the query
+     * @param WP_Query $query The current WP_Query object
+     * @return string The modified WHERE clauses
+     */
+    public static function output_filter_results( $where, $query ) {
+        if ( ! is_admin() ) {
+            return $where;
+        }
+
+        $method = isset( $_GET['montonio_shipping_method'] ) ? sanitize_text_field( wp_unslash( $_GET['montonio_shipping_method'] ) ) : false;
+
+        if ( isset( $query->query['post_type'] ) && $query->query['post_type'] == 'shop_order' && ! empty( $method ) ) {
+            global $wpdb;
+            $where .= $wpdb->prepare(
+                "AND ID IN (
+                    SELECT order_id
+                    FROM {$wpdb->prefix}woocommerce_order_itemmeta m
+                    LEFT JOIN {$wpdb->prefix}woocommerce_order_items i
+                    ON i.order_item_id = m.order_item_id
+                    WHERE meta_key = 'method_id' and meta_value = %s
+                )",
+                $method
+            );
+        }
+
+        return $where;
+    }
+
+    /**
+     * Filter orders list by selected shipping method for HPOS
+     *
+     * @since 7.0.0
+     * @param array $pieces The existing query clauses
+     * @param WP_Query $query The current WP_Query object
+     * @param array $query_vars The query variables
+     * @return array The modified query clauses
+     */
+    public static function hpos_output_filter_results( $pieces, $query, $query_vars ) {
+        $method = isset( $_GET['montonio_shipping_method'] ) ? sanitize_text_field( wp_unslash( $_GET['montonio_shipping_method'] ) ) : false;
+
+        if ( isset( $_GET['page'] ) && $_GET['page'] == 'wc-orders' && ! empty( $method ) ) {
+            global $wpdb;
+            $pieces['where'] .= $wpdb->prepare(
+                " AND {$wpdb->prefix}wc_orders.id IN (
+                    SELECT order_id
+                    FROM {$wpdb->prefix}woocommerce_order_itemmeta m
+                    LEFT JOIN {$wpdb->prefix}woocommerce_order_items i
+                    ON i.order_item_id = m.order_item_id
+                    WHERE meta_key = 'method_id' and meta_value = %s
+                )",
+                $method
+            );
+        }
+
+        return $pieces;
+    }
+
+    /**
+     * Add tracking codes to shipping address column
+     *
+     * @since 7.0.0
+     * @param string $column The column name
+     * @param int $order_id The order ID
+     * @return void
+     */
+    public static function modify_order_columns( $column, $order_id ) {
+        if ( 'shipping_address' !== $column ) {
+            return;
+        }
+
+        $order = wc_get_order( $order_id );
+
+        if ( empty( $order ) ) {
+            return;
+        }
+
+        $shipping_method = WC_Montonio_Shipping_Helper::get_chosen_montonio_shipping_method_for_order( $order );
+
+        if ( empty( $shipping_method ) ) {
+            return;
+        }
+
+        if ( $shipping_method->get_meta( 'tracking_codes' ) ) {
+            echo esc_html__( 'Tracking code(s)', 'montonio-for-woocommerce' ) . ':<br />' . wp_kses_post( $shipping_method->get_meta( 'tracking_codes' ) );
+            return;
+        }
+
+        $shipment_id = $order->get_meta( '_wc_montonio_shipping_shipment_id' );
+
+        if ( empty( $shipment_id ) ) {
+            return;
+        }
+
+        $date_paid = $order->get_date_paid();
+
+        if ( empty( $date_paid ) ) {
+            return;
+        }
+
+        if ( time() - $date_paid->getTimestamp() > 5 * 60 ) {
+            echo '<span style="color:sandybrown">' . esc_html__( 'Unexpected error - Check status in Montonio Partner System', 'montonio-for-woocommerce' ) . '</span><br />';
+        } else {
+            echo '<span style="color:orange">' . esc_html__( 'Waiting for tracking codes from Montonio', 'montonio-for-woocommerce' ) . '</span><br />';
+        }
+    }
+
+    /**
+     * Add shipping status column to order list
+     *
+     * @since 8.1.0
+     * @param array $columns Current order list columns.
+     * @return array Modified columns.
+     */
+    public static function add_shipping_status_column( $columns ) {
+        $new_columns = array();
+
+        // Insert our column after the 'order_status' column
+        foreach ( $columns as $column_name => $column_info ) {
+            $new_columns[$column_name] = $column_info;
+
+            if ( $column_name === 'order_status' ) {
+                $new_columns['montonio_shipping_status'] = __( 'Shipment status', 'montonio-for-woocommerce' );
+            }
+        }
+
+        return $new_columns;
+    }
+
+    /**
+     * Display shipping status column content
+     *
+     * @since 8.1.0
+     * @param string $column_name Column identifier.
+     * @param mixed $order_or_order_id WC_Order object or order ID.
+     * @return void
+     */
+    public static function display_shipping_status_column_content( $column_name, $order_or_order_id ) {
+        $order = is_numeric( $order_or_order_id ) ? wc_get_order( $order_or_order_id ) : $order_or_order_id;
+
+        if ( $column_name === 'montonio_shipping_status' && $order ) {
+            $status = $order->get_meta( '_wc_montonio_shipping_shipment_status' );
+
+            $status_labels = array(
+                'pending'            => __( 'Pending', 'montonio-for-woocommerce' ),
+                'creationFailed'     => __( 'Creation failed', 'montonio-for-woocommerce' ),
+                'registered'         => __( 'Registered', 'montonio-for-woocommerce' ),
+                'registrationFailed' => __( 'Registration failed', 'montonio-for-woocommerce' ),
+                'labelsCreated'      => __( 'Label printed', 'montonio-for-woocommerce' ),
+                'inTransit'          => __( 'In transit', 'montonio-for-woocommerce' ),
+                'awaitingCollection' => __( 'Awaiting collection', 'montonio-for-woocommerce' ),
+                'delivered'          => __( 'Delivered', 'montonio-for-woocommerce' )
+            );
+
+            if ( ! empty( $status ) ) {
+                $status_label = isset( $status_labels[$status] ) ? $status_labels[$status] : ucfirst( strtolower( preg_replace( '/(?<!^)([A-Z])/', ' $1', $status ) ) );
+
+                echo '<mark class="order-status montonio-shippment-status montonio-shippment-status--' . esc_html( $status ) . '"><span>' . esc_html( $status_label ) . '</span></mark>';
+            } else {
+                echo '<span class="na">–</span>';
+            }
+        }
+    }
+
+    /**
+     * Add Montonio Print Label action to WooCommerce orders
+     *
+     * @since 9.0.1
+     * @param array $actions Existing order actions.
+     * @param WC_Order $order WC_Order object.
+     * @return array Modified actions array.
+     */
+    public static function add_montonio_print_label_action( $actions, $order ) {
+        $shipping_method = WC_Montonio_Shipping_Helper::get_chosen_montonio_shipping_method_for_order( $order );
+
+        if ( empty( $shipping_method ) ) {
+            return $actions;
+        }
+
+        $status         = $order->get_meta( '_wc_montonio_shipping_shipment_status' );
+        $tracking_codes = $shipping_method->get_meta( 'tracking_codes' );
+
+        if ( ! empty( $tracking_codes ) && ! in_array( $status, array( 'pending', 'inTransit', 'awaitingCollection', 'delivered', 'returned' ) ) ) {
+            $actions['montonio_print_label'] = array(
+                'url'    => '#' . $order->get_id(),
+                'name'   => __( 'Print shipping label', 'montonio-for-woocommerce' ),
+                'action' => 'montonio_print_label'
+            );
+        }
+
+        return $actions;
+    }
+
+    /**
+     * Register custom order status
+     *
+     * @since 7.0.0
+     * @return void
+     */
+    public static function add_custom_order_status() {
+        register_post_status( 'wc-mon-label-printed', array(
+            'label'                     => _x( 'Label printed', 'Order status', 'montonio-for-woocommerce' ),
+            'public'                    => true,
+            'exclude_from_search'       => false,
+            'show_in_admin_all_list'    => true,
+            'show_in_admin_status_list' => true,
+            /* translators: %s: number of orders */
+            'label_count'               => _n_noop( 'Label printed (%s)', 'Label printed (%s)', 'montonio-for-woocommerce' )
+        ) );
+    }
+
+    /**
+     * Add custom order status to order statuses
+     *
+     * @since 7.0.0
+     * @param array $order_statuses The existing order statuses
+     * @return array The modified order statuses
+     */
+    public static function add_custom_order_status_to_order_statuses( $order_statuses ) {
+        $order_statuses['wc-mon-label-printed'] = _x( 'Label printed', 'Order status', 'montonio-for-woocommerce' );
+        return $order_statuses;
+    }
+
+    /**
+     * Add order actions for 'Label printed' status
+     *
+     * @since 7.0.2
+     * @param array $actions The existing actions for the order.
+     * @param WC_Order $order The current order object.
+     * @return array The modified actions array including the custom 'Complete' action.
+     */
+    public static function add_custom_status_order_action( $actions, $order ) {
+        if ( $order->has_status( 'mon-label-printed' ) ) {
+            $actions['complete'] = array(
+                'url'    => wp_nonce_url( admin_url( 'admin-ajax.php?action=woocommerce_mark_order_status&status=completed&order_id=' . $order->get_id() ), 'woocommerce-mark-order-status' ),
+                'name'   => __( 'Complete', 'montonio-for-woocommerce' ),
+                'action' => 'complete'
+            );
+        }
+
+        return $actions;
+    }
+
+    /**
+     * Hide custom order itemmeta fields from order view
+     *
+     * @since 7.0.0
+     * @param array $hidden_order_itemmeta The existing hidden order itemmeta fields
+     * @return array The modified hidden order itemmeta fields
+     */
+    public static function hide_custom_order_itemmeta( $hidden_order_itemmeta ) {
+        $add_to_hidden = array(
+            'shipping_method_identifier',
+            'carrier_code',
+            'provider_name',
+            'type',
+            'type_v2',
+            'method_class_name',
+            'tracking_codes',
+            'instance_id'
+        );
+
+        return array_merge( $hidden_order_itemmeta, $add_to_hidden );
+    }
+
+    /**
+     * Add shipping panel in order page
+     *
+     * @since 7.0.0
+     * @param WC_Order $order The order object
+     * @return void
+     */
+    public static function add_order_shipping_panel( $order ) {
+        wp_enqueue_script( 'wc-montonio-shipping-label-printing' );
+
+        wp_localize_script(
+            'wc-montonio-shipping-label-printing',
+            'wcMontonioShippingLabelPrintingData',
+            array(
+                'orderId' => $order->get_id(),
+                'restUrl' => esc_url_raw( rest_url( 'montonio/shipping/v2' ) ),
+                'nonce'   => wp_create_nonce( 'wp_rest' )
+            )
+        );
+
+        wp_set_script_translations(
+            'wc-montonio-shipping-label-printing',
+            'montonio-for-woocommerce',
+            WC_MONTONIO_PLUGIN_PATH . '/languages'
+        );
+
+        wp_enqueue_script( 'wc-montonio-shipping-shipment-manager' );
+
+        wp_localize_script(
+            'wc-montonio-shipping-shipment-manager',
+            'wcMontonioShippingShipmentData',
+            array(
+                'orderId'         => $order->get_id(),
+                'shippingRestUrl' => esc_url_raw( rest_url( 'montonio/shipping/v2' ) ),
+                'nonce'           => wp_create_nonce( 'wp_rest' )
+            )
+        );
+
+        wp_set_script_translations(
+            'wc-montonio-shipping-shipment-manager',
+            'montonio-for-woocommerce',
+            WC_MONTONIO_PLUGIN_PATH . '/languages'
+        );
+
+        echo '<div class="montonio-shipping-panel-wrapper">';
+
+        wc_get_template(
+            'admin-order-shipping-panel.php',
+            array(
+                'order' => $order
+            ),
+            '',
+            WC_MONTONIO_PLUGIN_PATH . '/templates/'
+        );
+
+        echo '</div>';
+    }
+
+    /**
+     * Get shipping panel content to update it dynamically
+     *
+     * @since 7.0.0
+     * @param WC_Order $order The order object
+     * @return void
+     */
+    public static function get_order_shipping_panel_content( $order ) {
+        ob_start();
+        wc_get_template(
+            'admin-order-shipping-panel.php',
+            array(
+                'order' => $order
+            ),
+            '',
+            WC_MONTONIO_PLUGIN_PATH . '/templates/'
+        );
+        $content = ob_get_clean();
+
+        return $content;
+    }
+
+    /**
+     * Country select for chosen shipping method
+     *
+     * @since 7.0.0
+     * @return void
+     */
+    public static function get_country_select() {
+        if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['nonce'] ), 'montonio_shipping_pickup_points_admin_nonce' ) ) {
+            wp_send_json_error( 'Unable to verify your request. Please reload the page and try again.', 403 );
+        }
+
+        if ( ! isset( $_POST['shipping_method_id'] ) ) {
+            wp_send_json_error();
+        }
+
+        $shipping_method_id       = sanitize_text_field( wp_unslash( $_POST['shipping_method_id'] ) );
+        $shipping_method_instance = WC_Montonio_Shipping_Helper::create_shipping_method_instance( $shipping_method_id );
+        $carrier                  = $shipping_method_instance->carrier_code;
+        $type                     = $shipping_method_instance->type_v2;
+
+        $country_availability = WC_Montonio_Shipping_Item_Manager::get_shipping_method_countries( $carrier, $type );
+
+        if ( ! empty( $country_availability ) ) {
+            $wc_countries  = new WC_Countries();
+            $country_names = $wc_countries->__get( 'countries' );
+
+            $country_select = '<select name="montonio_carrier_country" class="montonio_carrier_country" data-carrier="' . $carrier . '" data-type="' . $type . '">';
+            $country_select .= '<option value="">' . __( 'Select a destination country', 'montonio-for-woocommerce' ) . '</option>';
+
+            foreach ( $country_availability as $country ) {
+                $country_select .= '<option value="' . $country . '">';
+                $country_select .= $country_names[strtoupper( $country )];
+                $country_select .= '</option>';
+            }
+
+            $country_select .= '</select>';
+        } else {
+            wp_send_json_error();
+        }
+
+        wp_send_json_success( $country_select );
+    }
+
+    /**
+     * Pickup point select for chosen shipping method
+     *
+     * @since 7.0.0
+     * @return void
+     */
+    public static function get_pickup_point_select() {
+        if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['nonce'] ), 'montonio_shipping_pickup_points_admin_nonce' ) ) {
+            wp_send_json_error( 'Unable to verify your request. Please reload the page and try again.', 403 );
+        }
+
+        if ( ! isset( $_POST['country'] ) || ! isset( $_POST['carrier'] ) || ! isset( $_POST['type'] ) ) {
+            wp_send_json_error();
+        }
+
+        $country = sanitize_text_field( wp_unslash( $_POST['country'] ) );
+        $carrier = sanitize_text_field( wp_unslash( $_POST['carrier'] ) );
+        $type    = sanitize_text_field( wp_unslash( $_POST['type'] ) );
+
+        $shipping_method_items = WC_Montonio_Shipping_Item_Manager::fetch_and_group_pickup_points( $country, $carrier, $type );
+
+        if ( empty( $shipping_method_items ) ) {
+            wp_send_json_error();
+        }
+
+        $include_address = get_option( 'montonio_shipping_show_address' );
+
+        $pickup_point_select = '<select name="montonio_carrier_pickup_point" class="montonio_carrier_pickup_point">';
+        $pickup_point_select .= '<option value="">' . __( 'Select pickup point', 'montonio-for-woocommerce' ) . '</option>';
+
+        foreach ( $shipping_method_items as $locality => $items ) {
+            $pickup_point_select .= '<optgroup label="' . esc_attr( $locality ) . '">';
+
+            foreach ( $items as $item ) {
+                $pickup_point_select .= '<option value="' . esc_attr( $item['id'] ) . '">';
+                $pickup_point_select .= esc_html( $item['name'] );
+
+                if ( $include_address === 'yes' && ! empty( $item['address'] ) ) {
+                    $pickup_point_select .= ' - ' . esc_html( $item['address'] );
+                }
+
+                $pickup_point_select .= '</option>';
+            }
+            $pickup_point_select .= '</optgroup>';
+        }
+
+        $pickup_point_select .= '</select>';
+
+        wp_send_json_success( $pickup_point_select );
+    }
+
+    /**
+     * Process chosen shipping method data
+     *
+     * @since 7.0.0
+     * @return void
+     */
+    public static function process_selected_pickup_point() {
+        if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['nonce'] ), 'montonio_shipping_pickup_points_admin_nonce' ) ) {
+            wp_send_json_error( 'Unable to verify your request. Please reload the page and try again.', 403 );
+        }
+
+        if ( ! isset( $_POST['order_id'] ) || ! isset( $_POST['country'] ) || ! isset( $_POST['carrier'] ) || ! isset( $_POST['type'] ) ) {
+            wp_send_json_error();
+        }
+
+        $order_id = sanitize_text_field( wp_unslash( $_POST['order_id'] ) );
+        $country  = sanitize_text_field( wp_unslash( $_POST['country'] ) );
+        $carrier  = sanitize_text_field( wp_unslash( $_POST['carrier'] ) );
+        $type     = sanitize_text_field( wp_unslash( $_POST['type'] ) );
+
+        $order = wc_get_order( $order_id );
+
+        if ( in_array( $type, array( 'parcelMachine', 'postOffice', 'parcelShop' ) ) ) {
+            // Set method type
+            $type = 'pickupPoint';
+
+            // Get chosen pickup
+            $shipping_method_item_id = isset( $_POST['pickup_point_id'] ) ? sanitize_text_field( wp_unslash( $_POST['pickup_point_id'] ) ) : null;
+
+            if ( empty( $shipping_method_item_id ) ) {
+                wp_send_json_error();
+            }
+
+            // Get pickup point info
+            $shipping_method_item = WC_Montonio_Shipping_Item_Manager::get_shipping_method_item( $shipping_method_item_id );
+
+            // Update order meta data and shipping address
+            $order->update_meta_data( '_montonio_pickup_point_name', $shipping_method_item->item_name );
+
+            if ( method_exists( $order, 'set_shipping' ) ) {
+                $order->set_shipping(
+                    array(
+                        'address_1' => $shipping_method_item->item_name,
+                        'address_2' => '',
+                        'city'      => $shipping_method_item->locality,
+                        'state'     => '',
+                        'postcode'  => $shipping_method_item->postal_code,
+                        'country'   => strtoupper( $shipping_method_item->country_code )
+                    )
+                );
+            } else {
+                $order->update_meta_data( '_shipping_address_1', $shipping_method_item->item_name );
+                $order->update_meta_data( '_shipping_address_2', '' );
+                $order->update_meta_data( '_shipping_city', $shipping_method_item->locality );
+                $order->update_meta_data( '_shipping_postcode', $shipping_method_item->postal_code );
+            }
+        } else {
+            $shipping_method_item_id = WC_Montonio_Shipping_Item_Manager::get_courier_id( $country, $carrier );
+        }
+
+        $order->update_meta_data( '_montonio_pickup_point_uuid', $shipping_method_item_id );
+        $order->update_meta_data( '_wc_montonio_shipping_method_type', $type );
+
+        $order->save();
+
+        wp_send_json_success( $shipping_method_item );
+    }
+}

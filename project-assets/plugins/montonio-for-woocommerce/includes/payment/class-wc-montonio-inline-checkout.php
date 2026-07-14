@@ -1,0 +1,72 @@
+<?php
+defined( 'ABSPATH' ) || exit;
+
+class WC_Montonio_Inline_Checkout {
+
+    /**
+     * Initialize hooks for inline checkout AJAX handlers.
+     *
+     * @since 9.5.0
+     * @return void
+     */
+    public static function init() {
+        add_action( 'wp_ajax_get_payment_intent', array( __CLASS__, 'get_payment_intent' ) );
+        add_action( 'wp_ajax_nopriv_get_payment_intent', array( __CLASS__, 'get_payment_intent' ) );
+        add_action( 'wp_ajax_get_session_uuid', array( __CLASS__, 'get_session_uuid' ) );
+        add_action( 'wp_ajax_nopriv_get_session_uuid', array( __CLASS__, 'get_session_uuid' ) );
+    }
+
+    /**
+     * Handles the creation and retrieval of a Montonio payment intent for inline checkout.
+     *
+     * @since 8.0.1
+     * @return void
+     * @throws Exception Internally for parameter validation and API errors, caught and handled within the function.
+     * @package WooCommerce
+     */
+    public static function get_payment_intent() {
+        try {
+            if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['nonce'] ), 'montonio_embedded_checkout_nonce' ) ) {
+                throw new Exception( 'Unable to verify your request. Please reload the page and try again.' );
+            }
+
+            $method = isset( $_POST['method'] ) ? sanitize_text_field( wp_unslash( $_POST['method'] ) ) : null;
+
+            if ( empty( $method ) ) {
+                throw new Exception( 'Missing payment method parameter.' );
+            }
+
+            $montonio_api = new WC_Montonio_API();
+            $response     = $montonio_api->create_payment_intent( $method );
+
+            wp_send_json_success( $response );
+        } catch ( Exception $e ) {
+            WC_Montonio_Logger::log( 'Montonio Embedded Checkout: ' . $e->getMessage() );
+
+            wp_send_json_error( $e->getMessage() );
+        }
+    }
+
+    /**
+     * Handles the retrieval of a Montonio session UUID for inline checkout.
+     *
+     * @since 8.0.1
+     * @return void
+     */
+    public static function get_session_uuid() {
+        try {
+            if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['nonce'] ), 'montonio_embedded_checkout_nonce' ) ) {
+                throw new Exception( 'Unable to verify your request. Please reload the page and try again.' );
+            }
+
+            $montonio_api = new WC_Montonio_API();
+            $response     = $montonio_api->get_session_uuid();
+
+            wp_send_json_success( json_decode( $response ) );
+        } catch ( Exception $e ) {
+            WC_Montonio_Logger::log( 'Montonio Embedded Checkout: ' . $e->getMessage() );
+
+            wp_send_json_error( $e->getMessage() );
+        }
+    }
+}

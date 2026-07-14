@@ -271,6 +271,15 @@ function my_acf_init_block_types()
             'keywords'          => array('cta', 'call to action', 'buttons', 'booking', 'block'),
         ));
         acf_register_block_type(array(
+            'name'              => 'booking-info-block',
+            'title'             => __('Booking Info Block'),
+            'description'       => __('A two-card booking rules and contact information section.'),
+            'render_template'   => 'acf-blocks/booking-info-block.php',
+            'category'          => 'golden-break',
+            'icon'              => 'clipboard',
+            'keywords'          => array('booking', 'rules', 'contact', 'info', 'block'),
+        ));
+        acf_register_block_type(array(
             'name'              => 'title-text-block',
             'title'             => __('Title Text Block'),
             'description'       => __('A custom block to display a title with accompanying text.'),

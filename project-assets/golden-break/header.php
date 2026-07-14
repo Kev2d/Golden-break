@@ -17,6 +17,7 @@
 <?php wp_body_open(); ?>
 
 <?php get_template_part('template-parts/UI/site-notification'); ?>
+<div class="site-header-slot">
 <header class="site-header">
 
   <div class="site-header__inner">
@@ -39,3 +40,4 @@
   <?php get_template_part('template-parts/header/navigation-mobile'); ?>
 
 </header>
+</div>

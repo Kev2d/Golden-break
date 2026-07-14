@@ -1,0 +1,375 @@
+<?php
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * @since 7.0.0 - Polyfill for wp_timezone_string that was introduced in WordPress 5.3
+ */
+if ( ! function_exists( 'wp_timezone_string' ) ) {
+    function wp_timezone_string() {
+        $timezone = get_option( 'timezone_string' );
+        if ( ! empty( $timezone ) ) {
+            return $timezone;
+        }
+
+        $offset  = get_option( 'gmt_offset' );
+        if ( 0 === $offset ) {
+            return 'UTC';
+        }
+
+        $hours    = (int) $offset;
+        $minutes  = ( $offset - $hours );
+        $sign     = ( $offset < 0 ) ? '-' : '+';
+        $abs_hour = abs( $hours );
+        $abs_mins = abs( $minutes * 60 );
+
+        return sprintf( '%s%02d:%02d', $sign, $abs_hour, $abs_mins );
+    }
+}
+
+/**
+ * Class WC_Montonio_Telemetry_Service
+ *
+ * @since 7.0.0
+ */
+class WC_Montonio_Telemetry_Service {
+    /**
+     * @since 7.0.0
+     * @var string Root URL for the Montonio telemetry application
+     */
+    const MONTONIO_TELEMETRY_API_URL = 'https://plugin-telemetry.montonio.com/api';
+
+    /**
+     * @since 9.4.1
+     * @var string WP-Cron hook name for telemetry sync
+     */
+    const CRON_HOOK = 'montonio_telemetry_sync_event';
+
+    /**
+     * @since 7.0.0
+     * @var array Common setting keys for all services
+     */
+    private static $common_setting_keys = array(
+        'enabled',
+        'title',
+        'description'
+    );
+
+    /**
+     * @since 7.0.0
+     * @var array Service-specific setting keys
+     */
+    private static $service_specific_setting_keys = array(
+        'wc_montonio_payments'      => array(
+            'handle_style',
+            'default_country',
+            'hide_country_select',
+            'preselect_country',
+            'custom_payment_description',
+            'payment_description'
+        ),
+        'wc_montonio_card'          => array(
+            'inline_checkout'
+        ),
+        'wc_montonio_bnpl'          => array(
+            'min_amount'
+        ),
+        'wc_montonio_hire_purchase' => array(
+            'min_amount',
+            'calculator_enabled'
+        ),
+        'wc_montonio_blik'          => array(
+            'blik_in_checkout'
+        )
+    );
+
+    /**
+     * Initialize hooks.
+     *
+     * @since 7.0.0
+     */
+    public static function init() {
+        add_action( self::CRON_HOOK, array( __CLASS__, 'send_telemetry_data' ) );
+        add_action( 'init', array( __CLASS__, 'setup_sync' ) );
+        add_action( 'woocommerce_settings_saved', array( __CLASS__, 'send_telemetry_data' ) );
+        add_action( 'montonio_send_telemetry_data', array( __CLASS__, 'send_telemetry_data' ) );
+
+        register_deactivation_hook( WC_MONTONIO_PLUGIN_FILE, array( __CLASS__, 'wc_montonio_deactivated' ) );
+    }
+
+    /**
+     * Set up the telemetry sync mechanism.
+     *
+     * Uses WP-Cron by default. Falls back to a throttled wp_loaded-based
+     * sync when WP-Cron is disabled via the DISABLE_WP_CRON constant.
+     *
+     * @since 9.4.1
+     */
+    public static function setup_sync() {
+        if ( ! wp_next_scheduled( self::CRON_HOOK ) ) {
+            wp_schedule_event( time(), 'daily', self::CRON_HOOK );
+        }
+
+        // Fall back to wp_loaded-based throttled sync when WP-Cron is disabled.
+        if ( defined( 'DISABLE_WP_CRON' ) && DISABLE_WP_CRON ) {
+            add_action( 'wp_loaded', array( __CLASS__, 'run_fallback_sync' ) );
+        }
+    }
+
+    /**
+     * Fallback sync for environments where WP-Cron is disabled.
+     *
+     * Performs a throttled sync on page load, at most once every 24 hours.
+     *
+     * @since 7.0.0
+     */
+    public static function run_fallback_sync() {
+        $last_sync = (int) get_option( 'montonio_telemetry_sync_timestamp', 0 );
+
+        if ( time() - $last_sync > 24 * HOUR_IN_SECONDS ) {
+            self::send_telemetry_data();
+        }
+    }
+
+    /**
+     * Send telemetry data upon plugin deactivation and clear the cron job.
+     *
+     * @since 7.0.0
+     */
+    public static function wc_montonio_deactivated() {
+        $timestamp = wp_next_scheduled( self::CRON_HOOK );
+        if ( $timestamp ) {
+            wp_unschedule_event( $timestamp, self::CRON_HOOK );
+        }
+
+        $deactivated_at = gmdate( 'Y-m-d H:i:s' );
+        self::send_telemetry_data( $deactivated_at );
+
+        update_option( 'montonio_telemetry_sync_timestamp', 0 );
+    }
+
+    /**
+     * Send telemetry data to the Montonio API.
+     *
+     * @since 7.0.0
+     * @param string|null $deactivated_at Optional deactivation timestamp.
+     */
+    public static function send_telemetry_data( $deactivated_at = null ) {
+        if ( ! WC_Montonio_Helper::has_api_keys() ) {
+            return;
+        }
+
+        update_option( 'montonio_telemetry_sync_timestamp', time() );
+
+        try {
+            $path = '/store-telemetry-data';
+            $data = self::collect_telemetry_data( $deactivated_at );
+
+            $options = array(
+                'headers' => array(
+                    'Content-Type'  => 'application/json',
+                    'Authorization' => 'Bearer ' . WC_Montonio_Helper::create_jwt_token()
+                ),
+                'method'  => 'PATCH',
+                'body'    => json_encode( $data ),
+                'timeout' => 5
+            );
+
+            self::api_request( $path, $options );
+
+        } catch ( Exception $e ) {
+            WC_Montonio_Logger::log( 'Telemetry sync failed. Response: ' . $e->getMessage() );
+        }
+    }
+
+    /**
+     * Collect telemetry data from the store.
+     *
+     * @since 7.0.0
+     * @param string|null $deactivated_at
+     * @return array The collected telemetry data
+     */
+    public static function collect_telemetry_data( $deactivated_at ) {
+        $data = array(
+            'storeUrl'  => get_site_url(),
+            'platform'  => 'wordpress',
+            'storeInfo' => array(
+                'phpVersion'            => phpversion(),
+                'wordpressVersion'      => get_bloginfo( 'version' ),
+                'woocommerceVersion'    => WC()->version,
+                'montonioPluginVersion' => WC_MONTONIO_PLUGIN_VERSION,
+                'deactivatedAt'         => $deactivated_at,
+                'wordpressInfo'         => array(
+                    'restApiUrl'            => rest_url(),
+                    'otaUpdatesUrl'         => rest_url( 'montonio/ota' ),
+                    'defaultLanguage'       => get_bloginfo( 'language' ),
+                    'supportedLanguages'    => get_available_languages(),
+                    'currency'              => get_option( 'woocommerce_currency' ),
+                    'timezone'              => wp_timezone_string(),
+                    'siteName'              => get_bloginfo( 'name' ),
+                    'siteDescription'       => get_bloginfo( 'description' ),
+                    'hasBlocksInCheckout'   => WC_Montonio_Helper::is_checkout_block(),
+                    'merchantReferenceType' => self::get_api_setting( 'merchant_reference_type' ),
+                    'services'              => array(
+                        'paymentInitiationV2' => self::get_payment_service_data( 'wc_montonio_payments' ),
+                        'cardPaymentsV2'      => self::get_payment_service_data( 'wc_montonio_card' ),
+                        'bnpl'                => self::get_payment_service_data( 'wc_montonio_bnpl' ),
+                        'hirePurchase'        => self::get_payment_service_data( 'wc_montonio_hire_purchase' ),
+                        'blik'                => self::get_payment_service_data( 'wc_montonio_blik' ),
+                        'shipping'            => self::get_shipping_service_data()
+                    )
+                )
+            )
+        );
+
+        $connection_uuid = self::get_api_setting( 'connection' );
+        if ( ! empty( $connection_uuid ) ) {
+            $data['connectionUuid'] = $connection_uuid;
+        }
+
+        return $data;
+    }
+
+    /**
+     * Get API Settings.
+     *
+     * @since 7.0.2
+     * @param string $key
+     * @return string|null
+     */
+    public static function get_api_setting( $key ) {
+        $settings = self::get_settings( 'wc_montonio_api' );
+
+        if ( empty( $settings ) || ! is_array( $settings ) ) {
+            return null;
+        }
+
+        return isset( $settings[$key] ) ? sanitize_text_field( $settings[$key] ) : null;
+    }
+
+    /**
+     * Get payment service data.
+     *
+     * @since 7.0.0
+     * @param string $service_key The service key to get settings for
+     * @return array The service data
+     */
+    public static function get_payment_service_data( $service_key ) {
+        $settings = self::get_settings( $service_key );
+
+        if ( empty( $settings ) || ! is_array( $settings ) ) {
+            return array();
+        }
+
+        $data = array();
+
+        $data['status']      = ( isset( $settings['enabled'] ) && $settings['enabled'] === 'yes' ) ? 'enabled' : 'disabled';
+        $data['environment'] = WC_Montonio_Helper::is_test_mode() ? 'sandbox' : 'production';
+
+        if ( $service_key === 'wc_montonio_blik' ) {
+            $data['showFieldsInCheckout'] = ( isset( $settings['blik_in_checkout'] ) && $settings['blik_in_checkout'] === 'yes' ) ? true : false;
+        }
+
+        if ( $service_key === 'wc_montonio_card' ) {
+            $data['showFieldsInCheckout'] = ( isset( $settings['inline_checkout'] ) && $settings['inline_checkout'] === 'yes' ) ? true : false;
+        }
+
+        $data['settings'] = array();
+
+        $setting_keys = array_merge(
+            self::$common_setting_keys,
+            self::$service_specific_setting_keys[$service_key] ?? array()
+        );
+
+        foreach ( $setting_keys as $key ) {
+            $data['settings'][$key] = isset( $settings[$key] ) ? sanitize_text_field( $settings[$key] ) : null;
+        }
+
+        return $data;
+    }
+
+    /**
+     * Get shipping service data.
+     *
+     * @since 7.0.0
+     * @return array The shipping service data
+     */
+    public static function get_shipping_service_data() {
+        $data = array(
+            'status'   => ( get_option( 'montonio_shipping_enabled' ) === 'yes' ) ? 'enabled' : 'disabled',
+            'version'  => '2',
+            'settings' => array(
+                'montonio_shipping_enabled'                     => get_option( 'montonio_shipping_enabled' ),
+                'montonio_shipping_orderStatusWhenLabelPrinted' => get_option( 'montonio_shipping_orderStatusWhenLabelPrinted' ),
+                'montonio_shipping_order_status_when_delivered' => get_option( 'montonio_shipping_order_status_when_delivered' ),
+                'montonio_email_tracking_code_text'             => get_option( 'montonio_email_tracking_code_text' ),
+                'montonio_shipping_show_address'                => get_option( 'montonio_shipping_show_address' ),
+                'montonio_shipping_show_provider_logos'         => get_option( 'montonio_shipping_show_provider_logos' ),
+                'montonio_shipping_dropdown_type'               => get_option( 'montonio_shipping_dropdown_type' )
+            )
+        );
+
+        $shipping_zones    = array_reverse( WC_Shipping_Zones::get_zones(), true );
+        $default_zone      = new WC_Shipping_Zone( 0 );
+        $shipping_zones[0] = array(
+            'id'               => $default_zone->get_id(),
+            'zone_name'        => $default_zone->get_zone_name(),
+            'zone_order'       => $default_zone->get_zone_order(),
+            'zone_locations'   => $default_zone->get_zone_locations(),
+            'shipping_methods' => $default_zone->get_shipping_methods()
+        );
+
+        foreach ( $shipping_zones as $zone ) {
+            foreach ( $zone['shipping_methods'] as $method ) {
+                if ( 'yes' !== $method->enabled ) {
+                    continue;
+                }
+
+                $is_montonio = strpos( $method->id, 'montonio_' ) !== false;
+
+                $data['shipping_methods'][$method->id] = array(
+                    'setting' => $is_montonio ? $method->instance_settings : null
+                );
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * Get settings for a specific method ID.
+     *
+     * @since 7.0.0
+     * @param string $method_id The method ID to get settings for
+     * @return array|false The settings array or false if not found
+     */
+    public static function get_settings( $method_id ) {
+        return get_option( 'woocommerce_' . $method_id . '_settings', false );
+    }
+
+    /**
+     * Make an API request to the Montonio Telemetry API.
+     *
+     * @since 7.0.0
+     * @param string $path    The path to the API endpoint
+     * @param array  $options The options for the request
+     * @return string The body of the response
+     * @throws Exception If the request fails
+     */
+    protected static function api_request( $path, $options ) {
+        $url      = self::MONTONIO_TELEMETRY_API_URL . $path;
+        $options  = wp_parse_args( $options, array( 'timeout' => 30 ) );
+
+        $response      = wp_remote_request( $url, $options );
+        $response_code = wp_remote_retrieve_response_code( $response );
+
+        if ( is_wp_error( $response ) ) {
+            throw new Exception( json_encode( $response->errors ) );
+        }
+
+        if ( 200 !== $response_code && 201 !== $response_code ) {
+            throw new Exception( wp_remote_retrieve_body( $response ) );
+        }
+
+        return wp_remote_retrieve_body( $response );
+    }
+}
