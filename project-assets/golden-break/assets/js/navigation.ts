@@ -1,4 +1,3 @@
-import { SettingsMenu } from "./settings-menu";
 import { LanguageMenu } from "./language-menu";
 
 class Navigation {
@@ -29,7 +28,6 @@ class Navigation {
         } else {
           if (!isMobileMenu) {
             this.closeAllMenus();
-            SettingsMenu.closeSettingsMenu();
             LanguageMenu.closeLanguageMenu(); // Close the language menu
           }
           subMenu?.classList.add("open");
@@ -47,7 +45,6 @@ class Navigation {
     if (hamburgers) {
       hamburgers.forEach((hamburger) => {
         hamburger.addEventListener("click", () => {
-          SettingsMenu.closeSettingsMenu();
           LanguageMenu.closeLanguageMenu(); // Close the language menu
           this.closeAllSubMenus();
           const isOpen = hamburger
@@ -76,8 +73,6 @@ class Navigation {
       const menuItems = document.querySelectorAll(
         ".site-nav__menu .menu-item-has-children"
       );
-      const settingsButton = document.querySelectorAll(".settings__toggle");
-      const settingsMenu = document.querySelectorAll(".settings__menu");
       const languageButton = document.querySelectorAll(".language__toggle");
       const languageMenu = document.querySelectorAll(".language__menu");
       const commonMenu = document.querySelectorAll(".common-menu__menu");
@@ -86,12 +81,6 @@ class Navigation {
 
       const isClickInsideMenu = Array.from(menuItems).some((item) =>
         item.contains(target)
-      );
-      const isClickInsideSettingsMenu = Array.from(settingsMenu).some((menu) =>
-        menu.contains(target)
-      );
-      const isClickOnSettingsButton = Array.from(settingsButton).some(
-        (button) => button.contains(target)
       );
       const isClickInsideLanguageMenu = Array.from(languageMenu).some((menu) =>
         menu.contains(target)
@@ -112,15 +101,12 @@ class Navigation {
 
       if (
         !isClickInsideMenu &&
-        !isClickInsideSettingsMenu &&
-        !isClickOnSettingsButton &&
         !isClickOnHamburger &&
         !isClickOnNav &&
         !isClickInsideLanguageMenu &&
         !isClickOnLanguageButton &&
         !isClickOnCommonMenu
       ) {
-        SettingsMenu.closeSettingsMenu();
         LanguageMenu.closeLanguageMenu();
         this.closeAllMenus();
       }

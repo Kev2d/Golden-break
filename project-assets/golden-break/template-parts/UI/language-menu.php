@@ -1,6 +1,6 @@
 <?php
 // Fetch the languages
-$languages = function_exists('icl_get_languages') ? icl_get_languages('skip_missing=0&orderby=code') : array();
+$languages = function_exists('icl_get_languages') ? icl_get_languages('skip_missing=1&orderby=code') : array();
 
 if (!empty($languages) && count($languages) > 1) :
     // Find the active language
@@ -11,13 +11,18 @@ if (!empty($languages) && count($languages) > 1) :
             break;
         }
     }
+
+    $current_language = $current_language ?: reset($languages);
+    $current_language_code = strtoupper($current_language['language_code'] ?? '');
 ?>
 
     <nav aria-label="<?php _e('Language menu', 'golden-break'); ?>">
         <ul class="language-menu common-menu">
             <li class="language">
                 <button class="language__toggle common-menu__toggle" aria-haspopup="true" aria-expanded="false">
-                    <?php echo esc_html($current_language['native_name']); ?>
+                    <span aria-label="<?php echo esc_attr($current_language['native_name']); ?>">
+                        <?php echo esc_html($current_language_code); ?>
+                    </span>
                     <?php GetSvg::import('/assets/img/icons/chevron-down.svg'); ?>
                 </button>
                 <ul class="language__menu common-menu__menu" aria-hidden="true">
@@ -31,7 +36,14 @@ if (!empty($languages) && count($languages) > 1) :
                     </li>
                     <?php foreach ($languages as $lang) : ?>
                         <li>
-                            <a class="<?php echo $lang['active'] ? 'active' : ''; ?>" href="<?php echo esc_url($lang['url']); ?>" class="language-switcher-item">
+                            <a
+                                class="language-switcher-item<?php echo $lang['active'] ? ' active' : ''; ?>"
+                                href="<?php echo esc_url($lang['url']); ?>"
+                                hreflang="<?php echo esc_attr($lang['language_code']); ?>"
+                                lang="<?php echo esc_attr($lang['language_code']); ?>"
+                                aria-label="<?php echo esc_attr($lang['native_name']); ?>"
+                                <?php echo $lang['active'] ? 'aria-current="page"' : ''; ?>
+                            >
                                 <?php echo esc_html($lang['native_name']); ?>
                             </a>
                         </li>

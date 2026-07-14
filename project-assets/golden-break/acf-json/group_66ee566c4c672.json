@@ -343,5 +343,7 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1783365679
+    "modified": 1784016354,
+    "local_file": "\/var\/www\/html\/wp-content\/themes\/golden-break\/acf-json\/group_66ee566c4c672.json",
+    "acfml_field_group_mode": "advanced"
 }

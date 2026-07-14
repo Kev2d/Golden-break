@@ -1,4 +1,3 @@
-import { SettingsMenu } from "./settings-menu";
 import { navigation } from "./navigation";
 
 class ButtonFunctions {
@@ -9,9 +8,6 @@ class ButtonFunctions {
   }
 
   private static initializeFunctionButtons() {
-    const closeSettingsMenuButtons = document.querySelectorAll(
-      'button[data-function="settings-menu-back"]'
-    );
     const closeNavButtons = document.querySelectorAll(
       'button[data-function="close-nav-menu"]'
     );
@@ -26,13 +22,6 @@ class ButtonFunctions {
     const accordionButton = document.querySelectorAll(
       'button[data-function="accordion-toggle"]'
     );
-
-    closeSettingsMenuButtons.forEach((button) => {
-      button.addEventListener("click", (event) => {
-        event.preventDefault();
-        this.settingsMenuBack();
-      });
-    });
 
     closeNavButtons.forEach((button) => {
       button.addEventListener("click", (event) => {
@@ -61,10 +50,6 @@ class ButtonFunctions {
         this.toggleAccordion(button as HTMLElement);
       });
     });
-  }
-
-  static settingsMenuBack() {
-    SettingsMenu.closeSettingsMenu();
   }
 
   static closeNav() {

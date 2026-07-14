@@ -6,7 +6,7 @@
     width: 100%;
     min-height: 5rem;
 
-    @media (width <= $screen-sm-min) {
+    @media (width <=$screen-sm-min) {
         min-height: 3.5rem;
     }
 }
@@ -47,7 +47,7 @@
         transform: translateY(0);
     }
 
-    @media (width <= $screen-sm-min) {
+    @media (width <=$screen-sm-min) {
         min-height: 3.5rem;
         background-size: auto 3.5rem;
 
@@ -61,14 +61,14 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: clamp(1.25rem, 2vw, 3rem);
+        gap: 1rem;
         width: 100%;
         max-width: 80rem;
         min-height: 5rem;
         margin: 0 auto;
         padding: 0 2rem;
 
-        @media (width <= $screen-sm-min) {
+        @media (width <=$screen-sm-min) {
             min-height: 3.5rem;
             padding: 0 1rem;
         }
@@ -93,7 +93,8 @@
                 min-height: 0;
             }
 
-            @media (width <= $screen-sm-min) {
+            @media (width <=$screen-sm-min) {
+
                 svg,
                 img {
                     max-width: 4.75rem;
@@ -105,6 +106,7 @@
 
     &__nav {
         display: flex;
+        align-items: center;
         justify-content: flex-end;
         flex: 1 1 auto;
         min-width: 0;
@@ -159,14 +161,27 @@
 
     .language-menu {
         .language__toggle {
+            display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 0.25rem;
+            min-height: 2.25rem;
             color: $primary-color;
             font-size: 0.75rem;
             font-weight: 600;
+            line-height: 1;
             padding: 0.25rem 0.125rem;
 
+            span {
+                display: flex;
+                align-items: center;
+                line-height: 1;
+            }
+
             svg {
+                margin-top: -2px;
+                display: block;
+                flex: 0 0 0.6875rem;
                 width: 0.6875rem;
                 height: auto;
 

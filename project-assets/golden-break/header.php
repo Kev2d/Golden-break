@@ -16,7 +16,6 @@
 <body>
 <?php wp_body_open(); ?>
 
-<?php get_template_part('template-parts/UI/site-notification'); ?>
 <div class="site-header-slot">
 <header class="site-header">
 

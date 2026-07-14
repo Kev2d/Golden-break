@@ -1,9 +1,0 @@
-@use "../abstracts" as *;
-@use "../base" as *;
-
-.keweb-newsletter {
-    @media (width <= $screen-sm-min) {
-        @include full-viewport-width;
-        border-radius: 0;
-    }
-}

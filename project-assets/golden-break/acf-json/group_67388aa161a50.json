@@ -125,6 +125,7 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "acfml_field_group_mode": "translation",
-    "modified": 1783429000
+    "acfml_field_group_mode": "advanced",
+    "modified": 1784016354,
+    "local_file": "\/var\/www\/html\/wp-content\/themes\/golden-break\/acf-json\/group_67388aa161a50.json"
 }
