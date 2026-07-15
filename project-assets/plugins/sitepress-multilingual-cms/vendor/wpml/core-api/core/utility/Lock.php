@@ -5,6 +5,7 @@ namespace WPML\Utilities;
 use function WPML\Container\make;
 
 class Lock implements ILock {
+	private static $active_locks = [];
 
 	/** @var \wpdb  */
 	private $wpdb;
@@ -38,9 +39,18 @@ class Lock implements ILock {
 	 *                             Default: 1 hour.
 	 * @return bool False if a lock couldn't be created or if the lock is still valid. True otherwise.
 	 */
-	public function create( $release_timeout = null ) {
+	public function create( $release_timeout = null, $retry_limit = 10 ) {
 		if ( ! $release_timeout ) {
 			$release_timeout = HOUR_IN_SECONDS;
+		}
+
+		if ( isset( self::$active_locks[ $this->name ] ) ) {
+			// The lock for this type was already determinated.
+			// No matter if this request has the valid lock or not,
+			// only one task is allowed per type & request.
+			// REPLACE THIS WITH: return self::$active_locks[ $this->name ];
+			// as part of wpmldev-4141.
+			return false;
 		}
 
 		// Try to lock.
@@ -49,24 +59,33 @@ class Lock implements ILock {
 		if ( ! $lock_result ) {
 			$lock_result = get_option( $this->name );
 
-			// If a lock couldn't be created, and there isn't a lock, bail.
-			if ( ! $lock_result ) {
-				return false;
-			}
+			// No lock could be created and found
+			// OR the lock found is still valid (used by another request).
+			// => No lock for this request.
 
-			// Check to see if the lock is still valid. If it is, bail.
-			if ( $lock_result > ( time() - $release_timeout ) ) {
+			if ( ! $this->isValidLockTimeout($lock_result) ) {
+				// avoid to be locked out if the lock is empty in case of key corruption (db error/corruption)
+				// and set it as expired
+				$lock_result = 1;
+			}
+			if ( ! $lock_result || $lock_result > ( time() - $release_timeout ) ) {
+				self::$active_locks[ $this->name ] = false;
 				return false;
 			}
 
 			// There must exist an expired lock, clear it and re-gain it.
-			$this->release();
-
-			return $this->create( $release_timeout );
+			if ( $retry_limit <= 0 || ! $this->release() ) {
+				self::$active_locks[ $this->name ] = false;
+				return false;
+			}
+			// Using self to make sure only current create method is called if it is being called recursively.
+			return self::create( $release_timeout, $retry_limit - 1 );
 		}
 
 		// Update the lock, as by this point we've definitely got a lock, just need to fire the actions.
-		update_option( $this->name, time() );
+		update_option( $this->name, time(), false );
+
+		self::$active_locks[ $this->name ] = true;
 
 		return true;
 	}
@@ -77,6 +96,20 @@ class Lock implements ILock {
 	 * @return bool True if the lock was successfully released. False on failure.
 	 */
 	public function release() {
+		unset( self::$active_locks[ $this->name ] );
 		return delete_option( $this->name );
 	}
+
+	/**
+	 * Check if the lock result is a valid timeout.
+	 * @param mixed $lock_result
+	 * @return bool
+	 */
+	private function isValidLockTimeout( $lock_result ) {
+
+		return is_numeric( $lock_result ) && $lock_result > 0;
+
+	}
+
+
 }

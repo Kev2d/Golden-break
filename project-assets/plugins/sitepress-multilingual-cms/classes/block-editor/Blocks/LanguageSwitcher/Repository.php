@@ -12,7 +12,7 @@ class Repository {
 
 	public function __construct(
 		\SitePress $sitepress,
-		\WPML_LS_Dependencies_Factory $dependencies = null
+		?\WPML_LS_Dependencies_Factory $dependencies = null
 	) {
 		$dependencies = $dependencies ?: new \WPML_LS_Dependencies_Factory( $sitepress, \WPML_Language_Switcher::parameters() );
 

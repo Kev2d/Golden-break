@@ -13,18 +13,18 @@ class WPML_Taxonomy_Translation_UI {
 	/**
 	 * WPML_Taxonomy_Translation constructor.
 	 *
-	 * @param SitePress                      $sitepress
-	 * @param string                         $taxonomy if given renders a specific taxonomy,
+	 * @param SitePress                           $sitepress
+	 * @param string                              $taxonomy if given renders a specific taxonomy,
 	 *                                                 otherwise renders a placeholder
-	 * @param bool[]                         $args array with possible indices:
+	 * @param bool[]                              $args array with possible indices:
 	 *                                             'taxonomy_selector' => bool .. whether or not to show the taxonomy selector
-	 * @param WPML_UI_Screen_Options_Factory $screen_options_factory
+	 * @param WPML_UI_Screen_Options_Factory|null $screen_options_factory
 	 */
 	public function __construct(
 		SitePress $sitepress,
 		$taxonomy = '',
 		array $args = array(),
-		WPML_UI_Screen_Options_Factory $screen_options_factory = null
+		?WPML_UI_Screen_Options_Factory $screen_options_factory = null
 	) {
 		$this->sitepress    = $sitepress;
 		$this->tax_selector = isset( $args['taxonomy_selector'] ) ? $args['taxonomy_selector'] : true;

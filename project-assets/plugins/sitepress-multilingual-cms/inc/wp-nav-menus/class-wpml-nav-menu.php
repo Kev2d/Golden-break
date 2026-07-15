@@ -74,8 +74,8 @@ class WPML_Nav_Menu {
 		if ( $pagenow === 'nav-menus.php' ) {
 			add_action( 'admin_footer', array( $this, 'nav_menu_language_controls' ), 10 );
 
-			wp_enqueue_script( 'wp_nav_menus', ICL_PLUGIN_URL . '/res/js/wp-nav-menus.js', array( 'jquery' ), ICL_SITEPRESS_VERSION, true );
-			wp_enqueue_style( 'wp_nav_menus_css', ICL_PLUGIN_URL . '/res/css/wp-nav-menus.css', array(), ICL_SITEPRESS_VERSION, 'all' );
+			wp_enqueue_script( 'wp_nav_menus', ICL_PLUGIN_URL . '/res/js/wp-nav-menus.js', array( 'jquery' ), ICL_SITEPRESS_SCRIPT_VERSION, true );
+			wp_enqueue_style( 'wp_nav_menus_css', ICL_PLUGIN_URL . '/res/css/wp-nav-menus.css', array(), ICL_SITEPRESS_SCRIPT_VERSION, 'all' );
 
 			// filter posts by language
 			add_action( 'parse_query', array( $this, 'action_parse_query' ) );
@@ -418,7 +418,7 @@ class WPML_Nav_Menu {
 					jQuery(document).ready(function () {
 						addLoadEvent(function () {
 							var update_menu_form = jQuery('#update-nav-menu');
-							update_menu_form.find('.publishing-action:first').before('<?php echo addslashes_gpc( $langsel ); ?>');
+							update_menu_form.find('.publishing-action:first').before(<?php echo wp_json_encode( $langsel ); ?>);
 							jQuery('#side-sortables').before('<?php $this->languages_menu(); ?>');
 				<?php if ( $this->current_lang != $default_language ) : ?>
 							jQuery('.nav-tabs .nav-tab').each(function () {

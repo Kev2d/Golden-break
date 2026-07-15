@@ -33,7 +33,7 @@ class WPML_TM_Ajax_Factory extends WPML_Ajax_Factory {
 						$this->wpdb,
 						$ICL_Pro_Translation
 					),
-					defined( 'WPML_ST_VERSION' )
+					wpml_is_st_loaded()
 						? new WPML_Translate_Link_Targets_In_Strings_Global(
 							new WPML_Translate_Link_Target_Global_State( $this->sitepress ),
 							$this->wpdb,

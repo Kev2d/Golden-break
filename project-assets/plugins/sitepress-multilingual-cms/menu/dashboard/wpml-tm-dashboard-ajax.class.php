@@ -1,7 +1,5 @@
 <?php
 
-use WPML\TM\API\Basket;
-
 class WPML_Dashboard_Ajax {
 
 	public function enqueue_js() {
@@ -9,7 +7,7 @@ class WPML_Dashboard_Ajax {
 			'wpml-tm-dashboard-scripts',
 			WPML_TM_URL . '/res/js/tm-dashboard/wpml-tm-dashboard.js',
 			array( 'jquery', 'backbone', 'wpml-tm-progressbar' ),
-			ICL_SITEPRESS_VERSION
+			ICL_SITEPRESS_SCRIPT_VERSION
 		);
 		$wpml_tm_strings = $this->get_wpml_tm_script_js_strings();
 		wp_localize_script( 'wpml-tm-dashboard-scripts', 'wpml_tm_strings', $wpml_tm_strings );
@@ -21,9 +19,7 @@ class WPML_Dashboard_Ajax {
 
 	private function get_wpml_tm_script_js_strings() {
 		$wpml_tm_strings = array(
-			'BB_default'                     => Basket::shouldUse()
-				? __( 'Add selected content to translation basket', 'wpml-translation-management' )
-				: __( 'Translate selected content', 'wpml-translation-management' ),
+			'BB_default'                     => __( 'Translate selected content', 'wpml-translation-management' ),
 			'BB_mixed_actions'               => __(
 				'Add selected content to translation basket / Duplicate',
 				'wpml-translation-management'

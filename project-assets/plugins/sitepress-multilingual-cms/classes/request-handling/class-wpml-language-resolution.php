@@ -60,8 +60,9 @@ class WPML_Language_Resolution {
 			} elseif ( $this->use_cookie_language() ) {
 				$lang = $wpml_request_handler->get_cookie_lang();
 			}
+
+			$this->current_request_lang = $this->filter_for_legal_langs( $lang );
 		}
-		$this->current_request_lang = $this->filter_for_legal_langs( $lang );
 
 		return $this->current_request_lang;
 	}
@@ -75,12 +76,20 @@ class WPML_Language_Resolution {
 	public function is_language_hidden( $lang_code ) {
 		$this->maybe_reload();
 
+		if ( null === $lang_code ) {
+			return false;
+		}
+
 		return isset( $this->hidden_lang_codes[ $lang_code ] );
 	}
 
 	public function is_language_active( $lang_code, $is_all_active = false ) {
 		global $wpml_request_handler;
 		$this->maybe_reload();
+
+		if ( null === $lang_code ) {
+			return false;
+		}
 
 		return ( $is_all_active === true && $lang_code === 'all' )
 			   || isset( $this->active_language_codes[ $lang_code ] )
@@ -134,7 +143,11 @@ class WPML_Language_Resolution {
 			return 'all';
 		}
 
-		if ( ! isset( $this->hidden_lang_codes[ $lang ] ) && ! isset( $this->active_language_codes[ $lang ] ) ) {
+		if ( null === $lang ) {
+			$lang = $this->default_lang ? $this->default_lang : icl_get_setting( 'default_language' );
+		}
+
+		if ( null !== $lang && ! isset( $this->hidden_lang_codes[ $lang ] ) && ! isset( $this->active_language_codes[ $lang ] ) ) {
 			$lang = $this->default_lang ? $this->default_lang : icl_get_setting( 'default_language' );
 		}
 

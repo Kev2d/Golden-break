@@ -44,6 +44,10 @@ class SyncTranslationDocumentStatus implements \IWPML_Action, \IWPML_DIC_Action,
 		}
 
 		foreach ( $postTranslations as $sourceLangCode => $data ) {
+			if( ! $data->element_id ) {
+				continue;
+			}
+
 			wp_update_post( ['ID' => $data->element_id, 'post_status' => $newStatus] );
 		}
 	}

@@ -22,7 +22,7 @@ class WPML_LS_Templates {
 	/** @var boolean $are_templates_loaded_from_cache */
 	private $are_templates_loaded_from_cache = false;
 
-	public function __construct( WPML_File $wpml_file = null ) {
+	public function __construct( ?WPML_File $wpml_file = null ) {
 		if ( ! $wpml_file ) {
 			$wpml_file = new WPML_File();
 		}

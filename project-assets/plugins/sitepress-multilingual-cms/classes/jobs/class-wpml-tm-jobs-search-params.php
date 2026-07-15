@@ -538,7 +538,7 @@ class WPML_TM_Jobs_Search_Params {
 	 *
 	 * @return $this
 	 */
-	public function set_needs_update( WPML_TM_Jobs_Needs_Update_Param $needs_update = null ) {
+	public function set_needs_update( ?WPML_TM_Jobs_Needs_Update_Param $needs_update = null ) {
 		$this->needs_update = $needs_update;
 
 		return $this;

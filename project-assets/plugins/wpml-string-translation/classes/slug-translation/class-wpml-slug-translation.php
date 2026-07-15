@@ -3,6 +3,7 @@
 class WPML_Slug_Translation implements IWPML_Action {
 
 	const STRING_DOMAIN = 'WordPress';
+	const CACHE_GROUP   = 'wpml-string-slug';
 
 	/** @var array $post_link_cache */
 	private $post_link_cache = array();
@@ -122,9 +123,19 @@ class WPML_Slug_Translation implements IWPML_Action {
 		}
 
 		if ( ! $this->sitepress->is_translated_post_type( $post->post_type )
-			 || ! ( $ld = $this->sitepress->get_element_language_details( $post->ID, 'post_' . $post->post_type ) )
+			|| ! ( $ld = $this->sitepress->get_element_language_details( $post->ID, 'post_' . $post->post_type ) )
 		) {
 			return $post_link;
+		}
+
+		$current_language = $this->sitepress->get_current_language();
+		$default_language = $this->sitepress->get_default_language();
+		if (
+			$current_language !== $default_language &&
+			$this->sitepress->is_display_as_translated_post_type( $post->post_type ) &&
+			null === $ld->source_language_code // Apply to original post only.
+		) {
+			$ld->language_code = $current_language;
 		}
 
 		$ld = apply_filters( 'wpml_st_post_type_link_filter_language_details', $ld );
@@ -208,7 +219,7 @@ class WPML_Slug_Translation implements IWPML_Action {
 			$types     = $post_slug_translation_settings['types'];
 			$cache_key = 'WPML_Slug_Translation::get_all_slug_translations' . md5( (string) json_encode( $types ) );
 
-			$slug_translations = wp_cache_get( $cache_key );
+			$slug_translations = wp_cache_get( $cache_key, self::CACHE_GROUP );
 
 			if ( ! is_array( $slug_translations ) ) {
 				$slug_translations = array();
@@ -234,7 +245,7 @@ class WPML_Slug_Translation implements IWPML_Action {
 					}
 				}
 
-				wp_cache_set( $cache_key, $slug_translations );
+				wp_cache_set( $cache_key, $slug_translations, self::CACHE_GROUP );
 			}
 		}
 

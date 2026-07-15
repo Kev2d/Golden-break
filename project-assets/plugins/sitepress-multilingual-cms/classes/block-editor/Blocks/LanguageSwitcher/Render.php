@@ -54,7 +54,8 @@ class Render {
 				$languageItem,
 				$languageSwitcherTemplate,
 				$parentBlock,
-				$context
+				$context,
+				$blockAttrs
 			);
 		}
 
@@ -62,10 +63,13 @@ class Render {
 	}
 
 	/**
-	 * @param LanguageItemTemplate $languageItemTemplate
-	 * @param string $XPathPrefix
-	 * @param LanguageItem $languageItem
+	 * @param LanguageItemTemplate     $languageItemTemplate
+	 * @param string                   $XPathPrefix
+	 * @param LanguageItem             $languageItem
 	 * @param LanguageSwitcherTemplate $languageSwitcherTemplate
+	 * @param \WP_Block                $sourceBlock
+	 * @param array                    $context
+	 * @param array                    $blockAttrs
 	 *
 	 * @return \DOMNode|null
 	 */
@@ -75,7 +79,8 @@ class Render {
 		LanguageItem $languageItem,
 		LanguageSwitcherTemplate $languageSwitcherTemplate,
 		$sourceBlock,
-		$context
+		$context,
+		$blockAttrs
 	) {
 		$template  = $languageItemTemplate->getTemplate();
 		$container = $languageItemTemplate->getContainer();
@@ -91,6 +96,9 @@ class Render {
 		if ( $linkQuery->length > 0 ) {
 			$link = $linkQuery->item( $linkQuery->length - 1 );
 			$link->setAttribute( 'href', $languageItem->getUrl() );
+			/* translators: %s: language name */
+			$ariaLabel = sprintf( __( 'Switch to %s', 'sitepress' ), $languageItem->getNativeName() );
+			$link->setAttribute( 'aria-label', $ariaLabel );
 			$textTarget = $link;
 		}
 
@@ -108,10 +116,14 @@ class Render {
 
 		$flagQuery = $languageSwitcherTemplate->getDOMXPath()->query( $XPathPrefix . '/' . Parser::PATH_ITEM_FLAG_URL );
 		if ( $flagQuery->length > 0 ) {
-			$flag = $flagQuery->item( $flagQuery->length - 1 );
+			$flag       = $flagQuery->item( $flagQuery->length - 1 );
+			$flagWidth  = ! empty( $blockAttrs['flagWidth'] ) ? $blockAttrs['flagWidth'] : 18;
+			$flagHeight = ! empty( $blockAttrs['flagHeight'] ) ? $blockAttrs['flagHeight'] : 12;
 
 			if ( $flag ) {
 				$flag->setAttribute( 'src', $languageItem->getFlagUrl() );
+				$flag->setAttribute( 'width', $flagWidth );
+				$flag->setAttribute( 'height', $flagHeight );
 			}
 		}
 

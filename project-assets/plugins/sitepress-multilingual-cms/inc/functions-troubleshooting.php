@@ -29,6 +29,7 @@ function icl_reset_wpml( $blog_id = false ) {
 			$wpdb->prefix . 'icl_translations',
 			$wpdb->prefix . 'icl_translation_status',
 			$wpdb->prefix . 'icl_translate_job',
+			$wpdb->prefix . 'icl_translate_unsolvable_jobs',
 			$wpdb->prefix . 'icl_translate',
 			$wpdb->prefix . 'icl_locale_map',
 			$wpdb->prefix . 'icl_flags',
@@ -75,6 +76,7 @@ function icl_reset_wpml( $blog_id = false ) {
 			'wpml_config_index',
 			'wpml_config_index_updated',
 			'wpml_config_files_arr',
+			\WPML_Config_Update::OPTION_KEY_GLOBAL_NOTICES_CONFIG,
 			'wpml_language_switcher',
 			'wpml_notices',
 			'wpml_start_version',
@@ -96,6 +98,8 @@ function icl_reset_wpml( $blog_id = false ) {
 			'wpml-tm-custom-xml',
 			'wpml-st-persist-errors',
 			'wpml_base_slug_translation',
+			'wpml_ate_auto_migration_data',
+			'wpml_ate_auto_migration_failed',
 		);
 		$wpml_options = apply_filters( 'wpml_reset_options', $wpml_options, $blog_id );
 
@@ -174,7 +178,7 @@ function icl_reset_wpml( $blog_id = false ) {
 		if ( ! isset( $wpmu_sitewide_plugins[ WPML_PLUGIN_BASENAME ] ) ) {
 			remove_action( 'deactivate_' . WPML_PLUGIN_BASENAME, 'icl_sitepress_deactivate' );
 			deactivate_plugins( WPML_PLUGIN_BASENAME );
-			$ra                         = get_option( 'recently_activated' );
+			$ra                         = (array) get_option( 'recently_activated' );
 			$ra[ WPML_PLUGIN_BASENAME ] = time();
 			update_option( 'recently_activated', $ra );
 		} else {

@@ -40,11 +40,28 @@ class Manual {
 			}
 
 			if ( $postId && $this->can_user_translate( $sourceLangCode, $targetLanguageCode, $postId ) ) {
-				return $this->markJobAsManual( $this->createLocalJob( $postId, $sourceLangCode, $targetLanguageCode, $elementType ) );
+				$createdJob = $this->markJobAsManual( $this->createLocalJob( $postId, $sourceLangCode, $targetLanguageCode, $elementType ) );
+				if ( $createdJob ) {
+					JobLog::add( 'manual_editor_job_prepared', [
+						'job_id'      => JobLog::safeCall( $createdJob, 'get_id' ),
+						'post_id'     => $postId,
+						'target_lang' => $targetLanguageCode,
+						'reused'      => false,
+					] );
+				}
+				return $createdJob;
 			}
 		}
 
-		return $jobId ? $this->markJobAsManual( wpml_tm_load_job_factory()->get_translation_job_as_active_record( $jobId ) ) : null;
+		$reusedJob = $jobId ? $this->markJobAsManual( wpml_tm_load_job_factory()->get_translation_job_as_active_record( $jobId ) ) : null;
+		if ( $reusedJob ) {
+			JobLog::add( 'manual_editor_job_prepared', [
+				'job_id'      => JobLog::safeCall( $reusedJob, 'get_id' ),
+				'target_lang' => $targetLanguageCode,
+				'reused'      => true,
+			] );
+		}
+		return $reusedJob;
 	}
 
 	/**
@@ -114,10 +131,17 @@ class Manual {
 		$languageCode = (string) filter_var( Obj::prop( 'language_code', $params ), FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
 		$job = null;
-		if ( $jobId ) {
-			$job = Jobs::get( $jobId );
-		} else if ( $trid && $languageCode ) {
+
+		/**
+		 * Get the last created job from trid and language code to prevent displaying the old job content
+		 * after reloading the CTE translation page.
+		 *
+		 * @see https://onthegosystems.myjetbrains.com/youtrack/issue/wpmldev-2433
+		 */
+		if ( $trid && $languageCode ) {
 			$job = Jobs::getTridJob( $trid, $languageCode );
+		} elseif ( $jobId ) {
+			$job = Jobs::get( $jobId );
 		}
 
 		if ( is_object( $job ) ) {

@@ -7,7 +7,7 @@ class ICanLocalizeQuery {
 	private $sitepress;
 	private $wpml_icl_client;
 
-	function __construct( $site_id = null, $access_key = null, SitePress $sitepress = null, $wpml_icl_client = null ) {
+	function __construct( $site_id = null, $access_key = null, ?SitePress $sitepress = null, $wpml_icl_client = null ) {
 		$this->site_id    = $site_id;
 		$this->access_key = $access_key;
 		if ( null === $sitepress ) {

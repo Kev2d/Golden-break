@@ -102,8 +102,12 @@ class WPML_URL_Converter_Subdir_Strategy extends WPML_URL_Converter_Abstract_Str
 		$code             = $this->get_language_of_current_dir( $code, '' );
 		$current_language = $this->get_language_of_current_dir( $current_language, '' );
 
-		$code             = isset( $this->language_codes_map[ $code ] ) ? $this->language_codes_map[ $code ] : $code;
-		$current_language = isset( $this->language_codes_map[ $current_language ] ) ? $this->language_codes_map[ $current_language ] : $current_language;
+		$code = null !== $code && isset( $this->language_codes_map[ $code ] )
+			? $this->language_codes_map[ $code ]
+			: $code;
+		$current_language = null !== $current_language && isset( $this->language_codes_map[ $current_language ] )
+			? $this->language_codes_map[ $current_language ]
+			: $current_language;
 
 		$source_url = str_replace(
 			[

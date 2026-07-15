@@ -3,7 +3,9 @@
    "locale_data": {
       "messages": {
          "": {
-            "domain": "messages"
+            "domain": "messages",
+            "plural_forms": "nplurals=2; plural=(n != 1);",
+            "lang": "sv_SE"
          },
          "Advanced": [
             "Avancerat"
@@ -12,7 +14,7 @@
             "HTML-ankare"
          ],
          "Add a shortcut to this block when loading the page using the “#anchor” URL.": [
-            "Lägg till en genväg till det här blocket när du ladder sidan med hjälp av URL \"#anchor\"."
+            "Lägg till en genväg till det här blocket när sidan laddas med URL:en “#anchor”."
          ],
          "Additional CSS class(es)": [
             "Ytterligare CSS-klass(er)"
@@ -23,8 +25,14 @@
          "Color": [
             "Färg"
          ],
+         "px": [
+            "px"
+         ],
+         "%": [
+            "%"
+         ],
          "Dimensions": [
-            "Dimensioner"
+            "Mått"
          ],
          "BLOCK": [
             "BLOCK"
@@ -39,28 +47,28 @@
             "SPRÅK"
          ],
          "Language spacing": [
-            "Språk avstånd"
+            "Språkmellanrum"
          ],
          "Language padding": [
             "Språkutfyllnad"
          ],
          "Display": [
-            "Bildskärm"
+            "Visa"
          ],
          "Show flag": [
             "Visa flagga"
          ],
          "Show language name": [
-            "Visa språknamn"
+            "Visa språkets namn"
          ],
          "Display language name in": [
-            "Visa språknamnet i"
+            "Visa språkets namn i"
          ],
          "Style": [
             "Stil"
          ],
          "Flag settings": [
-            "Flagginställningar"
+            "Flagga inställningar"
          ],
          "Width": [
             "Bredd"
@@ -69,16 +77,22 @@
             "Höjd"
          ],
          "Spacing": [
-            "Avstånd"
+            "Mellanrum"
+         ],
+         "Switch to %s": [
+            "Byt till %s"
+         ],
+         "Available languages": [
+            "Tillgängliga språk"
          ],
          "Allow wrapping to multiple lines": [
-            "Tillåt radbrytning till flera rader"
+            "Tillåt radbrytning"
          ],
          "Open on click": [
             "Öppna vid klick"
          ],
          "Show arrow": [
-            "Visa pilen"
+            "Visa pil"
          ],
          "Layout": [
             "Layout"
@@ -89,6 +103,12 @@
          "Orientation": [
             "Orientering"
          ],
+         "Language Switcher": [
+            "Språkväljare"
+         ],
+         "Language switcher, press tab to navigate to other languages": [
+            "Språkväljare, tryck på tab för att navigera till andra språk"
+         ],
          "Typography": [
             "Typografi"
          ],
@@ -96,34 +116,34 @@
             "Bakgrund"
          ],
          "Language Text": [
-            "Språk Text"
+            "Språktext"
          ],
          "Language Background": [
             "Språkbakgrund"
          ],
          "Current language text": [
-            "Text på aktuellt språk"
+            "Aktuell språktext"
          ],
          "Current language background": [
             "Aktuell språkbakgrund"
          ],
          "Full name": [
-            "Fullt namn"
+            "Fullständigt namn"
          ],
          "Code": [
             "Kod"
          ],
          "Justify items left": [
-            "Justera object till vänster"
+            "Justera objekt vänster"
          ],
          "Justify items center": [
-            "Justera object i mitten"
+            "Justera objekt center"
          ],
          "Justify items right": [
-            "Justera object till höger"
+            "Justera objekt höger"
          ],
          "Justify items space between": [
-            "Justera object med mellanslag mellan"
+            "Justera objekt med jämnt mellanrum"
          ],
          "Horizontal": [
             "Horisontell"
@@ -135,31 +155,37 @@
             "Normal"
          ],
          "Medium": [
-            "Medelstor"
+            "Medium"
          ],
          "Large": [
             "Stor"
          ],
          "X-Large": [
-            "X-Large"
+            "X-stor"
+         ],
+         "Ab": [
+            "Ab"
+         ],
+         "AB": [
+            "AB"
+         ],
+         "ab": [
+            "ab"
          ],
          "Small": [
             "Liten"
          ],
          "Displays the WPML Language Switcher.": [
-            "Visar WPML:s språkväxlare."
-         ],
-         "Language Switcher": [
-            "Språkväxlare"
+            "Visar WPML-språkväljaren."
          ],
          "displays the WPML Language Switcher": [
-            "visar WPML-språkväxlaren "
+            "visar WPML-språkväljaren"
          ],
          "Displays the WPML Language Switcher. <br/> Learn <a>how to translate this block</a>.": [
-            "Visar WPML-språkväxlaren <br/> Lär dig <a>att översätta detta block</a>."
+            "Visar WPML-språkväljaren. <br/> Lär dig <a>hur du översätter det här blocket</a>."
          ],
          "Navigation Language Switcher": [
-            "Språkväxlare för navigering"
+            "Navigeringsspråkväljare"
          ],
          "Reset all": [
             "Återställ alla"

@@ -30,7 +30,7 @@ class Cache {
 		self::macro( 'get', curryN( 2, [ self::class, 'getInternal' ] ) );
 
 		self::macro( 'set', curryN( 4, function ( $group, $key, $expire, $value ) {
-			$keys = self::getKeysInGroup( $group );
+			$keys = self::getKeysInGroup( $group, true );
 			if ( ! in_array( $key, $keys, true ) ) {
 				$keys[] = $key;
 				\wp_cache_set( $group, [ 'data' => $keys ], self::KEYS );
@@ -64,12 +64,13 @@ class Cache {
 	/**
 	 * @param string $group
 	 * @param string $key
+	 * @param bool   $force
 	 *
 	 * @return \WPML\FP\Just|\WPML\FP\Nothing
 	 */
-	public static function getInternal( $group, $key ) {
+	public static function getInternal( $group, $key, $force = false ) {
 		$found  = false;
-		$result = wp_cache_get( $key, $group, false, $found );
+		$result = wp_cache_get( $key, $group, $force, $found );
 
 		if ( $found && is_array( $result ) && array_key_exists( 'data', $result ) ) {
 			return Maybe::just( $result['data'] );
@@ -80,11 +81,12 @@ class Cache {
 
 	/**
 	 * @param string $group
+	 * @param bool   $force
 	 *
 	 * @return void
 	 */
-	public static function flushGroup( $group ) {
-		$keys = self::getKeysInGroup( $group );
+	public static function flushGroup( $group, $force = false ) {
+		$keys = self::getKeysInGroup( $group, $force );
 
 		foreach ( $keys as $key ) {
 			wp_cache_delete( $key, $group );
@@ -126,7 +128,7 @@ class Cache {
 	public static function delete( $group, $key ) {
 		wp_cache_delete( $key, $group );
 
-		$keys = self::getKeysInGroup( $group );
+		$keys = self::getKeysInGroup( $group, true );
 		$keys = array_values( array_diff( $keys, [ $key ] ) );
 		wp_cache_set( $group, [ 'data' => $keys ], self::KEYS );
 	}
@@ -137,8 +139,8 @@ class Cache {
 	 *
 	 * @return array
 	 */
-	public static function getKeysInGroup( $group ) {
-		return self::getInternal( self::KEYS, $group )->getOrElse( [] );
+	public static function getKeysInGroup( $group, $force = false ) {
+		return self::getInternal( self::KEYS, $group, $force )->getOrElse( [] );
 	}
 
 	/**

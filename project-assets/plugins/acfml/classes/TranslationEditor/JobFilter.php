@@ -2,6 +2,7 @@
 
 namespace ACFML\TranslationEditor;
 
+use ACFML\FieldGroup\FieldNamePatterns;
 use ACFML\Strings\Config;
 use ACFML\Strings\Factory as StringsFactory;
 use ACFML\Strings\Package;
@@ -10,9 +11,7 @@ use WPML\FP\Fns;
 use WPML\FP\Str;
 use WPML\FP\Obj;
 
-use function WPML\FP\pipe;
-
-class JobFilter implements \IWPML_Backend_Action, \IWPML_Frontend_Action {
+class JobFilter implements \IWPML_Backend_Action, \IWPML_Frontend_Action, \IWPML_DIC_Action {
 
 	const ACF_TOP_LEVEL_GROUP_ID    = 'acf';
 	const ACF_TOP_LEVEL_GROUP_TITLE = 'Advanced Custom Fields (ACF)';
@@ -25,6 +24,15 @@ class JobFilter implements \IWPML_Backend_Action, \IWPML_Frontend_Action {
 
 	/** @var array */
 	private $jobToGroupId = [];
+
+	/**
+	 * @var FieldNamePatterns $fieldNamePatterns
+	 */
+	private $fieldNamePatterns;
+
+	public function __construct( FieldNamePatterns $fieldNamePatterns ) {
+		$this->fieldNamePatterns = $fieldNamePatterns;
+	}
 
 	public function add_hooks() {
 		add_filter( 'wpml_tm_adjust_translation_fields', [ $this, 'addTitleAndGroupInfo' ], 10, 2 );
@@ -52,11 +60,10 @@ class JobFilter implements \IWPML_Backend_Action, \IWPML_Frontend_Action {
 	 * @return array
 	 */
 	private function processField( $field, $job ) {
-		$fieldTitle                          = (string) Obj::prop( 'title', $field );
-		$groupIdFromJob                      = $this->getGroupIdFromJob( $job );
-		list( $groupId, , $namespace, $key ) = TranslationJobFilter::parseFieldName( $fieldTitle, $groupIdFromJob );
-		$isSimpleLabel                       = $groupId && $namespace && $key;
-		$getRepeaterParts                    = Str::match( '/field-(\w+)_(\d+)_(\w+)-\d+/' );
+		$fieldTitle                           = (string) Obj::prop( 'title', $field );
+		$groupKeyFromJob                      = $this->getGroupKeyFromJob( $job );
+		list( $groupKey, , $namespace, $key ) = TranslationJobFilter::parseFieldName( $fieldTitle, $groupKeyFromJob );
+		$isSimpleLabel                        = $groupKey && $namespace && $key;
 
 		$matchSpecialLabels = function( $string ) {
 			return wpml_collect( self::SPECIAL_LABELS )
@@ -66,17 +73,10 @@ class JobFilter implements \IWPML_Backend_Action, \IWPML_Frontend_Action {
 
 		if ( $isSimpleLabel ) {
 			$label = Obj::prop( 'title', Config::get( $namespace, $key ) );
-			$field = $this->handleFieldLabels( $field, $label, $fieldTitle, $groupId );
+			$field = $this->handleFieldLabels( $field, $label, $fieldTitle, $groupKey );
 		} elseif ( $matchSpecialLabels( $fieldTitle ) ) {
 			$prefix = $matchSpecialLabels( $fieldTitle );
 			$field  = $this->handleSpecialLabels( $field, $prefix );
-		} elseif ( $getRepeaterParts( $field['field_type'] ) ) {
-			list( , $group, $groupId, $title ) = $getRepeaterParts( $field['field_type'] );
-
-			$fieldGroup = get_field_object( $group, $job->original_doc_id );
-			if ( false !== $fieldGroup ) {
-				$field = $this->handleRepeaters( $field, $group . '_' . $groupId, $title, $fieldGroup['label'] );
-			}
 		} else {
 			$field = $this->handleContent( $field, $job );
 		}
@@ -88,19 +88,19 @@ class JobFilter implements \IWPML_Backend_Action, \IWPML_Frontend_Action {
 	 * @param array  $field
 	 * @param string $label
 	 * @param string $title
-	 * @param int    $groupId
+	 * @param string $groupKey
 	 *
 	 * @return array
 	 */
-	private function handleFieldLabels( $field, $label, $title, $groupId ) {
+	private function handleFieldLabels( $field, $label, $title, $groupKey ) {
 		$field['title'] = $label ?: $title;
 		$field['group'] = [
 			self::ACF_TOP_LEVEL_GROUP_ID => self::ACF_TOP_LEVEL_GROUP_TITLE,
 		];
 
-		$fieldGroup = acf_get_field_group( $groupId );
+		$fieldGroup = acf_get_field_group( $groupKey );
 
-		$field['group'][ 'acf_labels_' . $groupId ] = sprintf( '%s Labels', $fieldGroup['title'] );
+		$field['group'][ 'acf_labels_' . $groupKey ] = sprintf( '%s Labels', $fieldGroup['title'] );
 
 		return $field;
 	}
@@ -111,33 +111,15 @@ class JobFilter implements \IWPML_Backend_Action, \IWPML_Frontend_Action {
 	 *
 	 * @return array
 	 */
-	public function handleSpecialLabels( $field, $prefix ) {
+	private function handleSpecialLabels( $field, $prefix ) {
 		$field['group'] = [
 			self::ACF_TOP_LEVEL_GROUP_ID => self::ACF_TOP_LEVEL_GROUP_TITLE,
 			$prefix . '-labels'          => self::SPECIAL_LABELS[ $prefix ] . ' Labels',
 		];
 		$field['title'] = substr( $field['title'], strlen( $prefix ) );
 		$field['title'] = preg_replace( '/-[0-9a-f]+$/', '', $field['title'] );
-		$field['title'] = str_replace( [ '-', '_' ], [ ' ', ' ' ], $field['title'] );
-		$field['title'] = ucwords( trim( $field['title'] ) );
-
-		return $field;
-	}
-
-	/**
-	 * @param array  $field
-	 * @param string $groupId
-	 * @param string $title
-	 * @param string $group
-	 *
-	 * @return array
-	 */
-	private function handleRepeaters( $field, $groupId, $title, $group ) {
-		$field['title'] = ucwords( str_replace( [ '-', '_' ], [ ' ', ' ' ], $title ) );
-		$field['group'] = [
-			self::ACF_TOP_LEVEL_GROUP_ID => self::ACF_TOP_LEVEL_GROUP_TITLE,
-			$groupId                     => $group,
-		];
+		$field['title'] = apply_filters( 'wpml_labelize_string', $field['title'] );
+		$field['title'] = trim( $field['title'] );
 
 		return $field;
 	}
@@ -150,34 +132,135 @@ class JobFilter implements \IWPML_Backend_Action, \IWPML_Frontend_Action {
 	 */
 	private function handleContent( $field, $job ) {
 		$fieldName   = Str::match( '/^field-(.*?)-\d+$/', $field['field_type'] );
-		$fieldName   = $fieldName ? $fieldName[1] : $field['field_type'];
-		$fieldObject = get_field_object( $fieldName, $job->original_doc_id );
-		if ( false !== $fieldObject ) {
-			$field['title'] = $fieldObject['label'];
-			$field['group'] = [
-				self::ACF_TOP_LEVEL_GROUP_ID => self::ACF_TOP_LEVEL_GROUP_TITLE,
-			];
+		$customField = $fieldName ? $fieldName[1] : '';
 
-			$parentId   = $fieldObject['parent'];
-			$fieldGroup = acf_get_field_group( $parentId );
+		if ( $customField ) {
+			return $this->handleCustomField( $field, $job->original_doc_id, $customField );
+		}
 
-			if ( $fieldGroup ) {
-				$field['group'][ $fieldGroup['key'] ] = $fieldGroup['title'];
-			}
+		$optionFieldName = Str::match( '/^options-(.*?)-(field_(.*?))-(.*?)$/', $field['field_type'] );
+		$optionField     = $optionFieldName ? $optionFieldName[1] : '';
+
+		if ( $optionField ) {
+			return $this->handleCustomField( $field, 'options', $optionField );
 		}
 
 		return $field;
 	}
 
 	/**
+	 * @param array      $field
+	 * @param int|string $objectId
+	 * @param string     $customField
+	 *
+	 * @return array
+	 */
+	private function handleCustomField( array $field, $objectId, string $customField ) {
+		$acfObject = get_field_object( $customField, $objectId );
+
+		if ( false !== $acfObject ) {
+			$parentId   = $acfObject['parent'];
+			$fieldGroup = acf_get_field_group( $parentId );
+
+			return $this->handleAcfField( $field, $objectId, $acfObject, $fieldGroup );
+		}
+
+		return $field;
+	}
+
+	/**
+	 * @param array       $field
+	 * @param int|string  $objectId
+	 * @param array       $acfObject
+	 * @param array|false $fieldGroup
+	 *
+	 * @return array
+	 */
+	private function handleAcfField( array $field, $objectId, array $acfObject, $fieldGroup ) {
+		if ( ! $fieldGroup ) {
+			return $this->handleAcfSubField( $field, $objectId, $acfObject, acf_get_field_group( $this->getGroupKeyWithPatterns( $acfObject['name'] ) ) );
+		}
+
+		$field['title'] = $acfObject['label'];
+		$field['group'] = [
+			self::ACF_TOP_LEVEL_GROUP_ID => self::ACF_TOP_LEVEL_GROUP_TITLE,
+			$fieldGroup['key']           => $fieldGroup['title'],
+		];
+
+		return $field;
+	}
+
+	/**
+	 * @param array       $field
+	 * @param int|string  $objectId
+	 * @param array       $acfObject
+	 * @param array|false $fieldGroup
+	 *
+	 * @return array
+	 */
+	private function handleAcfSubField( array $field, $objectId, array $acfObject, $fieldGroup = false ) {
+		$parent = $acfObject['parent'];
+		$title  = $acfObject['label'];
+		$index  = '';
+
+		$isTopLevelField = function( $id ) {
+			return (bool) acf_get_field_group( $id );
+		};
+
+		while ( ! $isTopLevelField( $parent ) ) {
+			$parentName = Str::match( '/^(.*)_(\d+)_' . $acfObject['_name'] . '$/', $acfObject['name'] );
+			if ( $parentName ) {
+				$index = ' #' . ( $parentName[2] + 1 );
+			} else {
+				$parentName = Str::match( '/^(.*)_' . $acfObject['_name'] . '$/', $acfObject['name'] );
+			}
+
+			// TODO Check how ATE shows fields in layouts for posts.
+			// TODO We are not adding proper layout labels or groups, this only works for repeater fields actually.
+			// TODO Check if we do so for layours inside post fields?
+			$parentObject = get_field_object( $parentName[1], $objectId );
+			if ( ! $parentObject ) {
+				break;
+			}
+
+			$fieldTitle = $parentObject['label'] . $index;
+			$title      = $fieldTitle . ' / ' . $title;
+
+			$parent     = $parentObject['parent'];
+			$fieldGroup = (bool) $fieldGroup ? $fieldGroup : acf_get_field_group( $parent );
+			$acfObject  = $parentObject;
+		}
+
+		$field['title'] = $title;
+		$field['group'] = [
+			self::ACF_TOP_LEVEL_GROUP_ID => self::ACF_TOP_LEVEL_GROUP_TITLE,
+		];
+
+		if ( $fieldGroup && isset( $fieldGroup['key'], $fieldGroup['title'] ) ) {
+			$field['group'][ $fieldGroup['key'] ] = $fieldGroup['title'];
+		}
+
+		return $field;
+	}
+
+	/**
+	 * @param string $name
+	 *
+	 * @return string|null
+	 */
+	private function getGroupKeyWithPatterns( string $name ) {
+		return $this->fieldNamePatterns->findMatchingGroup( $name );
+	}
+
+	/**
 	 * @param \stdClass $job
 	 *
-	 * @return int|null
+	 * @return string|null
 	 */
-	private function getGroupIdFromJob( $job ) {
+	private function getGroupKeyFromJob( $job ) {
 		if ( ! array_key_exists( $job->original_doc_id, $this->jobToGroupId ) ) {
 			if ( 'package_' . Package::KIND_SLUG === $job->original_post_type ) {
-				$this->jobToGroupId[ $job->original_doc_id ] = (int) StringsFactory::createWpmlPackage( $job->original_doc_id )->name;
+				$this->jobToGroupId[ $job->original_doc_id ] = StringsFactory::createWpmlPackage( $job->original_doc_id )->name;
 			} else {
 				$this->jobToGroupId[ $job->original_doc_id ] = null;
 			}
@@ -207,20 +290,44 @@ class JobFilter implements \IWPML_Backend_Action, \IWPML_Frontend_Action {
 		$orderedFields = $this->getOrderedFields( $postId, $metaKeys );
 		$orderMap      = array_flip( $orderedFields );
 
-		return wpml_collect( $jobFields )
-			->sort( function( $a, $b ) use ( $orderMap ) {
-				$keyA = $this->getKey( $a );
-				$keyB = $this->getKey( $b );
+		// Partition: extract ACF fields with their original indices, leave non-ACF untouched.
+		// This avoids a non-transitive comparator which causes undefined usort behavior.
+		$acfFields    = [];
+		$acfPositions = [];
 
-				// Leave non ACF fields intact.
-				if ( ! isset( $orderMap[ $keyA ] ) || ! isset( $orderMap[ $keyB ] ) ) {
-					return 0;
-				}
+		foreach ( $jobFields as $index => $field ) {
+			$key = $this->getKey( $field );
+			if ( isset( $orderMap[ $key ] ) ) {
+				$acfFields[]    = [
+					'field'          => $field,
+					'original_index' => $index,
+					'order_rank'     => $orderMap[ $key ],
+				];
+				$acfPositions[] = $index;
+			}
+		}
 
-				return $orderMap[ $keyA ] - $orderMap[ $keyB ];
-			} )
-			->values()
-			->all();
+		if ( count( $acfFields ) < 2 ) {
+			return $jobFields;
+		}
+
+		// Sort ACF fields by orderMap rank, with original index as stable tie-breaker.
+		usort( $acfFields, function ( $a, $b ) {
+			if ( $a['order_rank'] === $b['order_rank'] ) {
+				return $a['original_index'] <=> $b['original_index'];
+			}
+			return $a['order_rank'] <=> $b['order_rank'];
+		} );
+
+		// Rebuild: walk original positions, replacing ACF slots with sorted ACF fields.
+		$result      = $jobFields;
+		$acfIterator = 0;
+		foreach ( $acfPositions as $position ) {
+			$result[ $position ] = $acfFields[ $acfIterator ]['field'];
+			$acfIterator++;
+		}
+
+		return array_values( $result );
 	}
 
 	/**

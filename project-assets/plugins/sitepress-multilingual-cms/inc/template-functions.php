@@ -281,7 +281,7 @@ function wpml_link_to_element_filter(
 			$title                   = apply_filters( 'single_cat_title', $title );
 		} else {
 			list( $term_id, $title ) = $wpdb->get_row( $wpdb->prepare( "SELECT t.term_id, t.name FROM {$wpdb->term_taxonomy} tx JOIN {$wpdb->terms} t ON t.term_id = tx.term_id WHERE tx.term_taxonomy_id = %d AND tx.taxonomy=%s", $translations[ ICL_LANGUAGE_CODE ]->element_id, $element_type ), ARRAY_N );
-			$url                     = get_term_link( $term_id, $element_type );
+			$url                     = get_term_link( (int) $term_id, $element_type );
 			$title                   = apply_filters( 'single_cat_title', $title );
 		}
 	} else {
@@ -871,7 +871,10 @@ function wpml_custom_post_translation_options() {
 
 		$out .= sprintf( __( '%1$s is translated via WPML. %2$sClick here to change translation options.%3$s', 'sitepress' ), '<strong>' . $type->labels->singular_name . '</strong>', '<a href="' . $link . '">', '</a>' );
 
-		if ( $type->rewrite['enabled'] && class_exists( 'WPML_ST_Post_Slug_Translation_Settings' ) ) {
+		if (
+			( true === $type->rewrite || ( is_array( $type->rewrite ) && $type->rewrite['enabled'] ) )
+			&& class_exists( 'WPML_ST_Post_Slug_Translation_Settings' )
+		) {
 
 			$settings = new WPML_ST_Post_Slug_Translation_Settings( $sitepress );
 

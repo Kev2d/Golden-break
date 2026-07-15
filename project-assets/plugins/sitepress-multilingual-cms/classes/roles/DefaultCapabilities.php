@@ -36,7 +36,7 @@ class DefaultCapabilities {
 			'wpml_manage_support'                       => __( 'Manage Support', 'sitepress' ),
 			'wpml_manage_woocommerce_multilingual'      => __( 'Manage WooCommerce Multilingual', 'sitepress' ),
 			'wpml_operate_woocommerce_multilingual'     => __( 'Operate WooCommerce Multilingual. Everything on WCML except the settings tab.', 'sitepress' ),
-			'wpml_manage_media_translation'             => __( 'Manage Media translation', 'sitepress' ),
+			'wpml_manage_media_translation'             => __( 'Manage translation of media', 'sitepress' ),
 			'wpml_manage_navigation'                    => __( 'Manage Navigation', 'sitepress' ),
 			'wpml_manage_sticky_links'                  => __( 'Manage Sticky Links', 'sitepress' ),
 			'wpml_manage_string_translation'            => __( 'Manage String Translation', 'sitepress' ),

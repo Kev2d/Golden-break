@@ -111,7 +111,19 @@ class WPML_Set_Language extends WPML_Full_Translation_API {
 		}
 		do_action( 'icl_set_element_language', $translation_id, $el_id, $language_code, $trid );
 
+		wp_cache_delete( ...self::get_cache_ref( $el_id, $el_type ) );
+
 		return $translation_id;
+	}
+
+	/**
+	 * @param string|int $el_id
+	 * @param string     $el_type
+	 *
+	 * @return array<string, string>
+	 */
+	public static function get_cache_ref( $el_id, $el_type ) {
+		return [ $el_id . ':' . $el_type, 'element_language_details' ];
 	}
 
 	/**
@@ -240,6 +252,23 @@ class WPML_Set_Language extends WPML_Full_Translation_API {
 	 * @return int Translation ID of the new row
 	 */
 	private function insert_new_row( $el_id, $trid, $el_type, $language_code, $src_language_code ) {
+		// Insert with no $el_id produces a row in icl_translations with NULL
+		// element_id. That's the normal pre-delivery state for a translation
+		// placeholder (element_id gets backfilled once the translated post is
+		// created), so we log at INFO — the trace remains as the actionable
+		// breadcrumb if a downstream investigation needs to identify the
+		// caller, but it doesn't flip the request's error badge on healthy
+		// sends.
+		if ( ! $el_id && class_exists( \WPML\TM\Jobs\JobLog::class ) ) {
+			\WPML\TM\Jobs\JobLog::add( 'insert_new_row_null_element_id', [
+				'el_id'                => $el_id,
+				'el_type'              => $el_type,
+				'trid'                 => $trid,
+				'language_code'        => $language_code,
+				'source_language_code' => $src_language_code,
+			] );
+		}
+
 		$new = array(
 			'element_type'  => $el_type,
 			'language_code' => $language_code,
@@ -257,6 +286,19 @@ class WPML_Set_Language extends WPML_Full_Translation_API {
 		if ( $el_id ) {
 			$new['element_id'] = $el_id;
 		}
+
+		// Check if there is already an entry for this trid + language_code combination.
+		$existing_id = $this->wpdb->get_var( $this->wpdb->prepare(
+			"SELECT translation_id FROM {$this->wpdb->prefix}icl_translations
+			WHERE trid = %d AND language_code = %s",
+			$trid,
+			$language_code
+		) );
+
+		if ( $existing_id ) {
+			return $existing_id;
+		}
+
 		$this->wpdb->insert( $this->wpdb->prefix . 'icl_translations', $new );
 		$translation_id = $this->wpdb->insert_id;
 
@@ -387,6 +429,24 @@ class WPML_Set_Language extends WPML_Full_Translation_API {
 				'translation_id' => $translation_id,
 				'context'        => $context[0],
 			);
+
+			// Orphan classification means this icl_translations row pointed at
+			// $result->element_id for trid+language, but a different element_id
+			// is now claimed as correct, so we drop the old row. If the "old"
+			// row was actually live translation work (6742-class race), this
+			// delete silently destroys it. Logging with the request-scoped
+			// stack trace surfaces which sending stage triggered the
+			// reclassification, and the element_id pair shows what was lost.
+			if ( class_exists( \WPML\TM\Jobs\JobLog::class ) ) {
+				\WPML\TM\Jobs\JobLog::addError( 'orphan_translation_deleted', [
+					'trid'                  => (int) $trid,
+					'language_code'         => $language_code,
+					'translation_id'        => (int) $translation_id,
+					'orphan_element_id'     => null === $result->element_id ? null : (int) $result->element_id,
+					'kept_element_id'       => (int) $correct_element_id,
+					'element_type'          => $result->element_type,
+				] );
+			}
 
 			do_action( 'wpml_translation_update', array_merge( $update_args, array( 'type' => 'before_delete' ) ) );
 

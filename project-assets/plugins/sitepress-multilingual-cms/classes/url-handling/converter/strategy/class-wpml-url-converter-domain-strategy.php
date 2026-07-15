@@ -90,7 +90,7 @@ class WPML_URL_Converter_Domain_Strategy extends WPML_URL_Converter_Abstract_Str
 			return $source_url;
 		}
 
-		$base_url = isset( $this->domains[ $lang ] ) ? $this->domains[ $lang ] : $this->get_url_helper()->get_abs_home();
+		$base_url = ( null !== $lang && isset( $this->domains[ $lang ] ) ) ? $this->domains[ $lang ] : $this->get_url_helper()->get_abs_home();
 
 		$base_url_parts = $this->parse_domain_and_subdir( $base_url );
 		$url_parts      = $this->parse_domain_and_subdir( $source_url );

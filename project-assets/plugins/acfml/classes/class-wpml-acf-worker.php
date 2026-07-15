@@ -54,20 +54,21 @@ class WPML_ACF_Worker implements \IWPML_Backend_Action, \IWPML_Frontend_Action, 
 	 * @param string $meta_key     The meta key of the copied term field.
 	 */
 	public function after_copy_term_field( $term_id_from, $term_id_to, $meta_key ) {
-		$this->afterCopyObjectField( $term_id_from, $term_id_to, $meta_key, self::META_TYPE_TERM, get_term( $term_id_to )->taxonomy );
+		$this->afterCopyObjectField( \WPML_ACF_Term_Id::normalizeId( $term_id_from ), $term_id_to, $meta_key, self::META_TYPE_TERM, get_term( $term_id_to )->taxonomy );
 	}
 
 	/**
 	 * When an object field has been copied, adjusts its values to represent translated objects.
 	 *
-	 * @param int    $objectFromId The id of the original object: ID for posts and term_id for terms.
-	 * @param int    $objectToId   The id of the translated object: ID for posts and term_id for terms.
-	 * @param string $metaKey      The meta key of the copied object field.
-	 * @param string $metaType     The type of object that the meta field is for: post or term.
-	 * @param string $objectType   The type of the object holding the meta field: a post type slug or a taxonomy slug.
+	 * @param int|string $objectFromId The id of the original object: ID for posts and term_id for terms(prefixed by 'term_').
+	 * @param int        $objectToId   The id of the translated object: ID for posts and term_id for terms.
+	 * @param string     $metaKey      The meta key of the copied object field.
+	 * @param string     $metaType     The type of object that the meta field is for: post or term.
+	 * @param string     $objectType   The type of the object holding the meta field: a post type slug or a taxonomy slug.
 	 */
 	private function afterCopyObjectField( $objectFromId, $objectToId, $metaKey, $metaType, $objectType ) {
-		$field = acf_get_field( $metaKey );
+		$field = $this->getFieldObjectWithFilteredReference( $metaKey, $objectFromId );
+
 		if ( ! $field ) {
 			return;
 		}
@@ -77,12 +78,36 @@ class WPML_ACF_Worker implements \IWPML_Backend_Action, \IWPML_Frontend_Action, 
 			return;
 		}
 
+		wp_cache_delete( $objectToId, $metaType . '_meta' );
 		$metaValue          = get_metadata( $metaType, $objectToId, $metaKey, true );
 		$metaValueConverted = $this->convertMetaValue( $metaValue, $metaKey, Obj::prop( 'type', $field ), $metaType, $objectFromId, $objectToId, $targetLang );
 
 		if ( $metaValue !== $metaValueConverted ) {
 			update_metadata( $metaType, $objectToId, $metaKey, $metaValueConverted, $metaValue );
 		}
+	}
+
+	/**
+	 * @param string     $metaKey
+	 * @param string|int $objectFromId
+	 *
+	 * @return array|false
+	 */
+	private function getFieldObjectWithFilteredReference( $metaKey, $objectFromId ) {
+		$keepOnlyLastFieldReference = function( $reference ) {
+			if ( ! $reference ) {
+				return $reference;
+			}
+
+			preg_match( '/(field_[a-zA-Z0-9]+)$/', $reference, $m );
+			return $m[1] ?? $reference;
+		};
+
+		add_filter( 'acf/load_reference', $keepOnlyLastFieldReference );
+		$field = get_field_object( $metaKey, $objectFromId, false, false );
+		remove_filter( 'acf/$metaKey', $keepOnlyLastFieldReference );
+
+		return $field;
 	}
 
 	/**

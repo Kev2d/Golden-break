@@ -19,7 +19,7 @@ class Fields {
 	 */
 	public static function iterate( $fields, $transformField, $transformLayout, $fieldBasePattern = '' ) {
 		foreach ( $fields as &$field ) {
-			$fieldPattern = $fieldBasePattern . $field['name'];
+			$fieldPattern = $fieldBasePattern . preg_quote( $field['name'] );
 			$field        = $transformField( $field, $fieldPattern );
 
 			if ( isset( $field['sub_fields'] ) ) {
@@ -66,6 +66,23 @@ class Fields {
 		return in_array(
 			Obj::prop( 'type', $field ),
 			self::WRAPPER_FIELDS,
+			true
+		);
+	}
+
+	/**
+	 * Checks if a field is a wrapper of other fields.
+	 *  - Repeater field has sub_fields.
+	 *  - Flexible content field has layouts, which also have sub_fields.
+	 *
+	 * @param array $field
+	 *
+	 * @return bool|callable
+	 */
+	public static function isWrapperOrGroup( $field ) {
+		return in_array(
+			Obj::prop( 'type', $field ),
+			array_merge( [ 'group' ], self::WRAPPER_FIELDS ),
 			true
 		);
 	}

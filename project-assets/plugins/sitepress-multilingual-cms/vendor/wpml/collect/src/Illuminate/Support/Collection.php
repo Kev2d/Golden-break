@@ -276,7 +276,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @param  callable|null  $callback
      * @return static
      */
-    public function filter(callable $callback = null)
+    public function filter(?callable $callback = null)
     {
         if ($callback) {
             return new static(Arr::where($this->items, $callback));
@@ -381,7 +381,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @param  mixed  $default
      * @return mixed
      */
-    public function first(callable $callback = null, $default = null)
+    public function first(?callable $callback = null, $default = null)
     {
         return Arr::first($this->items, $callback, $default);
     }
@@ -573,7 +573,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @param  mixed  $default
      * @return mixed
      */
-    public function last(callable $callback = null, $default = null)
+    public function last(?callable $callback = null, $default = null)
     {
         return Arr::last($this->items, $callback, $default);
     }
@@ -992,7 +992,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @param  callable|null  $callback
      * @return static
      */
-    public function sort(callable $callback = null)
+    public function sort(?callable $callback = null)
     {
         $items = $this->items;
 
@@ -1296,7 +1296,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 	#[\ReturnTypeWillChange]
     public function offsetExists($key)
     {
-        return array_key_exists($key, $this->items);
+        return null !== $key && array_key_exists($key, $this->items);
     }
 
     /**

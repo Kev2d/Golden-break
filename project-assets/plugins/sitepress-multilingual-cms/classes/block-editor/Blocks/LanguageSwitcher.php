@@ -8,6 +8,7 @@ use WPML\FP\Lst;
 use WPML\FP\Obj;
 use WPML\FP\Relation;
 use WPML\LIB\WP\Hooks;
+use WPML_Block_Editor_Helper;
 use function WPML\Container\make;
 use function WPML\FP\spreadArgs;
 use WPML\BlockEditor\Blocks\LanguageSwitcher\Render;
@@ -41,14 +42,16 @@ class LanguageSwitcher {
 
 	private function registerLanguageSwitcherBlock() {
 		$blockSettings = [
+			'api_version'     => '3',
 			'render_callback' => [ $this->render, 'render_block' ],
 		];
 
 		register_block_type( self::BLOCK_LANGUAGE_SWITCHER, $blockSettings );
-	}
 
+	}
 	private function registerNavigationLanguageSwitcherBlock() {
 		$blockSettings = [
+			'api_version'     => '3',
 			'render_callback' => [ $this->render, 'render_block' ],
 			'attributes'      => [
 				'navigationLsHasSubMenuInSameBlock' => [
@@ -68,6 +71,7 @@ class LanguageSwitcher {
 				'layout',
 				'showSubmenuIcon',
 				'openSubmenusOnClick',
+				'submenuVisibility',
 				'style',
 				'textColor',
 				'customTextColor',

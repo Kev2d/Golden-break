@@ -227,6 +227,11 @@ class ICLMenusSync extends WPML_Menu_Sync_Functionality {
 		$this->menus = isset( $this->menus ) ? $this->menu_item_sync->sync_menu_order( $this->menus ) : $this->menus;
 		$this->menu_item_sync->cleanup_broken_page_items();
 
+		/**
+		 * See get term cache in wp-includes/class-wp-term-query.php get_terms()
+		 */
+		wp_cache_delete( 'last_changed', 'terms' );
+
 		return $this->menus;
 	}
 
@@ -575,7 +580,7 @@ class ICLMenusSync extends WPML_Menu_Sync_Functionality {
 
 		if ( count( $menu_links_data ) > 0 ) {
 			echo '<p>';
-			esc_html_e( "Your menu includes custom items, which you need to translate using WPML's String Translation.", 'sitepress' );
+			esc_html_e( 'Your menu includes custom items, which you need to translate using the WPML Translation Dashboard.', 'sitepress' );
 			echo '<br/>';
 			esc_html_e( '1. Translate these strings: ', 'sitepress' );
 			$i = 0;
@@ -609,15 +614,10 @@ class ICLMenusSync extends WPML_Menu_Sync_Functionality {
 			}
 
 			if ( ! empty( $menu_names ) ) {
-				$menu_url_base = add_query_arg( 'page', urlencode( $wpml_st_folder . '/menu/string-translation.php' ), 'admin.php' );
+				$tm_url = add_query_arg( 'page', urlencode( WPML_TM_FOLDER . '/menu/main.php' ), 'admin.php' );
 
 				foreach ( $menu_names as $menu_name ) {
-					$menu_url                 = add_query_arg(
-						'context',
-						urlencode( $menu_name . WPML_Menu_Sync_Functionality::STRING_CONTEXT_SUFFIX ),
-						$menu_url_base
-					);
-					$menu_links[ $menu_name ] = $menu_url;
+					$menu_links[ $menu_name ] = $tm_url;
 				}
 			}
 		}

@@ -38,6 +38,10 @@ class WPML_TM_Element_Translations extends WPML_TM_Record_User {
 	}
 
 	public function is_update_needed( $trid, $language_code ) {
+		if ( null === $language_code ) {
+			return false;
+		}
+
 		if ( isset( $this->update_status_cache[ $trid ][ $language_code ] ) ) {
 			$needs_update = $this->update_status_cache[ $trid ][ $language_code ];
 		} else {

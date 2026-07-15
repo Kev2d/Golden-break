@@ -23,6 +23,6 @@ class GetJobsCount implements IHandler {
 	}
 
 	public function run( Collection $data ) {
-		return Either::of( $this->jobsCount->get() );
+		return Either::of( $this->jobsCount->get( $data->get( 'withCache', true ) ) );
 	}
 }

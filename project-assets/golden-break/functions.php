@@ -5,6 +5,7 @@ $theme_includes = [
   'theme/required-plugins.php',
   'theme/custom-login.php',
   'theme/theme-image-sizes.php',
+  'theme/woocommerce.php',
   'acf/blocks.php',
   'acf/options.php',
   'acf/wysiwyg-editor.php',

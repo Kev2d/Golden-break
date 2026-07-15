@@ -99,6 +99,18 @@ class Display {
 			[],
 			$installer->version()
 		);
+		wp_enqueue_script(
+			'installer-admin',
+			$installer->res_url() . '/res/js/admin.js',
+			[ 'jquery' ],
+			$installer->version()
+		);
+		wp_enqueue_script(
+			'expired-notice',
+			$installer->res_url() . '/dist/js/expired-notice/app.js',
+			[ 'installer-admin' ],
+			$installer->version()
+		);
 	}
 }
 

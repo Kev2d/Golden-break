@@ -25,10 +25,10 @@ class WPML_ST_Slug_Custom_Type {
 	 * @param string   $slug_translation
 	 */
 	public function __construct( $name, $display_as_translated, $slug, $slug_translation ) {
-		$this->name                  = $name;
-		$this->display_as_translated = $display_as_translated;
-		$this->slug                  = $slug;
-		$this->slug_translation      = $slug_translation;
+		$this->name                  = $name ?: '';
+		$this->display_as_translated = (bool) $display_as_translated;
+		$this->slug                  = $slug ?: '';
+		$this->slug_translation      = $slug_translation ?: '';
 	}
 
 

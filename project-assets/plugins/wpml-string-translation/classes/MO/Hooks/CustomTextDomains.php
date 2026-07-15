@@ -45,7 +45,7 @@ class CustomTextDomains implements \IWPML_Action {
 		LoadedMODictionary $loadedDictionary,
 		StoragePerLanguageInterface $cache,
 		WPML_Locale $locale,
-		callable $syncMissingFile = null
+		?callable $syncMissingFile = null
 	) {
 		$this->manager          = $file_manager;
 		$this->domains          = $domains;
@@ -85,7 +85,7 @@ class CustomTextDomains implements \IWPML_Action {
 
 
 	public function init_custom_text_domains( $locale = null ) {
-		$locale = $locale ?: get_locale();
+		$locale = $locale ?: determine_locale();
 
 		$addJitMoToL10nGlobal = pipe( Lst::nth( 0 ), function ( $domain ) use ( $locale ) {
 			// Following unset is important because WordPress is setting their

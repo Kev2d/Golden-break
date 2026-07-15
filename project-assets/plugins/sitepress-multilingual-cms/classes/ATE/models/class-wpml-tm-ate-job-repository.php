@@ -40,6 +40,16 @@ class WPML_TM_ATE_Job_Repository {
 	}
 
 	/**
+	 * Get ATE job IDs with their associated element IDs for ordering.
+	 *
+	 * @param bool $includeManualAndLongstandingJobs
+	 * @return array{ateJobIds: int[], postIds: int[], stringIds: int[], packageIds: int[]}
+	 */
+	public function get_jobs_to_sync_with_element_ids( $includeManualAndLongstandingJobs = true ): array {
+		return $this->ateJobs->getATEJobIdsToSyncWithElementIds( $includeManualAndLongstandingJobs );
+	}
+
+	/**
 	 * @param array $ateJobIds
 	 *
 	 * @return bool

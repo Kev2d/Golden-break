@@ -15,11 +15,11 @@ class LanguageItemTemplate {
 	private $labelTemplate;
 
 	/**
-	 * @param \DOMNode $template
-	 * @param \DOMNode $container
-	 * @param ?LabelTemplateInterface $labelTemplate
+	 * @param \DOMNode                     $template
+	 * @param \DOMNode                     $container
+	 * @param ?LabelTemplateInterface|null $labelTemplate
 	 */
-	public function __construct( \DOMNode $template, \DOMNode $container, LabelTemplateInterface $labelTemplate = null) {
+	public function __construct( \DOMNode $template, \DOMNode $container, ?LabelTemplateInterface $labelTemplate = null) {
 		$this->template = $template;
 		$this->container = $container;
 		$this->labelTemplate = $labelTemplate;

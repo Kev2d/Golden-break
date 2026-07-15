@@ -62,13 +62,47 @@ class Texts {
 	}
 
 	public static function refunded() {
-		// translators: %s Product name
-		$headingHTML = self::getHeadingHTML( __( 'Remember to remove %s from this website', 'installer' ) );
-		// translators: %s Product name
-		$body = self::getBodyHTML( __( 'This site is using the %s plugin, which has not been paid for. After receiving a refund, you should remove this plugin from your sites. Using unregistered plugins means you are not receiving stability and security updates and will ultimately lead to problems running the site.', 'installer' ) ) .
-		        self::inButtonAreaHTML( self::getRefundedButtons() );
+		$model = static::buildRefundedModel();
 
-		return self::insideDiv( 'refund', $headingHTML . $body );
+		$classes = implode( ' ', [
+			'notice',
+			'otgs-installer-notice',
+			'otgs-installer-notice-' . esc_attr( static::$repo ),
+			'otgs-installer-notice-refund',
+			'otgs-installer-notice-refund--cards',
+			'otgs-installer-expired',
+		] );
+
+		ob_start();
+		\OTGS\Installer\Templates\Repository\Refunded::renderContent( $model );
+		$html = ob_get_clean();
+
+		return '<div class="' . $classes . '">' . $html . '</div>';
+	}
+
+	/**
+	 * Builds the model object required by Refunded::renderContent() from the
+	 * static properties available in this class.
+	 */
+	protected static function buildRefundedModel() {
+		$repo    = static::$repo;
+		$install = \WP_Installer::instance();
+
+		return (object) [
+			'productName'                 => static::$product,
+			'repoId'                      => $repo,
+			'siteUrl'                     => home_url(),
+			'productUrl'                  => static::$productURL,
+			'siteKeysManagementUrl'       => $install->get_product_data( $repo, 'site_keys_management_url' ),
+			'updateSiteKeyNonce'          => wp_create_nonce( 'update_site_key_' . $repo ),
+			'saveSiteKeyNonce'            => wp_create_nonce( 'save_site_key_' . $repo ),
+			'removeSiteKeyNonce'          => wp_create_nonce( 'remove_site_key_' . $repo ),
+			'findAccountNonce'            => wp_create_nonce( 'find_account_' . $repo ),
+			'siteKey'                     => \WP_Installer_API::get_site_key( $repo ),
+			'endUserRenewalUrl'           => $install->get_end_user_renewal_url( $repo ),
+			'expired'                     => true,
+			'shouldDisplayUnregisterLink' => true,
+		];
 	}
 
 	public static function connectionIssues() {
@@ -180,18 +214,6 @@ class Texts {
 		    self::getStatusHTML( $statusText ) .
 		    self::getRefreshButtonHTML( $checkOrderStatusUrl, $checkButton );
     }
-
-	/**
-	 * @return string
-	 */
-	private static function getRefundedButtons() {
-		$checkOrderStatusUrl = \WP_Installer::menu_url() . '&validate_repository=' . static::$repo;
-		$checkButton         = __( 'Check my order status', 'installer' );
-		$status              = __( 'Bought again?', 'installer' );
-
-		return self::getStatusHTML( $status ) .
-		       self::getPrimaryButtonHTML( $checkOrderStatusUrl, $checkButton );
-	}
 
 	/**
 	 * @param string $notice_type The method takes care of escaping the string.

@@ -3,6 +3,7 @@
 namespace WPML\TM\ATE;
 
 use WPML\FP\Obj;
+use WPML\TM\Jobs\JobLog;
 use function WPML\Container\make;
 
 /**
@@ -33,6 +34,17 @@ class ReturnedJobs {
 			$translationStatus = $tm_records->icl_translation_status_by_rid( $jobTranslation->rid() );
 			if ( ICL_TM_DUPLICATE === $translationStatus->status() ) {
 				$translationStatus->update( [ 'status' => ICL_TM_IN_PROGRESS ] );
+				// Direct DB write bypasses Jobs::setStatus, so the central
+				// job_status_set event would not fire. Emit a dedicated one
+				// here so the DUPLICATE→IN_PROGRESS transition is traceable.
+				if ( class_exists( JobLog::class ) ) {
+					JobLog::add( 'returned_job_duplicate_cleared', [
+						'job_id'     => (int) $wpmlJobId,
+						'ate_job_id' => (int) $ateJobId,
+						'old_status' => (int) ICL_TM_DUPLICATE,
+						'new_status' => (int) ICL_TM_IN_PROGRESS,
+					] );
+				}
 			}
 		}
 	}

@@ -14,14 +14,14 @@ class WPML_Theme_String_Scanner extends WPML_String_Scanner implements IWPML_ST_
 		$this->text_domain  = $current_theme->get( 'TextDomain' );
 		$this->init_text_domain( $text_domain );
 		$this->scan_theme_files();
-		$this->set_stats( 'theme_localization_domains', $current_theme_name );
+		$stats = $this->set_stats( 'theme_localization_domains', $current_theme_name );
 
 		//@todo test this properly
 		if ( $theme_info && $theme_info->exists() ) {
 			$this->remove_notice( $theme_info->get( 'Name' ) );
 		}
 
-		$this->scan_response();
+		$this->scan_response( $stats );
 	}
 
 	private function scan_theme_files() {
@@ -31,14 +31,15 @@ class WPML_Theme_String_Scanner extends WPML_String_Scanner implements IWPML_ST_
 
 			foreach ( $_POST['files'] as $file ) {
 				$file = (string) \WPML\API\Sanitize::string( $file );
-				if ( $this->file_hashing->hash_changed( $file ) ) {
 
-					$this->add_stat( sprintf( __( 'Scanning file: %s', 'wpml-string-translation' ), $file ) );
+				if ( $this->is_js_file( $file ) ) {
+					$jsScanner = new \WPML\ST\StringsScanning\JS\Scanner();
+					$jsScanner->scan( $file, $this->text_domain, [ $this, 'store_results' ] );
 					$this->add_scanned_file( $file );
-					_potx_process_file( $file, 0, array( $this, 'store_results' ), '_potx_save_version', $this->get_default_domain() );
-
 				} else {
-					$this->add_stat( sprintf( __( 'Skipping file: %s', 'wpml-string-translation' ), $file ) );
+					$this->add_stat( sprintf( __( 'Scanning file: %s', 'wpml-string-translation' ), $file ) );
+					_potx_process_file( $file, 0, array( $this, 'store_results' ), '_potx_save_version', $this->get_default_domain() );
+					$this->add_scanned_file( $file );
 				}
 			}
 		}

@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2014-2020 ServMask Inc.
+ * Copyright (C) 2014-2025 ServMask Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,6 +14,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Attribution: This code is part of the All-in-One WP Migration plugin, developed by
  *
  * ███████╗███████╗██████╗ ██╗   ██╗███╗   ███╗ █████╗ ███████╗██╗  ██╗
  * ██╔════╝██╔════╝██╔══██╗██║   ██║████╗ ████║██╔══██╗██╔════╝██║ ██╔╝
@@ -42,7 +44,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					</div>
 				<?php endif; ?>
 
-				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php?action=ai1wmue_settings' ) ); ?>">
+				<form method="post" action="<?php echo esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=ai1wmue_settings' ), 'ai1wmue_settings_save' ) ); ?>">
 
 					<article class="ai1wmue-article">
 						<h3><?php _e( 'Retention settings', AI1WMUE_PLUGIN_NAME ); ?></h3>
@@ -76,7 +78,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 							</div>
 
 							<div class="ai1wm-field" id="ai1wmue-backups-path">
-								<folder-browser destination="<?php echo $destination; ?>" dir-separator="<?php echo DIRECTORY_SEPARATOR; ?>">
+								<folder-browser destination="<?php echo esc_attr( $destination ); ?>" dir-separator="<?php echo esc_attr( DIRECTORY_SEPARATOR ); ?>">
 									<h3><?php _e( 'Backups directory', AI1WMUE_PLUGIN_NAME ); ?></h3>
 								</folder-browser>
 							</div>
@@ -95,12 +97,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<div class="ai1wm-sidebar">
 				<div class="ai1wm-segment">
 					<?php if ( ! AI1WM_DEBUG ) : ?>
-						<?php include AI1WM_TEMPLATES_PATH . '/common/share-buttons.php'; ?>
+						<?php require AI1WM_TEMPLATES_PATH . '/common/share-buttons.php'; ?>
 					<?php endif; ?>
 
 					<h2><?php _e( 'Leave Feedback', AI1WMUE_PLUGIN_NAME ); ?></h2>
 
-					<?php include AI1WM_TEMPLATES_PATH . '/common/leave-feedback.php'; ?>
+					<?php require AI1WM_TEMPLATES_PATH . '/common/leave-feedback.php'; ?>
 				</div>
 			</div>
 		</div>

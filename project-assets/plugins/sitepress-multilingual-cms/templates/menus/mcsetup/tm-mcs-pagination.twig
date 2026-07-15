@@ -28,16 +28,18 @@
                         {% if link.class == "" %}
                             <a class="page-numbers" href="#">{{ link.number }}</a>
                         {% endif %}
-                        {% if link.class == "dots" %}
-                            <span class="page-numbers dots">{{ link.number }}</span>
-                        {% endif %}
                     {% endfor %}
+
+                    {% if total_items > to %}
+                        <span class="page-numbers dots">&#8230;</span>
+                    {% endif %}
 
                     {% if current_page < total_pages %}
                         <a class="next page-numbers" href="#">»</a>
                     {% endif %}
                 {% endif %}
             {% endif %}
+
 
             {% if total_items > select[0] %}
                 <select name="wpml_tm_per_page">

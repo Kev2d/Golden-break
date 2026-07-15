@@ -29,13 +29,13 @@ class WPML_Upgrade {
 	 * @param array                        $commands
 	 * @param SitePress                    $sitepress
 	 * @param WPML_Upgrade_Command_Factory $command_factory
-	 * @param CommandsStatus               $command_status
+	 * @param CommandsStatus|null          $command_status
 	 */
 	public function __construct(
 		array $commands,
 		SitePress $sitepress,
 		WPML_Upgrade_Command_Factory $command_factory,
-		CommandsStatus $command_status = null
+		?CommandsStatus $command_status = null
 	) {
 		$this->add_commands( $commands );
 		$this->sitepress       = $sitepress;

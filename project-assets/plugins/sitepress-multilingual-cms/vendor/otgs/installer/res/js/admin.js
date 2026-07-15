@@ -14,8 +14,21 @@ var otgs_wp_installer = {
         jQuery('.otgs_wp_installer_table').on('click', '.enter_site_key_js', otgs_wp_installer.show_site_key_form);
         jQuery('.otgs_wp_installer_table').on('click', '.cancel_site_key_js', otgs_wp_installer.hide_site_key_form);
 
-        jQuery('.otgs_wp_installer_table').on('click', '.remove_site_key_js', otgs_wp_installer.remove_site_key);
-        jQuery('.otgs_wp_installer_table').on('click', '.update_site_key_js', otgs_wp_installer.update_site_key);
+        jQuery(document).on('click', '.remove_site_key_js', otgs_wp_installer.remove_site_key);
+        jQuery(document).on('click', '.update_site_key_js', otgs_wp_installer.update_site_key);
+
+        jQuery(document).on('click', '.js-otgs-unregister-toggle', function () {
+            var $card = jQuery(this).closest('.otgs-installer-refund-card-body');
+            jQuery(this).hide();
+            $card.find('.otgs-installer-refund-confirm').show();
+            return false;
+        });
+        jQuery(document).on('click', '.js-otgs-unregister-cancel', function () {
+            var $card = jQuery(this).closest('.otgs-installer-refund-card-body');
+            $card.find('.otgs-installer-refund-confirm').hide();
+            $card.find('.js-otgs-unregister-toggle').show();
+            return false;
+        });
 
         jQuery('.otgs_wp_installer_table').on('submit', '.otgsi_site_key_form', otgs_wp_installer.save_site_key);
         jQuery('.otgs_wp_installer_table').on('submit', '.otgsi_downloads_form', otgs_wp_installer.download_downloads);
@@ -25,6 +38,7 @@ var otgs_wp_installer = {
 
         otgs_wp_installer.scroll_to_repository();
         otgs_wp_installer.maybe_register();
+        otgs_wp_installer.update_downloads_form();
 
         if (typeof pagenow != 'undefined' && pagenow == 'plugins') {
 
@@ -143,7 +157,7 @@ var otgs_wp_installer = {
 
         } else {
 
-            if (confirm(jQuery(this).data('confirmation'))) {
+            if (!jQuery(this).data('confirmation') || confirm(jQuery(this).data('confirmation'))) {
 
                 jQuery('<span class="spinner"></span>').css({
                     visibility: 'visible',
@@ -167,7 +181,7 @@ var otgs_wp_installer = {
     },
 
     update_site_key: function () {
-        var error_wrap = jQuery(this).closest('.otgsi_register_product_wrap').find('.installer-error-box');
+        var error_wrap = jQuery(this).closest('.otgsi_register_product_wrap, .otgs-installer-refund-card-body').find('.installer-error-box');
         error_wrap.html('');
 
         var spinner = jQuery('<span class="spinner"></span>');
@@ -214,11 +228,10 @@ var otgs_wp_installer = {
     update_downloads_form: function () {
 
         var checked = jQuery('.otgsi_downloads_form :checkbox:checked[name="downloads[]"]').length;
-
         if (checked) {
-            jQuery(this).closest('form').find(':submit, :checkbox[name=activate]').removeAttr('disabled');
+            jQuery('.otgsi_downloads_form').closest('form').find(':submit, :checkbox[name=activate]').removeAttr('disabled');
         } else {
-            jQuery(this).closest('form').find(':submit, :checkbox[name=activate]').attr('disabled', 'disabled');
+            jQuery('.otgsi_downloads_form').closest('form').find(':submit, :checkbox[name=activate]').attr('disabled', 'disabled');
         }
 
 
@@ -273,8 +286,9 @@ var otgs_wp_installer = {
 
             otgs_wp_installer.reset_errors();
             downloads_form.find('div.installer-status-success').hide();
+            this_tr.find('.installer_checkbox.for_spinner_js label').css('display', 'none')
+            this_tr.find('.installer_version_installed.for_spinner_js .installed-version')
             spinner.css('visibility', 'visible');
-            installing.show();
 
             var plugin_name = this_tr.find('.installer_plugin_name').html();
             if (is_update) {
@@ -366,6 +380,7 @@ var otgs_wp_installer = {
                                     }
 
                                     downloads_form.trigger('installer-update-complete');
+                                    location.reload();
                                 }
                             }
                         });
@@ -379,6 +394,7 @@ var otgs_wp_installer = {
                             action_button.removeAttr('disabled');
 
                             downloads_form.trigger('installer-update-complete');
+                            location.reload();
 
                         }
                     }
@@ -453,13 +469,15 @@ var otgs_wp_installer = {
 
     toggle_release_notes: function () {
         var handle = jQuery(this);
-        var tr = handle.closest('tr');
-        if (tr.next('.installer-release-notes').is(':visible')) {
+        var plugin_id = handle.data('plugin-id');
+        var release_note_element = jQuery('#' + plugin_id + '_release-notes')
+
+        if (release_note_element.is(':visible')) {
             handle.removeClass('extended');
         } else {
             handle.addClass('extended');
         }
-        tr.next('.installer-release-notes').fadeToggle();
+        release_note_element.fadeToggle();
 
         return false;
     },

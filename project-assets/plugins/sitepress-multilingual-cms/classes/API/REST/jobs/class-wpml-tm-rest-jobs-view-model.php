@@ -90,6 +90,7 @@ class WPML_TM_Rest_Jobs_View_Model {
 
 		return [
 			'id'                     => $job->get_rid(),
+			'original_element_id'    => $job->get_original_element_id(),
 			'type'                   => $job->get_type(),
 			'tp_id'                  => $job->get_tp_id(),
 			'status'                 => $job->get_status(),

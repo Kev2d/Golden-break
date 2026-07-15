@@ -60,6 +60,37 @@ class User {
 		return self::userCan( self::getCurrentId(), $capability );
 	}
 
+
+	/**
+	 * Returns true if the current user is an admin.
+	 *
+	 * @return bool
+	 */
+	public static function currentUserIsAdmin() {
+		return self::currentUserCan( self::CAP_MANAGE_OPTIONS );
+	}
+
+
+	/**
+	 * Returns true if the current user is a translation manager or higher.
+	 *
+	 * @return bool
+	 */
+	public static function currentUserIsTranslationManagerOrHigher() {
+		return self::currentUserIsAdmin()
+			|| self::currentUserCan( self::CAP_MANAGE_TRANSLATIONS );
+	}
+
+	/**
+	 * Returns true if the current user is a translator or higher.
+	 *
+	 * @return bool
+	 */
+	public static function currentUserIsTranslatorOrHigher() {
+		return self::currentUserIsTranslationManagerOrHigher()
+			|| self::currentUserCan( self::CAP_TRANSLATE );
+	}
+
 	/**
 	 * @return int
 	 */
@@ -188,7 +219,7 @@ class User {
 	 * @param string $capability Capability to check for.
 	 * @param ?\WP_User $user User to check. Using current user if not defined.
 	 */
-	public static function hasCap( $capabilitiy, \WP_User $user = null ) {
+	public static function hasCap( $capabilitiy, ?\WP_User $user = null ) {
 		$user = $user ?: self::getCurrent();
 		return $user->has_cap( $capabilitiy );
 	}
@@ -199,7 +230,7 @@ class User {
 	 *
 	 * @param ?\WP_User $user User to check. Using current user if not defined.
 	 */
-	public static function canManageTranslations( \WP_User $user = null ) {
+	public static function canManageTranslations( ?\WP_User $user = null ) {
 		return self::hasCap( self::CAP_MANAGE_TRANSLATIONS, $user ) || self::isAdministrator( $user );
 	}
 
@@ -209,7 +240,7 @@ class User {
 	 *
 	 * @param ?\WP_User $user User to check. Using current user if not defined.
 	 */
-	public static function canManageOptions( \WP_User $user = null ) {
+	public static function canManageOptions( ?\WP_User $user = null ) {
 		return self::hasCap( self::CAP_MANAGE_OPTIONS, $user );
 	}
 
@@ -218,7 +249,7 @@ class User {
 	 *
 	 * @return bool
 	 */
-	public static function isAdministrator( \WP_User $user = null ) {
+	public static function isAdministrator( ?\WP_User $user = null ) {
 		return self::hasCap( self::CAP_ADMINISTRATOR, $user );
 	}
 
@@ -227,7 +258,7 @@ class User {
 	 *
 	 * @return bool
 	 */
-	public static function isEditor( \WP_User $user = null ) {
+	public static function isEditor( ?\WP_User $user = null ) {
 		foreach ( static::ROLE_EDITOR_MINIMUM_CAPS as $cap ) {
 			if ( ! self::hasCap( $cap, $user ) ) {
 				return false;
@@ -241,7 +272,7 @@ class User {
 	 *
 	 * @return bool
 	 */
-	public static function isTranslator( \WP_User $user = null ) {
+	public static function isTranslator( ?\WP_User $user = null ) {
 		return self::hasCap( self::CAP_TRANSLATE, $user );
 	}
 }

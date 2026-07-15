@@ -95,6 +95,10 @@ class Obj {
 				return $item->get( $key, $default );
 			}
 			if ( is_array( $item ) ) {
+                if ( null === $key ) {
+                    return $default;
+                }
+
 				return array_key_exists( $key, $item ) ? $item[ $key ] : $default;
 			}
 			if ( is_object( $item ) ) {

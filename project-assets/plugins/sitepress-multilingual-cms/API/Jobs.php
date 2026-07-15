@@ -14,7 +14,9 @@ use WPML\FP\Lst;
 use WPML\Settings\PostType\Automatic;
 use WPML\TM\API\ATE\LanguageMappings;
 use WPML\TM\API\Job\Map;
+use WPML\TM\Jobs\JobLog;
 use WPML\TM\Records\UpdateTranslationReviewStatus;
+use WPML\Translation\TranslateJobErrorServiceFactory;
 use function WPML\Container\make;
 use function WPML\FP\curryN;
 use function WPML\FP\pipe;
@@ -110,28 +112,21 @@ class Jobs {
 			global $wpdb;
 
 			$rid           = Map::fromJobId( $jobId );
-			$previousState = \WPML_TM_ICL_Translation_Status::makeByRid( $rid )
-			                                                ->previous()
-			                                                ->getOrElse( null );
 
-			if ( is_object( $previousState ) || is_array( $previousState ) ) {
-				$wpdb->update(
-					$wpdb->prefix . 'icl_translation_status',
-					Obj::pick( [ 'status', 'translator_id', 'needs_update', 'md5 ' ], $previousState ),
-					[ 'rid' => $rid ]
-				);
-			} else {
-				$wpdb->delete(
-					$wpdb->prefix . 'icl_translation_status',
-					[ 'rid' => $rid ],
-					[ 'rid' => '%d' ]
-				);
-			}
+			$wpdb->delete(
+				$wpdb->prefix . 'icl_translation_status',
+				[ 'rid' => $rid ],
+				[ 'rid' => '%d' ]
+			);
+
 			$wpdb->delete(
 				$wpdb->prefix . 'icl_translate_job',
 				[ 'job_id' => $jobId ],
 				[ 'job_id' => '%d' ]
 			);
+
+			$service = TranslateJobErrorServiceFactory::create();
+			$service->deleteError( $jobId );
 		} ) );
 
 		self::macro( 'isEligibleForAutomaticTranslations', curryN( 1, Fns::memorize( function ( $wpmlJobId ) {
@@ -373,6 +368,26 @@ class Jobs {
 	private static function updateTranslationStatusField( $jobId, $fieldName, $newValue, $fieldType = '%d' ) {
 		global $wpdb;
 
+		// Capture pre-update status only for the status field, and only when
+		// JobLog is actually going to write the event. Without the canLog()
+		// gate this SELECT would run unconditionally on every status mutation
+		// — on a TEA pass that flips status hundreds of times that's pure
+		// regression for sites that have logging disabled. A null old_status
+		// when we DO log signals the rid row was missing at read time
+		// (6742-class vanish signal).
+		$shouldLog = 'status' === $fieldName
+			&& class_exists( JobLog::class )
+			&& JobLog::canLog();
+		$oldStatus = null;
+		if ( $shouldLog ) {
+			$oldStatus = $wpdb->get_var( $wpdb->prepare(
+				"SELECT s.status FROM {$wpdb->prefix}icl_translation_status s
+				 INNER JOIN {$wpdb->prefix}icl_translate_job j ON j.rid = s.rid
+				 WHERE j.job_id = %d",
+				$jobId
+			) );
+		}
+
 		$newValueSqlString = null === $newValue ? 'NULL' : $fieldType;
 		$unpreparedQuery = "
 					UPDATE {$wpdb->prefix}icl_translation_status
@@ -392,7 +407,19 @@ class Jobs {
 		}
 
 		// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
-		$wpdb->query( $query );
+		$affected = $wpdb->query( $query );
+		if ( $affected > 0 ) {
+			do_action( 'wpml_tm_ate_jobs_updated', [ $jobId ] );
+		}
+
+		if ( $shouldLog ) {
+			JobLog::add( 'job_status_set', [
+				'job_id'     => (int) $jobId,
+				'old_status' => null === $oldStatus ? null : (int) $oldStatus,
+				'new_status' => null === $newValue ? null : (int) $newValue,
+				'affected'   => false === $affected ? false : (int) $affected,
+			] );
+		}
 
 		return $jobId;
 	}
@@ -407,6 +434,27 @@ class Jobs {
 		);
 
 		return $jobId;
+	}
+
+	/**
+	 * Returns object of the first found previous translation job if exists.
+	 *
+	 * @param $jobId
+	 *
+	 * @return object|null
+	 */
+	public static function getPreviousJob( $jobId ) {
+		global $wpdb;
+
+		$sql = "
+			SELECT * FROM {$wpdb->prefix}icl_translate_job job
+			WHERE job.job_id < %d AND job.rid = (
+				SELECT rid FROM {$wpdb->prefix}icl_translate_job WHERE job_id = %d
+			)			
+			ORDER BY job.job_id DESC
+		";
+
+		return $wpdb->get_row( $wpdb->prepare( $sql, $jobId, $jobId ) );
 	}
 }
 

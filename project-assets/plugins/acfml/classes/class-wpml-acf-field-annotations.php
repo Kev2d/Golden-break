@@ -7,11 +7,6 @@ use WPML\FP\Type;
 class WPML_ACF_Field_Annotations implements \IWPML_Backend_Action, \IWPML_Frontend_Action, \IWPML_DIC_Action {
 
 	/**
-	 * @var WPML_ACF_Options_Page
-	 */
-	private $acf_options_page;
-
-	/**
 	 * @var WPML_ACF_Field_Settings
 	 */
 	private $acf_field_settings;
@@ -24,16 +19,13 @@ class WPML_ACF_Field_Annotations implements \IWPML_Backend_Action, \IWPML_Fronte
 	/**
 	 * WPML_ACF_Field_Annotations constructor.
 	 *
-	 * @param WPML_ACF_Options_Page   $options_page
 	 * @param WPML_ACF_Field_Settings $field_settings
 	 * @param \ACFML\Field\Resolver   $fieldResolver
 	 */
 	public function __construct(
-		WPML_ACF_Options_Page $options_page,
 		WPML_ACF_Field_Settings $field_settings,
 		\ACFML\Field\Resolver $fieldResolver
 	) {
-		$this->acf_options_page   = $options_page;
 		$this->acf_field_settings = $field_settings;
 		$this->fieldResolver      = $fieldResolver;
 	}
@@ -54,7 +46,7 @@ class WPML_ACF_Field_Annotations implements \IWPML_Backend_Action, \IWPML_Fronte
 	 * @param mixed $post_id Current post ID.
 	 */
 	public function acf_create_field( $field, $post_id = null ) {
-		if ( $this->acf_options_page->is_acf_options_page() ) {
+		if ( $this->is_acf_options_page() ) {
 			return;
 		}
 
@@ -64,7 +56,6 @@ class WPML_ACF_Field_Annotations implements \IWPML_Backend_Action, \IWPML_Fronte
 
 		if ( $post_id ) {
 			$this->field_original_value( $field, $post_id );
-			$this->display_translated_warning( $field );
 		}
 	}
 
@@ -108,44 +99,6 @@ class WPML_ACF_Field_Annotations implements \IWPML_Backend_Action, \IWPML_Fronte
 		}
 
 		$originalByKey[ $field['key'] ] = true;
-	}
-
-	/**
-	 * @param array $field
-	 */
-	private function display_translated_warning( $field ) {
-		static $warningByKey = [];
-
-		if ( ! isset( $field['key'] ) ) {
-			return;
-		}
-
-		if ( ! $this->is_secondary_language() ) {
-			return;
-		}
-
-		if ( Obj::prop( $field['key'], $warningByKey ) ) {
-			return;
-		}
-
-		$field_object = $this->resolve_field( $field );
-
-		if ( $field_object->has_element_with_display_translated( false, $field ) ) {
-			echo '<div class="wpml_acf_annotation ' . esc_attr( $field_object->field_type() ) . '">';
-			echo sprintf(
-				/* translators: Displayed when editing a relational ACF field in a translation when the related object is set to Display as Translated; %1$s and %2$s turn the string into bold. */
-				esc_html_x(
-					'%1$sWarning%2$s: This field allows to select post type or taxonomy which you set in WPML translation options to "Translatable - use translation if available or fallback to default language". Whatever you set in this field for a secondary language post (this post) will be ignored and values from original post will be used (if you set to copy or duplicate value for this field).',
-					'Displayed when editing a relational ACF field in a translation when the related object is set to Display as Translated; %1$s and %2$s turn the string into bold.',
-					'acfml'
-				),
-				'<strong>',
-				'</strong>'
-			);
-			echo '</div>';
-		}
-
-		$warningByKey[ $field['key'] ] = true;
 	}
 
 	/**
@@ -204,5 +157,15 @@ class WPML_ACF_Field_Annotations implements \IWPML_Backend_Action, \IWPML_Fronte
 		$description .= implode( ' ', $field_data );
 
 		return $description;
+	}
+
+	/**
+	 * @return bool Tells if currently displayed page is ACF options page within wp-admin.
+	 */
+	private function is_acf_options_page() {
+		return is_admin()
+			&& function_exists( 'acf_get_options_page' )
+			/* phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.VIP.SuperGlobalInputUsage.AccessDetected */
+			&& acf_get_options_page( sanitize_text_field( wp_unslash( Obj::prop( 'page', $_REQUEST ) ) ) );
 	}
 }

@@ -34,8 +34,13 @@ class ResetPreferredTranslationService implements \IWPML_Backend_Action {
 		$nonce  = Sanitize::stringProp( 'nonce', $_POST );
 
 		if ( $nonce && $action && wp_verify_nonce( $nonce, $action ) ) {
-			OTGS_Installer()->settings['repositories']['wpml']['ts_info']['preferred'] = null;
-			OTGS_Installer()->refresh_subscriptions_data();
+			$settings = OTGS_Installer()->get_settings();
+
+			if ( isset( $settings['repositories']['wpml']['ts_info'] ) ) {
+				$settings['repositories']['wpml']['ts_info']['preferred'] = null;
+				OTGS_Installer()->save_settings( $settings );
+				OTGS_Installer()->refresh_subscriptions_data();
+			}
 			wp_send_json_success();
 		} else {
 			wp_send_json_error();
@@ -48,7 +53,7 @@ class ResetPreferredTranslationService implements \IWPML_Backend_Action {
 				self::ACTION_ID,
 				WPML_TM_URL . '/res/js/reset-preferred-ts.js',
 				[ 'jquery' ],
-				ICL_SITEPRESS_VERSION
+				ICL_SITEPRESS_SCRIPT_VERSION
 			);
 		}
 	}

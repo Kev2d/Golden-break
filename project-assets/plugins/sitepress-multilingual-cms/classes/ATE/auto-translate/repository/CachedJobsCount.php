@@ -23,10 +23,12 @@ class CachedJobsCount implements JobsCountInterface {
 	 *   needsReviewCount: int
 	 * }
 	 */
-	public function get(): array {
-		$data = Transient::get( self::CACHE_KEY );
-		if ( $data && $this->validateCachedData( $data ) ) {
-			return $data;
+	public function get( $withCache = true ): array {
+		if ( $withCache ) {
+			$data = Transient::get( self::CACHE_KEY );
+			if ( $data && $this->validateCachedData( $data ) ) {
+				return $data;
+			}
 		}
 
 		$data = $this->jobsCount->get();

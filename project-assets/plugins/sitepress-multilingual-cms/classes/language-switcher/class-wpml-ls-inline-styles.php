@@ -146,7 +146,7 @@ class WPML_LS_Inline_Styles {
 		}
 
 		if ( $slot->get( 'font_other_hover' ) || $slot->get( 'background_other_hover' ) ) {
-			$css .= "$wrapper_class a, $wrapper_class .wpml-ls-sub-menu a:hover,$wrapper_class .wpml-ls-sub-menu a:focus, $wrapper_class .wpml-ls-sub-menu a:link:hover, $wrapper_class .wpml-ls-sub-menu a:link:focus  {";
+			$css .= "$wrapper_class .wpml-ls-sub-menu a:hover,$wrapper_class .wpml-ls-sub-menu a:focus, $wrapper_class .wpml-ls-sub-menu a:link:hover, $wrapper_class .wpml-ls-sub-menu a:link:focus  {";
 			$css .= $slot->get( 'font_other_hover' ) ? "color:{$slot->get( 'font_other_hover' )};" : '';
 			$css .= $slot->get( 'background_other_hover' ) ? "background-color:{$slot->get( 'background_other_hover' )};" : '';
 			$css .= '}';
