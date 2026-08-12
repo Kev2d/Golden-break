@@ -17,4 +17,9 @@ if (function_exists('acf_add_options_page')) {
         'menu_title'    => 'Footer',
         'parent_slug'    => 'theme-settings',
     ));
+    acf_add_options_sub_page(array(
+        'page_title'     => 'Theme Analytics',
+        'menu_title'     => 'Analytics',
+        'parent_slug'    => 'theme-settings',
+    ));
 }

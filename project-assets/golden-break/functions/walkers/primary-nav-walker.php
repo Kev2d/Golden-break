@@ -45,9 +45,10 @@ class PrimaryNavWalker extends Walker_Nav_Menu
     public function start_el(&$output, $item, $depth = 0, $args = null, $id = 0)
     {
         $has_children = in_array('menu-item-has-children', $item->classes);
+        $target = !empty($item->target) ? ' target="' . esc_attr($item->target) . '"' : '';
 
         $output .= '<li id="menu-item-' . $item->ID . '" class="' . implode(' ', $item->classes) . '">';
-        $output .= '<a href="' . esc_url($item->url) . '">' . $item->title;
+        $output .= '<a href="' . esc_url($item->url) . '"' . $target . '>' . $item->title;
 
         if (($this->is_mobile || $depth === 0) && $has_children) {
             $chevron_svg = $this->is_mobile ? GetSvg::import('/assets/img/icons/chevron-right.svg', true) : GetSvg::import('/assets/img/icons/chevron-down.svg', true);

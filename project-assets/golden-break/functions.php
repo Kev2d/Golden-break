@@ -1,6 +1,7 @@
 <?php
 $theme_includes = [
   'theme/theme.php',
+  'theme/analytics.php',
   'theme/maintenance.php',
   'theme/required-plugins.php',
   'theme/custom-login.php',
